@@ -1,26 +1,45 @@
-import { Box, Typography, TextField, InputAdornment, IconButton, Chip, Stack } from "@mui/material";
+import { useState } from "react";
+import {
+  Box,
+  Typography,
+  TextField,
+  InputAdornment,
+  IconButton,
+  Chip,
+  Stack,
+} from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
 import MenuIcon from "@mui/icons-material/Menu";
 import BookCard from "../components/BookCard";
+import SideMenu from "../components/SideMenu"; // ← agregamos el menú lateral
 
 export default function Home() {
+  const [menuOpen, setMenuOpen] = useState(false); // controla si el menú está abierto
+
   return (
     <Box p={2}>
       {/* Header */}
       <Box display="flex" alignItems="center" mb={2}>
-        <IconButton><MenuIcon /></IconButton>
+        <IconButton onClick={() => setMenuOpen(true)}>
+          <MenuIcon />
+        </IconButton>
         <Box>
-          <Typography variant="h6" color="primary" fontWeight="bold">Bienvenida, Lucía</Typography>
-          <Typography variant="body2" color="body">
+          <Typography variant="h3" color="primary" fontWeight="bold">
+            Bienvenida, Lucía
+          </Typography>
+          <Typography variant="body2" color="text.secondary">
             Miércoles, Septiembre 17, 2025
           </Typography>
         </Box>
       </Box>
 
+      {/* Drawer lateral */}
+      <SideMenu open={menuOpen} onClose={() => setMenuOpen(false)} active="Inicio" />
+
       {/* Search */}
       <TextField
         fullWidth
-        placeholder="Search"
+        placeholder="Buscar"
         variant="outlined"
         size="small"
         InputProps={{
@@ -42,7 +61,9 @@ export default function Home() {
       </Stack>
 
       {/* Recomendado semanal */}
-      <Typography variant="h6" fontWeight="bold" color="secondary" mb={1}>Recomendado semanal</Typography>
+      <Typography variant="h4" fontWeight="bold" color="secondary" mb={1}>
+        Recomendado semanal
+      </Typography>
       <BookCard
         image="https://via.placeholder.com/150x200"
         title="La Campana de Cristal"
@@ -51,7 +72,9 @@ export default function Home() {
       />
 
       {/* Destacados */}
-      <Typography variant="h6" fontWeight="bold" color="secondary" mt={3} mb={1}>Destacados</Typography>
+      <Typography variant="h4" fontWeight="bold" color="secondary" mt={3} mb={1}>
+        Destacados
+      </Typography>
       <BookCard
         image="https://via.placeholder.com/150x200"
         title="La Resistencia"
