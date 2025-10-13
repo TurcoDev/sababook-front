@@ -1,58 +1,62 @@
+import React, { useState } from "react";
+import { InputAdornment, IconButton, styled, OutlinedInput, FormControl } from "@mui/material";
+import SearchIcon from "@mui/icons-material/Search";
 
-import React, { useState } from 'react';
-import { TextField, InputAdornment, styled, useTheme } from '@mui/material';
-import SearchIcon from '@mui/icons-material/Search';
+const StyledFormControl = styled(FormControl)(({ theme }) => ({
+  width: "100%",
+  marginBottom: theme.spacing(3),
+  "& .MuiOutlinedInput-root": {
+    backgroundColor: theme.palette.grey[100],
+    borderRadius: "8px",
+    boxShadow: "0 1px 3px rgba(0,0,0,0.1)",
+    transition: "box-shadow 0.3s, background-color 0.3s",
+    padding: "6px 16px",
 
-const StyledTextField = styled(TextField)(({ theme }) => ({
-  '& .MuiOutlinedInput-root': {
-    backgroundColor: theme.palette.grey[100], 
-    borderRadius: '8px',
-    padding: '4px 0',
-    
-    '& fieldset': {
-      border: 'none', 
+    "& fieldset": { border: "none" },
+
+    "& .MuiInputBase-input": {
+      padding: 0,
     },
-    '&.Mui-focused fieldset': {
-      borderColor: 'transparent',
+
+    "&.Mui-focused": {
+      boxShadow: "0 4px 10px rgba(0,0,0,0.15)",
+      backgroundColor: theme.palette.common.white,
     },
+    "&.Mui-focused fieldset": { borderColor: "transparent" },
   },
-  '& .MuiInputBase-input::placeholder': {
+  "& input::placeholder": {
     color: theme.palette.text.secondary,
     opacity: 1,
   },
 }));
 
-/**
- * @param {function} props.onSearchChange -
- */
-const SearchBar = ({ onSearchChange }) => {
-  const [searchValue, setSearchValue] = useState('');
+const SearchBar = ({ onSearch }) => {
+  const [query, setQuery] = useState("");
 
-  const handleChange = (event) => {
-    const value = event.target.value;
-    setSearchValue(value);
-    
-    if (onSearchChange) {
-      onSearchChange(value);
-    }
+  const handleSearch = () => {
+    if (onSearch) onSearch(query);
+  };
+
+  const handleKeyPress = (e) => {
+    if (e.key === "Enter") handleSearch();
   };
 
   return (
-    <StyledTextField
-      variant="outlined"
-      placeholder="Buscar..."
-      size="small"
-      value={searchValue}
-      onChange={handleChange}
-      InputProps={{
-        startAdornment: (
-          <InputAdornment position="start" sx={{ marginLeft: '8px' }}>
-            <SearchIcon sx={{ color: 'text.secondary' }} />
+    <StyledFormControl variant="outlined">
+      <OutlinedInput
+        placeholder="Buscar libros, autores o géneros..."
+        value={query}
+        onChange={(e) => setQuery(e.target.value)}
+        onKeyDown={handleKeyPress}
+        endAdornment={
+          <InputAdornment position="end">
+            <IconButton edge="end" color="primary" onClick={handleSearch}>
+              <SearchIcon />
+            </IconButton>
           </InputAdornment>
-        ),
-      }}
-      sx={{ width: '300px' }} 
-    />
+        }
+      />
+    </StyledFormControl>
   );
 };
 
