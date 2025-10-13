@@ -1,4 +1,4 @@
-{/*Implementacion de Routes: npm install react-router-dom*/}
+//Implementacion de Routes: npm install react-router-dom
 import React from "react";
 import { Routes, Route } from 'react-router-dom'; 
 import Home from "./pages/Home";
