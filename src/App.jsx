@@ -1,12 +1,18 @@
 import React from "react";
+import { Routes, Route } from 'react-router-dom'; 
 import Home from "./pages/Home";
-import LoginPage from "./pages/LoginRegister";
+import LoginPage from "./pages/LoginRegister"; 
+import Favs from "./pages/Favs";
+
 function App() {
   return (
-    <>
-   
-      <LoginPage/>
-    </>
+    <Routes>
+      <Route path="/" element={<LoginPage />} /> 
+      <Route path="/home" element={<Home />} /> 
+      <Route path="/favoritos" element={<Favs />} />
+      <Route path="*" element={<div>Página no encontrada (404)</div>} />
+
+    </Routes>
   );
 }
 

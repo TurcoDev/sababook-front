@@ -7,7 +7,12 @@ import {
   Chip,
   Button,
   Box,
+  IconButton,
 } from "@mui/material";
+
+
+import FavoriteIcon from '@mui/icons-material/Favorite';
+import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
 
 // Define un valor para el padding horizontal que será común para el contenido
 const HORIZONTAL_PADDING = 2; // (Equivale a 16px en el tema de Material-UI)
@@ -17,7 +22,9 @@ export default function BookCard({
   title,
   rating,
   progress,
-  featured = false, // si es true → se usa para el recomendado semanal
+  featured = false,
+  isFavorite = false,
+  onFavoriteToggle,
 }) {
   return (
     <Card
@@ -27,8 +34,8 @@ export default function BookCard({
         borderRadius: 3,
         boxShadow: "0 3px 10px rgba(0,0,0,0.1)",
         bgcolor: "#fff",
-        px: 3, 
-        py: 1.5, 
+        px: 3,
+        py: 1.5,
         maxWidth: featured ? 500 : 320,
         minWidth: featured ? 400 : 300,
         transition: "transform 0.2s, box-shadow 0.2s",
@@ -39,21 +46,55 @@ export default function BookCard({
         mb: 2,
       }}
     >
-      {/* Imagen del libro */}
-      <CardMedia
-        component="img"
-        image={image}
-        alt={title}
+
+      <Box
         sx={{
+          position: 'relative',
           width: featured ? 145 : 110,
           height: featured ? 200 : 155,
-          borderRadius: 2,
-          objectFit: "cover",
           mr: 2,
         }}
-      />
+      >
 
-      {/* Contenido a la derecha */}
+        <CardMedia
+          component="img"
+          image={image}
+          alt={title}
+          sx={{
+            width: '100%',
+            height: '100%',
+            borderRadius: 2,
+            objectFit: "cover",
+          }}
+        />
+
+        <IconButton
+          aria-label="Toggle favorite"
+          onClick={onFavoriteToggle}
+          sx={{
+            position: 'absolute',
+            top: 4,
+            right: 4,
+            p: 0.5,
+            bgcolor: 'rgba(255, 255, 255, 0.7)',
+            bgcolor: 'rgba(255, 255, 255, 0.9)',
+          }}
+        >
+
+          {isFavorite ? (
+            <FavoriteIcon
+              fontSize="small"
+              sx={{ color: 'red' }}
+            />
+          ) : (
+            <FavoriteBorderIcon
+              fontSize="small"
+              sx={{ color: 'red' }}
+            />
+          )}
+        </IconButton>
+      </Box>
+
       <CardContent
         sx={{
           flex: 1,
@@ -63,14 +104,14 @@ export default function BookCard({
           height: '100%',
         }}
       >
-        {/* Bloque para el Contenido Superior (Título, Rating, Chip) */}
+
         <Box sx={{
           px: HORIZONTAL_PADDING,
           pt: 1,
-          pb: 1, 
+          pb: 1,
         }}>
           <Typography
-            variant={featured ? "h6" : "subtitle1"}
+            variant={featured ? "h5" : "subtitle1"}
             fontWeight="bold"
             sx={{ mb: 0.5 }}
           >
@@ -84,15 +125,16 @@ export default function BookCard({
             size={featured ? "medium" : "small"}
           />
           <Typography
-            variant="body2"
-            color="body"
+            variant="h6"
+            color="subtitle"
+            fontWeight="bold"
             sx={{ mt: 0.2, mb: 1 }}
           >
             {rating.toFixed(1)}
           </Typography>
           <Box mt={1}>
             <Chip
-              label={`${progress}% leído`}
+              label={`${progress}%`}
               color="primary"
               size="small"
               sx={{ fontSize: "0.75rem" }}
@@ -100,16 +142,14 @@ export default function BookCard({
           </Box>
         </Box>
 
-
-        {/* Bloque para el Botón (Usa mt: 'auto' para irse al fondo) */}
         <Box
           sx={{
             display: "flex",
             justifyContent: "flex-end",
-            mt: 'auto', 
+            mt: 'auto',
             px: HORIZONTAL_PADDING,
-            pt: 1, 
-            pb: 0, 
+            pt: 1,
+            pb: 0,
           }}
         >
           <Button
