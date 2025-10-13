@@ -12,7 +12,7 @@ import SearchBar from "../components/SearchBar";
 import LogoImage from '../assets/logo.png';
 import LibroImage from '../assets/libro.jpg'
 
-// 1. Data inicial de los libros con estado de favorito
+
 const INITIAL_BOOKS = [
   { id: 1, title: "La Resistencia", rating: 4.7, progress: 90, isFavorite: true, image: LibroImage },
   { id: 2, title: "El Principito", rating: 4.8, progress: 50, isFavorite: true, image: LibroImage },
@@ -25,32 +25,28 @@ const INITIAL_BOOKS = [
 
 export default function Favs() {
   const [menuOpen, setMenuOpen] = useState(false);
-  // 2. Usar useState para manejar la lista de libros
   const [books, setBooks] = useState(INITIAL_BOOKS);
 
-  // Función que maneja la búsqueda
   const handleSearch = (query) => {
     console.log("Buscando:", query);
     // aca se haria la llamada a la API
   };
   
-  // 3. Función para cambiar el estado de favorito de un libro por su ID
+
   const handleFavoriteToggle = (bookId) => {
     // Actualizamos el estado de los libros
     setBooks(prevBooks => 
       prevBooks.map(book => {
         // Si el ID del libro coincide, invertimos su estado 'isFavorite'
         if (book.id === bookId) {
-          // Nota: En una aplicación real, aquí también harías la llamada a la API para guardar el cambio.
+          // Nota: aca iria la llamada a la API para guardar el cambio.
           return { ...book, isFavorite: !book.isFavorite };
         }
-        // Si no coincide, devolvemos el libro sin cambios
         return book;
       })
     );
   };
 
-  // Filtramos para mostrar solo los libros que son favoritos (ya que estamos en la vista de "Favoritos")
   const favoriteBooks = books.filter(book => book.isFavorite);
 
 
@@ -64,7 +60,7 @@ export default function Favs() {
         margin: "0 auto"
       }}
     >
-      {/* ... (Header y SideMenu sin cambios) ... */}
+      {/* ... (Header y SideMenu */}
       <Box display="flex"
         alignItems="center"
         justifyContent="space-between"
@@ -91,8 +87,8 @@ export default function Favs() {
           alt="Logo de la aplicación"
           sx={{
             height: {
-              xs: 40, // 40px en pantallas pequeñas
-              sm: 50  // 50px en pantallas medianas/grandes
+              xs: 40, 
+              sm: 50, 
             },
             width: 'auto',
             ml: 2,
