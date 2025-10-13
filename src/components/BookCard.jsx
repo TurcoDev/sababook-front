@@ -76,7 +76,6 @@ export default function BookCard({
             top: 4,
             right: 4,
             p: 0.5,
-            bgcolor: 'rgba(255, 255, 255, 0.7)',
             bgcolor: 'rgba(255, 255, 255, 0.9)',
           }}
         >
