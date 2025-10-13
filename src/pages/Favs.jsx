@@ -2,14 +2,13 @@ import { useState } from "react";
 import {
   Box,
   Typography,
-  IconButton,
 } from "@mui/material";
 
-import MenuIcon from "@mui/icons-material/Menu";
+import AppHeader from "../components/AppHeader"; 
 import BookCard from "../components/BookCard";
 import SideMenu from "../components/SideMenu";
 import SearchBar from "../components/SearchBar";
-import LogoImage from '../assets/logo.png';
+
 import LibroImage from '../assets/libro.jpg'
 
 
@@ -60,53 +59,26 @@ export default function Favs() {
         margin: "0 auto"
       }}
     >
-      {/* ... (Header y SideMenu */}
-      <Box display="flex"
-        alignItems="center"
-        justifyContent="space-between"
-        mb={2}>
-        {/* BLOQUE IZQUIERDO: Menú y Saludo */}
-        <Box display="flex" alignItems="center">
-          <IconButton onClick={() => setMenuOpen(true)} sx={{ mr: 1 }}>
-            <MenuIcon />
-          </IconButton>
-          <Box>
-            <Typography variant="h4" color="primary" fontWeight="bold">
-              Bienvenida, Lucía
-            </Typography>
-            <Typography variant="body2" color="text.secondary">
-              Miércoles, Septiembre 17, 2025
-            </Typography>
-          </Box>
-        </Box>
-
-        {/* BLOQUE DERECHO: Logo */}
-        <Box
-          component="img"
-          src={LogoImage}
-          alt="Logo de la aplicación"
-          sx={{
-            height: {
-              xs: 40, 
-              sm: 50, 
-            },
-            width: 'auto',
-            ml: 2,
-          }}
-        />
-      </Box>
-
+      
+     
+      <AppHeader 
+        onMenuClick={() => setMenuOpen(true)}
+        title="Mis Favoritos" 
+        subtitle={`Tienes ${favoriteBooks.length} libros favoritos`} 
+      />
+     
       {/* Drawer lateral */}
-      <SideMenu open={menuOpen} onClose={() => setMenuOpen(false)} active="Inicio" />
+      <SideMenu open={menuOpen} onClose={() => setMenuOpen(false)} active="Favoritos" /> 
 
 
       {/* SearchBar personalizada */}
       <Box mb={2}>
         <SearchBar onSearch={handleSearch} />
       </Box>
+      
       {/* Favs */}
-      <Typography variant="h5" fontWeight="bold" color="secondary" mt={3} mb={1}>
-       Favoritos
+      <Typography variant="h5" fontWeight="bold" color="secondary"  mb={2}>
+       Tu Colección Favorita
       </Typography>
 
       <Box
@@ -125,8 +97,8 @@ export default function Favs() {
                 title={book.title}
                 rating={book.rating}
                 progress={book.progress}
-                isFavorite={book.isFavorite} // Pasamos el estado actual
-                onFavoriteToggle={() => handleFavoriteToggle(book.id)} //  Pasamos la función con el ID
+                isFavorite={book.isFavorite} 
+                onFavoriteToggle={() => handleFavoriteToggle(book.id)} 
             />
         ))}
         

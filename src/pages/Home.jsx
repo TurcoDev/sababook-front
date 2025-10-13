@@ -2,15 +2,14 @@ import { useState } from "react";
 import {
   Box,
   Typography,
-  IconButton,
 } from "@mui/material";
 
-import MenuIcon from "@mui/icons-material/Menu";
+
+import AppHeader from "../components/AppHeader"; 
 import BookCard from "../components/BookCard";
 import SideMenu from "../components/SideMenu";
 import SearchBar from "../components/SearchBar";
 import FilterChips from "../components/FilterChips";
-import LogoImage from '../assets/logo.png';
 import LibroImage from '../assets/libro.jpg'
 
 const INITIAL_BOOKS = [
@@ -19,7 +18,7 @@ const INITIAL_BOOKS = [
   { id: 3, title: "Rayuela", rating: 4.6, progress: 80, isFavorite: true, image: LibroImage },
 ];
 
-// Data del libro recomendado semanal (puede ser manejado por separado si es un caso especial)
+
 const FEATURED_BOOK = {
   id: 0,
   title: "La Campana de Cristal",
@@ -32,28 +31,22 @@ const FEATURED_BOOK = {
 
 export default function Home() {
   const [menuOpen, setMenuOpen] = useState(false);
-  // useState para manejar la lista de libros destacados
   const [books, setBooks] = useState(INITIAL_BOOKS);
-  // useState para manejar el libro destacado (featured)
   const [featuredBook, setFeaturedBook] = useState(FEATURED_BOOK);
 
 
-  // Función que maneja la búsqueda
   const handleSearch = (query) => {
     console.log("Buscando:", query);
     // aca se haria la llamada a la API
   };
 
-  // Función para cambiar el estado de favorito de un libro por su ID
   const handleFavoriteToggle = (bookId, isFeatured = false) => {
     if (isFeatured) {
-      // Manejar el libro destacado
       setFeaturedBook(prevBook => ({
         ...prevBook,
         isFavorite: !prevBook.isFavorite
       }));
     } else {
-      // Manejar los libros de la lista Destacados
       setBooks(prevBooks =>
         prevBooks.map(book => {
           if (book.id === bookId) {
@@ -76,42 +69,12 @@ export default function Home() {
       }}
     >
 
-      {/* Header */}
-      <Box display="flex"
-        alignItems="center"
-        justifyContent="space-between"
-        mb={2}>
-        {/* BLOQUE IZQUIERDO: Menú y Saludo */}
-        <Box display="flex" alignItems="center">
-          <IconButton onClick={() => setMenuOpen(true)} sx={{ mr: 1 }}>
-            <MenuIcon />
-          </IconButton>
-          <Box>
-
-            <Typography variant="h4" color="primary" fontWeight="bold">
-              Bienvenida, Lucía
-            </Typography>
-            <Typography variant="body2" color="text.secondary">
-              Miércoles, Septiembre 17, 2025
-            </Typography>
-          </Box>
-        </Box>
-
-        {/* BLOQUE DERECHO: Logo */}
-        <Box
-          component="img"
-          src={LogoImage}
-          alt="Logo de la aplicación"
-          sx={{
-            height: {
-              xs: 40,
-              sm: 50
-            },
-            width: 'auto',
-            ml: 2,
-          }}
-        />
-      </Box>
+  
+      <AppHeader
+        onMenuClick={() => setMenuOpen(true)}
+        title="Bienvenida, Lucía"
+        subtitle="Miércoles, Septiembre 17, 2025"
+      />
 
       {/* Drawer lateral */}
       <SideMenu open={menuOpen} onClose={() => setMenuOpen(false)} active="Inicio" />
@@ -140,8 +103,8 @@ export default function Home() {
           title={featuredBook.title}
           rating={featuredBook.rating}
           progress={featuredBook.progress}
-          isFavorite={featuredBook.isFavorite} // Pasa el estado del recomendado
-          onFavoriteToggle={() => handleFavoriteToggle(featuredBook.id, true)} // 👈 Pasa la función con flag 'true'
+          isFavorite={featuredBook.isFavorite}
+          onFavoriteToggle={() => handleFavoriteToggle(featuredBook.id, true)}
         />
       </Box>
 
@@ -167,8 +130,8 @@ export default function Home() {
             title={book.title}
             rating={book.rating}
             progress={book.progress}
-            isFavorite={book.isFavorite} // Pasa el estado
-            onFavoriteToggle={() => handleFavoriteToggle(book.id, false)} // 👈 Pasa la función con flag 'false'
+            isFavorite={book.isFavorite}
+            onFavoriteToggle={() => handleFavoriteToggle(book.id, false)}
           />
         ))}
 
