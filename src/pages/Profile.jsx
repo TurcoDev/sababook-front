@@ -1,5 +1,8 @@
 import React, { useState } from 'react';
 import { Box, Button, styled, Avatar, Typography } from '@mui/material';
+// 👈 IMPORTAR: useNavigate para la navegación
+import { useNavigate } from 'react-router-dom'; 
+
 import AppHeader from '../components/AppHeader'; 
 import SideMenu from '../components/SideMenu';
 import UserProfileForm from '../components/UserProfileForm'; 
@@ -17,7 +20,11 @@ const StyledButton = styled(Button)(({ theme }) => ({
 }));
 
 
-const Profile = ({ onMyCommentsClick }) => {
+// ⚠️ Se eliminó la prop 'onMyCommentsClick'
+const Profile = () => { 
+  // 💡 INICIALIZAR: Hook de navegación
+  const navigate = useNavigate(); 
+  
   const [menuOpen, setMenuOpen] = useState(false);
   const [currentView, setCurrentView] = useState('menu'); 
   
@@ -25,7 +32,7 @@ const Profile = ({ onMyCommentsClick }) => {
   const [userData, setUserData] = useState({
     userName: "Lucía Gómez",
     userEmail: "lucia.gomez@mail.com",
-    avatarUrl: "https://i.pravatar.cc/150?img=1", // Inicializamos la URL aquí
+    avatarUrl: "https://i.pravatar.cc/150?img=1",
   });
 
  
@@ -35,7 +42,7 @@ const Profile = ({ onMyCommentsClick }) => {
   const handleChangeAvatar = (newUrl) => {
       setUserData(prevData => ({
           ...prevData,
-          avatarUrl: newUrl // Actualiza solo la URL
+          avatarUrl: newUrl
       }));
   };
 
@@ -45,7 +52,12 @@ const Profile = ({ onMyCommentsClick }) => {
   const handleSave = () => {
     // Aquí iría la lógica para enviar userData a la API
     console.log("Datos guardados. Volviendo al menú.");
-    handleCancel(); // Vuelve al menú después de guardar
+    handleCancel();
+  };
+  
+  // 💡 NUEVA FUNCIÓN: Redirige a la página de Mis Comentarios
+  const handleMyCommentsClick = () => {
+    navigate('/mis-comentarios'); 
   };
   
   // -----------------------------------------------------
@@ -60,7 +72,6 @@ const Profile = ({ onMyCommentsClick }) => {
           userName={userName} 
           onCancel={handleCancel}
           onSave={handleSave}
-
           onAvatarChange={handleChangeAvatar} 
           currentAvatarUrl={avatarUrl} 
         />  
@@ -82,7 +93,7 @@ const Profile = ({ onMyCommentsClick }) => {
         >
           <Avatar 
             alt={userName} 
-            src={avatarUrl} // Usa la URL del estado (avatarUrl)
+            src={avatarUrl}
             sx={{ width: 240, height: 240, mb: 1.5 }} 
           />
           <Typography variant="h5" fontWeight="bold">
@@ -113,10 +124,11 @@ const Profile = ({ onMyCommentsClick }) => {
             Modificar Perfil
           </StyledButton>
 
-          {/* Botón 2: Mis Comentarios */}
+          {/* Botón 2: Mis Comentarios (MODIFICADO) */}
           <StyledButton
             variant="contained"
-            onClick={onMyCommentsClick}
+            // ✅ Usa la nueva función de navegación
+            onClick={handleMyCommentsClick} 
             fullWidth
           >
             Mis Comentarios
