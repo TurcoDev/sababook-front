@@ -1,4 +1,4 @@
-//Implementacion de Routes: npm install react-router-dom
+
 import React from "react";
 import { Routes, Route } from 'react-router-dom'; 
 import Home from "./pages/Home";
@@ -21,7 +21,7 @@ function App() {
           <Route path="/perfil" element={<Profile />} />
    <Route path="/mis-comentarios" element={<MyComments />} />
       <Route path="*" element={<div>Página no encontrada (404)</div>} />
-     <Route path="/book/:id" element={<BookDetailsPage />} /> {/* ✅ nueva ruta */}
+     <Route path="/book/:id" element={<BookDetailsPage />} /> 
 
     </Routes>
   );

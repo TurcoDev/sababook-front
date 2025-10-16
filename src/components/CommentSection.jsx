@@ -11,17 +11,16 @@ import {
     useTheme
 } from '@mui/material';
 
-// Importa NavButton si lo necesitas aquí, pero para no romperlo, usaré un botón simple.
-// import NavButton from './NavButton'; // Descomenta si usas NavButton aquí
 
-// Datos de ejemplo para los comentarios
+
+
 const COMMENTS = [
     { id: 1, user: 'Ana G.', time: 'Hace 5 horas', text: '¡Excelente libro! La narrativa te atrapa desde la primera página.' },
     { id: 2, user: 'Pedro L.', time: 'Ayer', text: 'Esperaba un poco más del final, pero la construcción de personajes es impecable.' },
-    // ... más comentarios
+    
 ];
 
-// Estilo para el botón de enviar (usando tu color primario naranja)
+
 const StyledSendButton = styled(Button)(({ theme }) => ({
     backgroundColor: theme.palette.button?.main || '#f25600',
     '&:hover': {
@@ -35,7 +34,7 @@ const StyledSendButton = styled(Button)(({ theme }) => ({
     minWidth: '100px',
 }));
 
-// Estilo para el contenedor de cada comentario
+
 const CommentBox = styled(Box)(({ theme }) => ({
     display: 'flex',
     gap: theme.spacing(2),
@@ -65,7 +64,7 @@ const CommentSection = () => {
             </Typography>
             <Divider sx={{ mb: 3 }} />
 
-            {/* Formulario de Nuevo Comentario */}
+           
             <Box mb={4}>
                 <Typography variant="subtitle1" fontWeight="bold" mb={1}>
                     Deja tu comentario
@@ -91,7 +90,7 @@ const CommentSection = () => {
                 </Box>
             </Box>
 
-            {/* Lista de Comentarios */}
+            
             <Box>
                 {COMMENTS.map((comment) => (
                     <CommentBox key={comment.id}>

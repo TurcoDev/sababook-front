@@ -1,4 +1,4 @@
-// src/views/BookDetails.jsx
+
 
 import React from 'react';
 import { 
@@ -11,18 +11,18 @@ import {
     useTheme,
 } from '@mui/material';
 
-// 🛑 IMPORTACIONES CLAVE (¡Verifica estas rutas!) 🛑
+
 import AppHeader from '../components/AppHeader'; 
 import NavButton from '../components/NavButton'; 
-// import CommentSection from '../components/CommentSection'; // No lo usamos directamente en este layout.
 
-// Datos de ejemplo
+
+
 const MOCK_BOOK_DATA = {
     title: "La Campana de Cristal",
     author: "Sylvia Plath",
     rating: 3.9,
     status: "78%", 
-    // Usamos una imagen de prueba. Reemplázala con tu imagen real (ej: ../assets/portada.jpg)
+  
     coverImage: "https://via.placeholder.com/100x150/D32F2F/FFFFFF?text=PORTADA", 
     description: "La campana de cristal es una novela de carácter semiautobiográfico. A través de la joven Esther Greenwood, la experiencia de una joven brillante que enfrenta una profunda crisis existencial y emocional.",
 };
@@ -44,7 +44,7 @@ const BookDetails = () => {
                 margin: '0 auto',
             }}
         >
-            {/* 1. AppHeader (Necesita el archivo AppHeader.jsx) */}
+            
             <AppHeader 
                 onMenuClick={handleMenuToggle} 
                 title="LIBRO - VER MÁS" 
@@ -53,9 +53,9 @@ const BookDetails = () => {
 
             <Paper elevation={3} sx={{ p: { xs: 2, md: 3 }, borderRadius: '16px', mb: 4 }}>
                 
-                {/* 1. SECCIÓN SUPERIOR: IMAGEN, TÍTULO Y PORCENTAJE */}
+                
                 <Box display="flex" alignItems="flex-start" gap={2}>
-                    {/* Imagen de la Cubierta */}
+                 
                     <Box 
                         component="img"
                         src={book.coverImage}
@@ -65,12 +65,12 @@ const BookDetails = () => {
                             height: 'auto', 
                             objectFit: 'cover',
                             borderRadius: '8px',
-                            border: '2px solid #D32F2F', // Borde rojo simulando el boceto
+                            border: '2px solid #D32F2F', 
                             boxShadow: '0 4px 8px rgba(0,0,0,0.2)',
                         }}
                     />
 
-                    {/* Título, Autor y Chip de Porcentaje */}
+                   
                     <Box flexGrow={1} textAlign="left">
                         <Typography variant="body1" fontWeight="bold" sx={{ color: theme.palette.text.primary }}>
                             {book.author}
@@ -103,7 +103,7 @@ const BookDetails = () => {
                         </Typography>
                     </Box>
                     
-                    {/* Botón Comentar (Necesita el archivo NavButton.jsx) */}
+                   
                     <NavButton onClick={handleCommentClick} sx={{ width: '150px', height: '40px', padding: '8px 16px' }}>
                         Comentar
                     </NavButton>
@@ -111,7 +111,7 @@ const BookDetails = () => {
                 
                 <Divider sx={{ my: 3 }} />
 
-                {/* 3. SECCIÓN DE DESCRIPCIÓN Y COMENTARIOS PREVIOS */}
+                
                 <Box textAlign="left" mt={2}>
                     <Typography variant="subtitle1" fontWeight="bold" mb={1}>
                         Descripción
@@ -119,8 +119,7 @@ const BookDetails = () => {
                     <Typography variant="body2" paragraph>
                         {book.description}...
                     </Typography>
-                    
-                    {/* Contenedor del Comentario Destacado (Simulación) */}
+                  
                     <Paper variant="outlined" sx={{ p: 1.5, my: 2, borderRadius: '10px' }}>
                         <Box display="flex" justifyContent="space-between" alignItems="center">
                              <Typography variant="body2" fontWeight="bold">Pablo</Typography>
@@ -130,7 +129,7 @@ const BookDetails = () => {
                         <Typography variant="body2" mt={1}>"Un libro sensible, para pensar..."</Typography>
                     </Paper>
                     
-                    {/* Botón de Ver todos los comentarios */}
+                    
                     <NavButton 
                         onClick={() => console.log("Ver todos los comentarios")} 
                         sx={{ 
