@@ -5,6 +5,8 @@ import Home from "./pages/Home";
 import LoginPage from "./pages/LoginRegister"; 
 import Favs from "./pages/Favs";
 import Profile from "./pages/Profile";
+import BookDetailsPage from "./pages/BookDetailsPage";
+
 
 function App() {
   return (
@@ -14,6 +16,7 @@ function App() {
       <Route path="/favoritos" element={<Favs />} />
           <Route path="/perfil" element={<Profile />} />
       <Route path="*" element={<div>Página no encontrada (404)</div>} />
+     <Route path="/book/:id" element={<BookDetailsPage />} /> {/* ✅ nueva ruta */}
 
     </Routes>
   );
