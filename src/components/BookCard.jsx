@@ -20,6 +20,9 @@ const HORIZONTAL_PADDING = 2; // (Equivale a 16px en el tema de Material-UI)
 export default function BookCard({
   image,
   title,
+  autor,
+  gender,
+  description,
   rating,
   progress,
   featured = false,
@@ -116,9 +119,24 @@ export default function BookCard({
           >
             {title}
           </Typography>
-
+          {/* Agrega autor, género y descripción */}
+          {autor && (
+            <Typography variant="body2" color="text.secondary" sx={{ mb: 0.5 }}>
+              <b>Autor:</b> {autor}
+            </Typography>
+          )}
+          {gender && (
+            <Typography variant="body2" color="text.secondary" sx={{ mb: 0.5 }}>
+              <b>Género:</b> {gender}
+            </Typography>
+          )}
+          {description && (
+            <Typography variant="body2" color="text.secondary" sx={{ mb: 0.5 }}>
+              {description}
+            </Typography>
+          )}
           <Rating
-            value={rating}
+            value={rating ?? 0}
             precision={0.5}
             readOnly
             size={featured ? "medium" : "small"}
@@ -129,11 +147,11 @@ export default function BookCard({
             fontWeight="bold"
             sx={{ mt: 0.2, mb: 1 }}
           >
-            {rating.toFixed(1)}
+            {rating?.toFixed(1)}
           </Typography>
           <Box mt={1}>
             <Chip
-              label={`${progress}%`}
+              label={`${progress ?? 0}%`}
               color="primary"
               size="small"
               sx={{ fontSize: "0.75rem" }}
