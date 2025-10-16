@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Box,
   Typography,
@@ -11,12 +11,7 @@ import SideMenu from "../components/SideMenu";
 import SearchBar from "../components/SearchBar";
 import FilterChips from "../components/FilterChips";
 import LibroImage from '../assets/libro.jpg'
-
-const INITIAL_BOOKS = [
-  { id: 1, title: "La Resistencia", rating: 4.7, progress: 90, isFavorite: true, image: LibroImage },
-  { id: 2, title: "El Principito", rating: 4.8, progress: 50, isFavorite: false, image: LibroImage },
-  { id: 3, title: "Rayuela", rating: 4.6, progress: 80, isFavorite: true, image: LibroImage },
-];
+import { API_BASE_URL } from "../environments/api";
 
 
 const FEATURED_BOOK = {
@@ -31,8 +26,20 @@ const FEATURED_BOOK = {
 
 export default function Home() {
   const [menuOpen, setMenuOpen] = useState(false);
-  const [books, setBooks] = useState(INITIAL_BOOKS);
+  const [books, setBooks] = useState([]);
   const [featuredBook, setFeaturedBook] = useState(FEATURED_BOOK);
+
+  useEffect(() => {
+    fetch(`${API_BASE_URL}/api/v1/libros`)
+      .then(res => res.json())
+      .then(data => {
+        setBooks(data);
+        console.log("Libros cargados:", data);
+      })
+      .catch(err => {
+        console.error("Error cargando libros:", err);
+      });
+  }, []);
 
 
   const handleSearch = (query) => {
@@ -125,9 +132,12 @@ export default function Home() {
         {/*Mapear la lista de libros destacados */}
         {books.map((book) => (
           <BookCard
-            key={book.id}
-            image={book.image}
-            title={book.title}
+            key={book.libro_id}
+            image={book.portada_url}
+            autor={book.autor}
+            gender={book.genero}
+            title={book.titulo}
+            description={book.descripcion}
             rating={book.rating}
             progress={book.progress}
             isFavorite={book.isFavorite}

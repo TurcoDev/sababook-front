@@ -5,7 +5,11 @@ import Home from "./pages/Home";
 import LoginPage from "./pages/LoginRegister"; 
 import Favs from "./pages/Favs";
 import Profile from "./pages/Profile";
+
 import BookDetailsPage from "./pages/BookDetailsPage";
+
+
+import MyComments from "./pages/MyComments";
 
 
 function App() {
@@ -15,6 +19,7 @@ function App() {
       <Route path="/home" element={<Home />} /> 
       <Route path="/favoritos" element={<Favs />} />
           <Route path="/perfil" element={<Profile />} />
+   <Route path="/mis-comentarios" element={<MyComments />} />
       <Route path="*" element={<div>Página no encontrada (404)</div>} />
      <Route path="/book/:id" element={<BookDetailsPage />} /> {/* ✅ nueva ruta */}
 
