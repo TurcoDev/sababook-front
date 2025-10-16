@@ -1,63 +1,151 @@
-import { Box, Typography, TextField, InputAdornment, IconButton, Chip, Stack } from "@mui/material";
-import SearchIcon from "@mui/icons-material/Search";
-import MenuIcon from "@mui/icons-material/Menu";
+import { useState, useEffect } from "react";
+import {
+  Box,
+  Typography,
+} from "@mui/material";
+
+
+import AppHeader from "../components/AppHeader"; 
 import BookCard from "../components/BookCard";
+import SideMenu from "../components/SideMenu";
+import SearchBar from "../components/SearchBar";
+import FilterChips from "../components/FilterChips";
+import LibroImage from '../assets/libro.jpg'
+import { API_BASE_URL } from "../environments/api";
+
+
+const FEATURED_BOOK = {
+  id: 0,
+  title: "La Campana de Cristal",
+  rating: 4.2,
+  progress: 80,
+  isFavorite: false,
+  image: LibroImage
+};
+
 
 export default function Home() {
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [books, setBooks] = useState([]);
+  const [featuredBook, setFeaturedBook] = useState(FEATURED_BOOK);
+
+  useEffect(() => {
+    fetch(`${API_BASE_URL}/api/v1/libros`)
+      .then(res => res.json())
+      .then(data => {
+        setBooks(data);
+        console.log("Libros cargados:", data);
+      })
+      .catch(err => {
+        console.error("Error cargando libros:", err);
+      });
+  }, []);
+
+
+  const handleSearch = (query) => {
+    console.log("Buscando:", query);
+    // aca se haria la llamada a la API
+  };
+
+  const handleFavoriteToggle = (bookId, isFeatured = false) => {
+    if (isFeatured) {
+      setFeaturedBook(prevBook => ({
+        ...prevBook,
+        isFavorite: !prevBook.isFavorite
+      }));
+    } else {
+      setBooks(prevBooks =>
+        prevBooks.map(book => {
+          if (book.id === bookId) {
+            return { ...book, isFavorite: !book.isFavorite };
+          }
+          return book;
+        })
+      );
+    }
+  };
+
   return (
-    <Box p={2}>
-      {/* Header */}
-      <Box display="flex" alignItems="center" mb={2}>
-        <IconButton><MenuIcon /></IconButton>
-        <Box>
-          <Typography variant="h6" color="primary" fontWeight="bold">Bienvenida, Lucía</Typography>
-          <Typography variant="body2" color="body">
-            Miércoles, Septiembre 17, 2025
-          </Typography>
-        </Box>
+    <Box
+      py={2}
+      px={1}
+      sx={{
+        width: '100%',
+        maxWidth: 1000,
+        margin: "0 auto"
+      }}
+    >
+
+  
+      <AppHeader
+        onMenuClick={() => setMenuOpen(true)}
+        title="Bienvenida, Lucía"
+        subtitle="Miércoles, Septiembre 17, 2025"
+      />
+
+      {/* Drawer lateral */}
+      <SideMenu open={menuOpen} onClose={() => setMenuOpen(false)} active="Inicio" />
+
+
+      {/* SearchBar personalizada */}
+      <Box mb={2}>
+        <SearchBar onSearch={handleSearch} />
       </Box>
 
-      {/* Search */}
-      <TextField
-        fullWidth
-        placeholder="Search"
-        variant="outlined"
-        size="small"
-        InputProps={{
-          endAdornment: (
-            <InputAdornment position="end">
-              <SearchIcon />
-            </InputAdornment>
-          ),
-        }}
-        sx={{ mb: 2 }}
-      />
 
-      {/* Chips de filtros */}
-      <Stack direction="row" spacing={1} mb={2} sx={{ overflowX: "auto" }}>
-        <Chip label="Género" />
-        <Chip label="Nivel Educativo" />
-        <Chip label="Listas" />
-        <Chip label="Destacados" />
-      </Stack>
+      {/* Chips de filtros*/}
+      <FilterChips />
+
 
       {/* Recomendado semanal */}
-      <Typography variant="h6" fontWeight="bold" color="secondary" mb={1}>Recomendado semanal</Typography>
-      <BookCard
-        image="https://via.placeholder.com/150x200"
-        title="La Campana de Cristal"
-        rating={3.9}
-        progress={76}
-      />
+
+      <Typography variant="h4" fontWeight="bold" color="secondary" mb={1}>
+        Recomendado semanal
+      </Typography>
+
+      <Box display="flex" justifyContent="left" mt={2} mb={3}>
+        <BookCard
+          featured
+          image={featuredBook.image}
+          title={featuredBook.title}
+          rating={featuredBook.rating}
+          progress={featuredBook.progress}
+          isFavorite={featuredBook.isFavorite}
+          onFavoriteToggle={() => handleFavoriteToggle(featuredBook.id, true)}
+        />
+      </Box>
 
       {/* Destacados */}
-      <Typography variant="h6" fontWeight="bold" color="secondary" mt={3} mb={1}>Destacados</Typography>
-      <BookCard
-        image="https://via.placeholder.com/150x200"
-        title="La Resistencia"
-        rating={4.7}
-        progress={90}
-      />
+
+      <Typography variant="h4" fontWeight="bold" color="secondary" mt={3} mb={1}>
+        Destacados
+      </Typography>
+
+      <Box
+        sx={{
+          display: "flex",
+          flexWrap: "wrap",
+          justifyContent: "center",
+          gap: 4,
+        }}
+      >
+        {/*Mapear la lista de libros destacados */}
+        {books.map((book) => (
+          <BookCard
+            key={book.libro_id}
+            image={book.portada_url}
+            autor={book.autor}
+            gender={book.genero}
+            title={book.titulo}
+            description={book.descripcion}
+            rating={book.rating}
+            progress={book.progress}
+            isFavorite={book.isFavorite}
+            onFavoriteToggle={() => handleFavoriteToggle(book.id, false)}
+          />
+        ))}
+
+      </Box>
     </Box>
   );
 }
