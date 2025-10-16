@@ -18,14 +18,14 @@ import AppHeader from '../components/AppHeader';
 import SideMenu from '../components/SideMenu';
 import SearchBar from '../components/SearchBar';
 
-// Data simulada de comentarios
+
 const COMMENT_DATA = [
     { id: 1, title: "La Resistencia", author: "Ernesto Sabato", image: "/path/to/book1.jpg" },
     { id: 2, title: "La campana de cristal", author: "Silvia Plath", image: "/path/to/book2.jpg" },
     { id: 3, title: "Apologías y rechazos", author: "Ernesto Sabato", image: "/path/to/book3.jpg" },
 ];
 
-// Componente para una fila de comentario
+
 const CommentItem = ({ title, author, image }) => (
     <Box 
         sx={{ 

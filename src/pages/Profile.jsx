@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { Box, Button, styled, Avatar, Typography } from '@mui/material';
-// 👈 IMPORTAR: useNavigate para la navegación
 import { useNavigate } from 'react-router-dom'; 
 
 import AppHeader from '../components/AppHeader'; 
@@ -20,11 +19,9 @@ const StyledButton = styled(Button)(({ theme }) => ({
 }));
 
 
-// ⚠️ Se eliminó la prop 'onMyCommentsClick'
+
 const Profile = () => { 
-  // 💡 INICIALIZAR: Hook de navegación
   const navigate = useNavigate(); 
-  
   const [menuOpen, setMenuOpen] = useState(false);
   const [currentView, setCurrentView] = useState('menu'); 
   
@@ -55,7 +52,7 @@ const Profile = () => {
     handleCancel();
   };
   
-  // 💡 NUEVA FUNCIÓN: Redirige a la página de Mis Comentarios
+
   const handleMyCommentsClick = () => {
     navigate('/mis-comentarios'); 
   };
@@ -77,8 +74,6 @@ const Profile = () => {
         />  
       );
     }
-
-    // Muestra el menú y avatar (Vista por defecto)
     return (
       <>
         {/* AVATAR Y DATOS DEL USUARIO */}
@@ -115,7 +110,7 @@ const Profile = () => {
             gap: 2, 
           }}
         >
-          {/* Botón 1: Modificar Perfil */}
+         
           <StyledButton
             variant="contained"
             onClick={handleModifyProfileClick}
@@ -124,10 +119,9 @@ const Profile = () => {
             Modificar Perfil
           </StyledButton>
 
-          {/* Botón 2: Mis Comentarios (MODIFICADO) */}
+          
           <StyledButton
             variant="contained"
-            // ✅ Usa la nueva función de navegación
             onClick={handleMyCommentsClick} 
             fullWidth
           >
