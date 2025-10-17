@@ -36,7 +36,7 @@ export default function BookCard({
         alignItems: "center",
         borderRadius: 3,
         boxShadow: "0 3px 10px rgba(0,0,0,0.1)",
-        bgcolor: "#fff",
+        bgcolor: "#ffffff",
         px: 3,
         py: 1.5,
         maxWidth: featured ? 500 : 320,

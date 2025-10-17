@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import { Box, Button, styled, Avatar, Typography } from '@mui/material';
+import { useNavigate } from 'react-router-dom'; 
+
 import AppHeader from '../components/AppHeader'; 
 import SideMenu from '../components/SideMenu';
 import UserProfileForm from '../components/UserProfileForm'; 
@@ -17,7 +19,9 @@ const StyledButton = styled(Button)(({ theme }) => ({
 }));
 
 
-const Profile = ({ onMyCommentsClick }) => {
+
+const Profile = () => { 
+  const navigate = useNavigate(); 
   const [menuOpen, setMenuOpen] = useState(false);
   const [currentView, setCurrentView] = useState('menu'); 
   
@@ -25,7 +29,7 @@ const Profile = ({ onMyCommentsClick }) => {
   const [userData, setUserData] = useState({
     userName: "Lucía Gómez",
     userEmail: "lucia.gomez@mail.com",
-    avatarUrl: "https://i.pravatar.cc/150?img=1", // Inicializamos la URL aquí
+    avatarUrl: "https://i.pravatar.cc/150?img=1",
   });
 
  
@@ -35,7 +39,7 @@ const Profile = ({ onMyCommentsClick }) => {
   const handleChangeAvatar = (newUrl) => {
       setUserData(prevData => ({
           ...prevData,
-          avatarUrl: newUrl // Actualiza solo la URL
+          avatarUrl: newUrl
       }));
   };
 
@@ -45,7 +49,12 @@ const Profile = ({ onMyCommentsClick }) => {
   const handleSave = () => {
     // Aquí iría la lógica para enviar userData a la API
     console.log("Datos guardados. Volviendo al menú.");
-    handleCancel(); // Vuelve al menú después de guardar
+    handleCancel();
+  };
+  
+
+  const handleMyCommentsClick = () => {
+    navigate('/mis-comentarios'); 
   };
   
   // -----------------------------------------------------
@@ -60,14 +69,11 @@ const Profile = ({ onMyCommentsClick }) => {
           userName={userName} 
           onCancel={handleCancel}
           onSave={handleSave}
-
           onAvatarChange={handleChangeAvatar} 
           currentAvatarUrl={avatarUrl} 
         />  
       );
     }
-
-    // Muestra el menú y avatar (Vista por defecto)
     return (
       <>
         {/* AVATAR Y DATOS DEL USUARIO */}
@@ -82,7 +88,7 @@ const Profile = ({ onMyCommentsClick }) => {
         >
           <Avatar 
             alt={userName} 
-            src={avatarUrl} // Usa la URL del estado (avatarUrl)
+            src={avatarUrl}
             sx={{ width: 240, height: 240, mb: 1.5 }} 
           />
           <Typography variant="h5" fontWeight="bold">
@@ -104,7 +110,7 @@ const Profile = ({ onMyCommentsClick }) => {
             gap: 2, 
           }}
         >
-          {/* Botón 1: Modificar Perfil */}
+         
           <StyledButton
             variant="contained"
             onClick={handleModifyProfileClick}
@@ -113,10 +119,10 @@ const Profile = ({ onMyCommentsClick }) => {
             Modificar Perfil
           </StyledButton>
 
-          {/* Botón 2: Mis Comentarios */}
+          
           <StyledButton
             variant="contained"
-            onClick={onMyCommentsClick}
+            onClick={handleMyCommentsClick} 
             fullWidth
           >
             Mis Comentarios
