@@ -24,7 +24,7 @@ import logoImage from "../assets/favicon.png";
 
 // Header gris claro
 const StyledAppBar = styled(AppBar)(() => ({
-  backgroundColor: "#F5F0F8", // gris lila claro
+  backgroundColor: "#F5F0F8", 
   boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
   height: "80px",
   display: "flex",
@@ -67,7 +67,7 @@ function SideMenu({ open, onClose, active = "Inicio" }) {
         paper: {
           sx: {
             width: 240,
-            backgroundColor: "#ff8a00", // 🟧 Fondo naranja principal
+            backgroundColor: "#f25600", 
             color: "#fff",
             borderTopLeftRadius: "20px",
             borderBottomLeftRadius: "20px",

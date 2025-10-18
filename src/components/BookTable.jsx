@@ -13,8 +13,10 @@ import {
   IconButton,
   styled,
   useTheme,
-  CircularProgress, // Importado para el indicador de carga
+  CircularProgress,
 } from '@mui/material';
+
+import { useNavigate } from 'react-router-dom'; 
 
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -31,7 +33,7 @@ const columns = [
   { id: 'editar', label: 'Editar' }, 
 ];
 
-// 2. Componentes Estilizados (Reutilizados)
+// 2. Componentes Estilizados (sin cambios)
 const StyledTableContainer = styled(Paper)(({ theme }) => ({
   borderRadius: '16px', 
   overflow: 'hidden',
@@ -61,14 +63,15 @@ const ActionButton = styled(IconButton)(({ theme }) => ({
 // 3. Componente Principal
 const BookTable = () => {
   const theme = useTheme();
+  const navigate = useNavigate(); 
   
-  // 📚 Estados de datos y UI
+  //  Estados de datos y UI
   const [books, setBooks] = useState([]);
   const [page, setPage] = useState(1);
-  const [isLoading, setIsLoading] = useState(true); // Estado de carga
-  const [error, setError] = useState(null);       // Estado de error
+  const [isLoading, setIsLoading] = useState(true); 
+  const [error, setError] = useState(null);       
 
-  // 🔄 Carga de datos
+  // Carga de datos
   useEffect(() => {
     setIsLoading(true);
     setError(null);
@@ -76,13 +79,11 @@ const BookTable = () => {
     fetch(`${API_BASE_URL}/api/v1/libros`)
       .then(res => {
           if (!res.ok) {
-              // Lanzar un error con el estado HTTP si la respuesta no es 2xx
               throw new Error(`Error HTTP: ${res.status}`);
           }
           return res.json();
       })
       .then(data => {
-        // Asumimos que la respuesta es un array de libros
         setBooks(Array.isArray(data) ? data : data.libros || []); 
         console.log("Libros cargados:", data);
       })
@@ -91,11 +92,11 @@ const BookTable = () => {
         setError(`Fallo la conexión o la API: ${err.message}`);
       })
       .finally(() => {
-        setIsLoading(false); // Detener la carga en cualquier caso
+        setIsLoading(false); 
       });
-  }, []);
+  }, []); 
   
-  // 🔢 Lógica de Paginación
+  //  Lógica de Paginación
   const pageCount = Math.ceil(books.length / ROWS_PER_PAGE);
 
   const startIndex = (page - 1) * ROWS_PER_PAGE;
@@ -104,25 +105,28 @@ const BookTable = () => {
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
   };
-  
-  // ✏️ Lógica de Acciones
-  const handleEdit = (id) => console.log(`Editando libro ${id}`);
-  const handleDelete = (id) => console.log(`Eliminando libro ${id}`);
+ 
 
-  // 🖼️ Renderizado
+  const handleEdit = (libro_id) => {
+      console.log(`Editando libro ${libro_id}`);
+      navigate(`/dashboard/libros/editar/${libro_id}`); 
+  }
+  
+  const handleDelete = (libro_id) => console.log(`Eliminando libro ${libro_id}`);
+
+  //  Renderizado
   return (
     <StyledTableContainer>
-      
-      {/* Título */}
-      <Box sx={{ padding: theme.spacing(3), borderBottom: `1px solid ${theme.palette.grey[100]}` }}>
+   
+     {/* <Box sx={{ padding: theme.spacing(3), borderBottom: `1px solid ${theme.palette.grey[100]}` }}>
         <Typography 
-          variant="h5" 
+          variant="h4" 
           fontWeight="bold" 
-          sx={{ color: theme.palette.body?.main || '#4A4C52' }}
+          sx={{ color: '#653A1B' }}
         >
           Libros
         </Typography>
-      </Box>
+      </Box>*/}
 
       <TableContainer>
         <Table stickyHeader aria-label="tabla de libros">
@@ -140,7 +144,6 @@ const BookTable = () => {
           </TableHead>
           
           <TableBody>
-            {/* 💡 Manejo de Carga y Errores */}
             {isLoading ? (
               <TableRow>
                 <TableCell colSpan={columns.length} align="center" sx={{ py: 5 }}>
@@ -167,18 +170,20 @@ const BookTable = () => {
                 </TableCell>
               </TableRow>
             ) : (
-              // 🖼️ Datos de la Tabla
               currentBooks.map((row) => (
-                <TableRow hover role="checkbox" tabIndex={-1} key={row.id}>
+               
+                <TableRow hover role="checkbox" tabIndex={-1} key={row.libro_id || row.id}> 
                   {columns.map((column) => {
                     if (column.id === 'editar') {
                       return (
-                        <TableCell key={column.id} align="center">
+                        <TableCell key={column.id} align="center"> 
                           <Box sx={{ display: 'flex', gap: 1, justifyContent: 'center' }}>
-                            <ActionButton onClick={() => handleEdit(row.id)} title="Editar">
+                       
+                            <ActionButton onClick={() => handleEdit(row.libro_id || row.id)} title="Editar">
                               <EditIcon sx={{ fontSize: '1.1rem' }} />
                             </ActionButton>
-                            <ActionButton onClick={() => handleDelete(row.id)} title="Eliminar">
+                        
+                            <ActionButton onClick={() => handleDelete(row.libro_id || row.id)} title="Eliminar">
                               <DeleteIcon sx={{ fontSize: '1.1rem' }} />
                             </ActionButton>
                           </Box>
@@ -188,7 +193,7 @@ const BookTable = () => {
                     
                     const value = row[column.id];
                     return (
-                      <TableCell key={column.id}>
+                      <TableCell key={column.id}> 
                         {value}
                       </TableCell>
                     );
@@ -200,8 +205,7 @@ const BookTable = () => {
         </Table>
       </TableContainer>
 
-      {/* Footer y Paginación */}
-      {/* Mostrar paginación solo si hay más de una página de datos y no hay error */}
+      {/* Footer y Paginación (sin cambios) */}
       {books.length > ROWS_PER_PAGE && !error && (
         <Box sx={{ 
           display: 'flex', 
