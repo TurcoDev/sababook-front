@@ -56,13 +56,14 @@ const LoginPage = () => {
         throw new Error(data.error || 'Error al iniciar sesión');
       }
 
-      // Mostramos el token en la consola para depuración
-      console.log("Login exitoso. Token recibido:", data.token);
+      // Mostramos toda la data recibida para depuración
+      console.log("Login exitoso. Datos recibidos:", data);
 
       // Guardamos el token en el almacenamiento local
       localStorage.setItem('token', data.token);
       localStorage.setItem('userId', data.userId);
-      localStorage.setItem('userRolId', data.rol);
+      // Corregimos la clave a 'rol' para que coincida con SideMenu.jsx
+      localStorage.setItem('rol', data.rol);
 
       // Redirigimos al home
       navigate('/home', { state: { fromLogin: true } });
