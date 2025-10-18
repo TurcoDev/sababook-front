@@ -1,5 +1,4 @@
-
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   Box, 
   Typography, 
@@ -14,33 +13,25 @@ import {
   IconButton,
   styled,
   useTheme,
+  CircularProgress, // Importado para el indicador de carga
 } from '@mui/material';
 
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
+import { API_BASE_URL } from "../environments/api";
 
-// 1. Datos de Ejemplo para Libros
+// 1. Definición de las constantes
 const ROWS_PER_PAGE = 5;
 
-const books = [
-  { id: 1, titulo: 'Cien Años', autor: 'García Márquez', genero: 'Novela', nivelEducativo: 'Superior' },
-  { id: 2, titulo: 'El Aleph', autor: 'Borges', genero: 'Cuento', nivelEducativo: 'Media' },
-  { id: 3, titulo: 'Don Quijote', autor: 'Cervantes', genero: 'Clásico', nivelEducativo: 'Superior' },
-  { id: 4, titulo: 'Rayuela', autor: 'Cortázar', genero: 'Novela', nivelEducativo: 'Superior' },
-  { id: 5, titulo: 'Física I', autor: 'Serway', genero: 'Ciencia', nivelEducativo: 'Media' },
-  { id: 6, titulo: 'Historia Argentina', autor: 'Pigna', genero: 'Historia', nivelEducativo: 'Básico' },
-];
-
-// Definición de las columnas de la tabla de libros
 const columns = [
   { id: 'titulo', label: 'Título' },
   { id: 'autor', label: 'Autor' },
   { id: 'genero', label: 'Género' },
-  { id: 'nivelEducativo', label: 'Nivel Educativo' },
-  { id: 'editar', label: 'Editar' }, // Columna para los botones
+  { id: 'nivel_educativo', label: 'Nivel Educativo' },
+  { id: 'editar', label: 'Editar' }, 
 ];
 
-// 2. Componentes Estilizados (Reutilizados del UserTable)
+// 2. Componentes Estilizados (Reutilizados)
 const StyledTableContainer = styled(Paper)(({ theme }) => ({
   borderRadius: '16px', 
   overflow: 'hidden',
@@ -67,9 +58,44 @@ const ActionButton = styled(IconButton)(({ theme }) => ({
   },
 }));
 
+// 3. Componente Principal
 const BookTable = () => {
   const theme = useTheme();
+  
+  // 📚 Estados de datos y UI
+  const [books, setBooks] = useState([]);
   const [page, setPage] = useState(1);
+  const [isLoading, setIsLoading] = useState(true); // Estado de carga
+  const [error, setError] = useState(null);       // Estado de error
+
+  // 🔄 Carga de datos
+  useEffect(() => {
+    setIsLoading(true);
+    setError(null);
+
+    fetch(`${API_BASE_URL}/api/v1/libros`)
+      .then(res => {
+          if (!res.ok) {
+              // Lanzar un error con el estado HTTP si la respuesta no es 2xx
+              throw new Error(`Error HTTP: ${res.status}`);
+          }
+          return res.json();
+      })
+      .then(data => {
+        // Asumimos que la respuesta es un array de libros
+        setBooks(Array.isArray(data) ? data : data.libros || []); 
+        console.log("Libros cargados:", data);
+      })
+      .catch(err => {
+        console.error("Error cargando libros:", err);
+        setError(`Fallo la conexión o la API: ${err.message}`);
+      })
+      .finally(() => {
+        setIsLoading(false); // Detener la carga en cualquier caso
+      });
+  }, []);
+  
+  // 🔢 Lógica de Paginación
   const pageCount = Math.ceil(books.length / ROWS_PER_PAGE);
 
   const startIndex = (page - 1) * ROWS_PER_PAGE;
@@ -79,13 +105,15 @@ const BookTable = () => {
     setPage(newPage);
   };
   
+  // ✏️ Lógica de Acciones
   const handleEdit = (id) => console.log(`Editando libro ${id}`);
   const handleDelete = (id) => console.log(`Eliminando libro ${id}`);
 
+  // 🖼️ Renderizado
   return (
     <StyledTableContainer>
       
-      {/* Título "Libros" */}
+      {/* Título */}
       <Box sx={{ padding: theme.spacing(3), borderBottom: `1px solid ${theme.palette.grey[100]}` }}>
         <Typography 
           variant="h5" 
@@ -112,67 +140,99 @@ const BookTable = () => {
           </TableHead>
           
           <TableBody>
-            {currentBooks.map((row) => (
-              <TableRow hover role="checkbox" tabIndex={-1} key={row.id}>
-                {columns.map((column) => {
-                  if (column.id === 'editar') {
+            {/* 💡 Manejo de Carga y Errores */}
+            {isLoading ? (
+              <TableRow>
+                <TableCell colSpan={columns.length} align="center" sx={{ py: 5 }}>
+                  <CircularProgress size={30} sx={{ color: theme.palette.button?.main || '#f25600' }} />
+                  <Typography variant="subtitle1" color="textSecondary" sx={{ mt: 2 }}>
+                    Cargando libros...
+                  </Typography>
+                </TableCell>
+              </TableRow>
+            ) : error ? (
+              <TableRow>
+                <TableCell colSpan={columns.length} align="center" sx={{ py: 5 }}>
+                  <Typography variant="subtitle1" color="error">
+                    🚨 {error}
+                  </Typography>
+                </TableCell>
+              </TableRow>
+            ) : books.length === 0 ? (
+              <TableRow>
+                <TableCell colSpan={columns.length} align="center" sx={{ py: 5 }}>
+                  <Typography variant="subtitle1" color="textSecondary">
+                    No se encontraron libros.
+                  </Typography>
+                </TableCell>
+              </TableRow>
+            ) : (
+              // 🖼️ Datos de la Tabla
+              currentBooks.map((row) => (
+                <TableRow hover role="checkbox" tabIndex={-1} key={row.id}>
+                  {columns.map((column) => {
+                    if (column.id === 'editar') {
+                      return (
+                        <TableCell key={column.id} align="center">
+                          <Box sx={{ display: 'flex', gap: 1, justifyContent: 'center' }}>
+                            <ActionButton onClick={() => handleEdit(row.id)} title="Editar">
+                              <EditIcon sx={{ fontSize: '1.1rem' }} />
+                            </ActionButton>
+                            <ActionButton onClick={() => handleDelete(row.id)} title="Eliminar">
+                              <DeleteIcon sx={{ fontSize: '1.1rem' }} />
+                            </ActionButton>
+                          </Box>
+                        </TableCell>
+                      );
+                    }
+                    
+                    const value = row[column.id];
                     return (
-                      <TableCell key={column.id} align="center">
-                        <Box sx={{ display: 'flex', gap: 1, justifyContent: 'center' }}>
-                          <ActionButton onClick={() => handleEdit(row.id)} title="Editar">
-                            <EditIcon sx={{ fontSize: '1.1rem' }} />
-                          </ActionButton>
-                          <ActionButton onClick={() => handleDelete(row.id)} title="Eliminar">
-                            <DeleteIcon sx={{ fontSize: '1.1rem' }} />
-                          </ActionButton>
-                        </Box>
+                      <TableCell key={column.id}>
+                        {value}
                       </TableCell>
                     );
-                  }
-                  
-                  const value = row[column.id];
-                  return (
-                    <TableCell key={column.id}>
-                      {value}
-                    </TableCell>
-                  );
-                })}
-              </TableRow>
-            ))}
+                  })}
+                </TableRow>
+              ))
+            )}
           </TableBody>
         </Table>
       </TableContainer>
 
-      {/* Footer y Paginación (omitted for brevity, same as UserTable) */}
-      <Box sx={{ 
-        display: 'flex', 
-        justifyContent: 'flex-end', 
-        alignItems: 'center', 
-        padding: theme.spacing(2),
-        borderTop: `1px solid ${theme.palette.grey[100]}`
-      }}>
-        <Pagination
-          count={pageCount}
-          page={page}
-          onChange={handleChangePage}
-          shape="rounded"
-          color="primary"
-          sx={{
-            '& .MuiPaginationItem-root.Mui-selected': {
-              backgroundColor: theme.palette.button?.main || '#f25600',
-              color: '#FFFFFF',
-              borderRadius: '20px',
-              '&:hover': {
-                backgroundColor: '#cc4800',
-              },
-            },
-            '& .MuiPaginationItem-root': {
+      {/* Footer y Paginación */}
+      {/* Mostrar paginación solo si hay más de una página de datos y no hay error */}
+      {books.length > ROWS_PER_PAGE && !error && (
+        <Box sx={{ 
+          display: 'flex', 
+          justifyContent: 'flex-end', 
+          alignItems: 'center', 
+          padding: theme.spacing(2),
+          borderTop: `1px solid ${theme.palette.grey[100]}`
+        }}>
+          <Pagination
+            count={pageCount}
+            page={page}
+            onChange={handleChangePage}
+            shape="rounded"
+            color="primary"
+            sx={{
+              '& .MuiPaginationItem-root.Mui-selected': {
+                backgroundColor: theme.palette.button?.main || '#f25600',
+                color: '#FFFFFF',
                 borderRadius: '20px',
-                margin: '0 4px',
-            }
-          }}
-        />
-      </Box>
+                '&:hover': {
+                  backgroundColor: '#cc4800',
+                },
+              },
+              '& .MuiPaginationItem-root': {
+                  borderRadius: '20px',
+                  margin: '0 4px',
+              }
+            }}
+          />
+        </Box>
+      )}
 
     </StyledTableContainer>
   );

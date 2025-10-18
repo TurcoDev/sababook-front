@@ -1,95 +1,172 @@
-// src/components/HeaderGlobal.jsx
+import React, { useState } from "react";
+import {
+  AppBar,
+  Toolbar,
+  IconButton,
+  Box,
+  styled,
+  Drawer,
+  List,
+  ListItem,
+  ListItemButton,
+  ListItemIcon,
+  ListItemText,
+} from "@mui/material";
+import MenuIcon from "@mui/icons-material/Menu";
+import HomeIcon from "@mui/icons-material/Home";
+import AccountCircleIcon from "@mui/icons-material/AccountCircle";
+import DashboardIcon from "@mui/icons-material/Dashboard";
+import LogoutIcon from "@mui/icons-material/Logout";
+import { Link } from "react-router-dom";
+import logoImage from "../assets/favicon.png";
 
-import React, { useState } from 'react';
-import { AppBar, Toolbar, IconButton, Box, styled, Drawer } from '@mui/material';
-import MenuIcon from '@mui/icons-material/Menu';
-import logoImage from '../assets/logo.png'; // 👈 ¡AÑADIR ESTA LÍNEA!
+// === Estilos ===
 
-// 1. Estilos para el AppBar (la barra superior)
-const StyledAppBar = styled(AppBar)(({ theme }) => ({
-  backgroundColor: '#F5F0F8', // Color de fondo lila muy claro
-  boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
-  position: 'static',
-  height: '80px', 
-  display: 'flex',
-  justifyContent: 'center',
+// Header gris claro
+const StyledAppBar = styled(AppBar)(() => ({
+  backgroundColor: "#F5F0F8", // gris lila claro
+  boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
+  height: "80px",
+  display: "flex",
+  justifyContent: "center",
+  position: "static",
 }));
 
-// 2. Estilos para la imagen del logo
-const LogoImage = styled('img')({
-  height: '65px', 
-  width: 'auto',
-  objectFit: 'contain', 
+// Logo
+const LogoImage = styled("img")({
+  height: "60px",
+  width: "auto",
+  objectFit: "contain",
 });
 
-// 3. Estilo para el botón de menú
+// Botón hamburguesa
 const StyledMenuButton = styled(IconButton)(({ theme }) => ({
-  backgroundColor: theme.palette.grey[300], 
+  backgroundColor: theme.palette.grey[200],
   color: theme.palette.grey[800],
-  borderRadius: '8px',
-  padding: theme.spacing(1),
-  '&:hover': {
-    backgroundColor: theme.palette.grey[400],
+  borderRadius: "8px",
+  "&:hover": {
+    backgroundColor: theme.palette.grey[300],
   },
 }));
 
-// 4. Contenido del Drawer (Menú Vertical)
-const DrawerContent = () => (
-    <Box sx={{ width: 250, padding: 2 }} role="presentation">
-        {/* Aquí puedes poner los enlaces de navegación del menú lateral */}
-        <p>Opción 1: Usuarios</p>
-        <p>Opción 2: Libros</p>
-        <p>Opción 3: Foros</p>
-        {/* ... más enlaces ... */}
-    </Box>
-);
-
-
-const HeaderGlobal = () => {
-  // Estado para controlar la apertura del Drawer
-  const [menuOpen, setMenuOpen] = useState(false);
-
-  const toggleDrawer = (open) => (event) => {
-    if (event.type === 'keydown' && (event.key === 'Tab' || event.key === 'Shift')) {
-      return;
-    }
-    setMenuOpen(open);
-  };
+// Drawer (menú lateral) con fondo naranja
+function SideMenu({ open, onClose, active = "Inicio" }) {
+  const menuItems = [
+    { text: "Inicio", icon: <HomeIcon />, path: "/inicio" },
+    { text: "Cuenta", icon: <AccountCircleIcon />, path: "/cuenta" },
+    { text: "Panel", icon: <DashboardIcon />, path: "/panel" },
+  ];
 
   return (
-    <StyledAppBar>
-      <Toolbar sx={{ justifyContent: 'space-between', paddingLeft: 2, paddingRight: 2 }}>
-        
-        {/* Lado Izquierdo: Logo */}
-        <Box>
-          <LogoImage src={logoImage} alt="La gran OCASION Logo" />
-        </Box>
-        
-        {/* Lado Derecho: Menú de Hamburguesa */}
-        <Box>
-          <StyledMenuButton 
-            edge="end" 
-            color="inherit" 
-            aria-label="menu" 
-            onClick={toggleDrawer(true)} // Abre el Drawer
-          >
-            <MenuIcon />
-          </StyledMenuButton>
-        </Box>
-        
-      </Toolbar>
-      
-      {/* Drawer (Menú Vertical) que se despliega desde la derecha */}
-      <Drawer
-        anchor="right" // Despliega de derecha a izquierda
-        open={menuOpen}
-        onClose={toggleDrawer(false)} // Cierra al hacer clic fuera
-      >
-        <DrawerContent />
-      </Drawer>
-      
-    </StyledAppBar>
-  );
-};
+    <Drawer
+      anchor="right"
+      open={open}
+      onClose={onClose}
+      transitionDuration={400}
+      slotProps={{
+        paper: {
+          sx: {
+            width: 240,
+            backgroundColor: "#ff8a00", // 🟧 Fondo naranja principal
+            color: "#fff",
+            borderTopLeftRadius: "20px",
+            borderBottomLeftRadius: "20px",
+            boxShadow: "-4px 0 15px rgba(0,0,0,0.2)",
+            display: "flex",
+            flexDirection: "column",
+            justifyContent: "space-between",
+            p: 1,
+          },
+        },
+      }}
+    >
+      {/* Lista de opciones */}
+      <Box>
+        <List>
+          {menuItems.map((item, i) => {
+            const isActive = item.text === active;
+            return (
+              <ListItem key={i} disablePadding sx={{ mb: 0.5 }}>
+                <ListItemButton
+                  component={Link}
+                  to={item.path}
+                  onClick={onClose}
+                  sx={{
+                    borderRadius: 3,
+                    bgcolor: isActive ? "#ff9e2a" : "transparent",
+                    color: "#fff",
+                    "&:hover": {
+                      bgcolor: "#ff9e2a",
+                    },
+                  }}
+                >
+                  <ListItemIcon
+                    sx={{
+                      color: "#fff",
+                      minWidth: 40,
+                    }}
+                  >
+                    {item.icon}
+                  </ListItemIcon>
+                  <ListItemText
+                    primary={item.text}
+                    primaryTypographyProps={{ fontWeight: 500 }}
+                  />
+                </ListItemButton>
+              </ListItem>
+            );
+          })}
+        </List>
+      </Box>
 
-export default HeaderGlobal; // 👈 Exportamos con el nombre corregido
+      {/* Botón de salida */}
+      <Box textAlign="center" pb={2}>
+        <ListItemButton
+          onClick={() => {
+            alert("Cerrar sesión");
+            onClose();
+          }}
+          sx={{
+            color: "#fff",
+            "&:hover": {
+              bgcolor: "rgba(255,255,255,0.1)",
+            },
+          }}
+        >
+          <ListItemIcon sx={{ color: "#fff" }}>
+            <LogoutIcon />
+          </ListItemIcon>
+          <ListItemText primary="Cerrar sesión" />
+        </ListItemButton>
+      </Box>
+    </Drawer>
+  );
+}
+
+// === Header principal ===
+export default function HeaderGlobal() {
+  const [menuOpen, setMenuOpen] = useState(false);
+
+  return (
+    <>
+      <StyledAppBar>
+        <Toolbar sx={{ justifyContent: "space-between", px: 2 }}>
+          {/* Logo */}
+          <Box>
+            <LogoImage src={logoImage} alt="La Gran Ocasión" />
+          </Box>
+
+          {/* Botón de menú */}
+          <Box>
+            <StyledMenuButton onClick={() => setMenuOpen(true)}>
+              <MenuIcon />
+            </StyledMenuButton>
+          </Box>
+        </Toolbar>
+      </StyledAppBar>
+
+      {/* Drawer */}
+      <SideMenu open={menuOpen} onClose={() => setMenuOpen(false)} />
+    </>
+  );
+}
