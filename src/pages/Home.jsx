@@ -1,7 +1,9 @@
 import { useState, useEffect } from "react";
+import { useLocation } from "react-router-dom";
 import {
   Box,
   Typography,
+  Modal,
 } from "@mui/material";
 
 
@@ -12,6 +14,7 @@ import SearchBar from "../components/SearchBar";
 import FilterChips from "../components/FilterChips";
 import LibroImage from '../assets/libro.jpg'
 import { API_BASE_URL } from "../environments/api";
+import WelcomeModal from "../components/WelcomeModal";
 
 
 const FEATURED_BOOK = {
@@ -28,6 +31,9 @@ export default function Home() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [books, setBooks] = useState([]);
   const [featuredBook, setFeaturedBook] = useState(FEATURED_BOOK);
+  const [welcomeUser, setWelcomeUser] = useState(null);
+  const [isWelcomeModalOpen, setWelcomeModalOpen] = useState(false);
+  const location = useLocation();
 
   useEffect(() => {
     fetch(`${API_BASE_URL}/api/v1/libros`)
@@ -40,6 +46,35 @@ export default function Home() {
         console.error("Error cargando libros:", err);
       });
   }, []);
+
+  // Efecto para mostrar el modal de bienvenida
+  useEffect(() => {
+    if (location.state?.fromLogin) {
+      const userId = localStorage.getItem('userId');
+      if (userId) {
+        // Hacemos un fetch para obtener los datos del usuario
+        const token = localStorage.getItem('token');
+        fetch(`${API_BASE_URL}/api/v1/user/${userId}`, {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        })
+          .then(res => {
+            if (!res.ok) throw new Error('La respuesta de la red no fue exitosa al obtener datos del usuario.');
+            return res.json();
+          })
+          .then(userData => {
+            setWelcomeUser(userData);
+            setWelcomeModalOpen(true);
+          })
+          .catch(err => console.error("Error al obtener datos del usuario:", err));
+      }
+      // Limpiamos el estado para que el modal no aparezca si se recarga la página
+      window.history.replaceState({}, document.title)
+    }
+  }, [location.state]);
+
+  const handleCloseWelcomeModal = () => setWelcomeModalOpen(false);
 
 
   const handleSearch = (query) => {
@@ -86,6 +121,12 @@ export default function Home() {
       {/* Drawer lateral */}
       <SideMenu open={menuOpen} onClose={() => setMenuOpen(false)} active="Inicio" />
 
+      {/* Modal de Bienvenida */}
+      <WelcomeModal
+        open={isWelcomeModalOpen}
+        onClose={handleCloseWelcomeModal}
+        user={welcomeUser}
+      />
 
       {/* SearchBar personalizada */}
       <Box mb={2}>

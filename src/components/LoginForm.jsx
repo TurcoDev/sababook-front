@@ -1,6 +1,6 @@
 // src/components/LoginForm.jsx
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Box, Button, TextField, Typography, styled, useTheme } from '@mui/material';
 
 // Estilos del contenedor del formulario (simplemente para dar un padding)
@@ -26,37 +26,44 @@ const StyledIngresarButton = styled(Button)(({ theme }) => ({
 /**
  * Componente funcional para el formulario de ingreso de usuario y contraseña.
  * @param {function} props.onLoginSubmit - Handler para cuando se presiona Ingresar.
+ * @param {string} props.error - Mensaje de error para mostrar.
  */
-const LoginForm = ({ onLoginSubmit }) => {
+const LoginForm = ({ onLoginSubmit, error }) => {
   const theme = useTheme();
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   
   // Usamos el color 'body.main' de tu tema para el texto del label
   const labelColor = theme.palette.body?.main || '#4A4C52';
   
   const handleSubmit = (event) => {
     event.preventDefault();
-    // Aquí podrías capturar los valores de los inputs si los necesitas
-    onLoginSubmit();
+    onLoginSubmit({ email, password });
   };
 
   return (
     <FormContainer component="form" onSubmit={handleSubmit}>
       
-      {/* Campo de Usuario */}
+      {/* Campo de Email */}
       <Box mb={2}>
         <Typography 
           variant="body1" 
           component="label" 
-          htmlFor="username" 
+          htmlFor="email" 
           sx={{ color: labelColor, fontWeight: 'bold' }}
         >
-          Usuario
+          Email
         </Typography>
         <TextField
-          id="username"
+          id="email"
+          name="email"
+          type="email"
           variant="outlined"
           fullWidth
           margin="dense"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          required
         />
       </Box>
 
@@ -72,12 +79,23 @@ const LoginForm = ({ onLoginSubmit }) => {
         </Typography>
         <TextField
           id="password"
+          name="password"
           variant="outlined"
           type="password"
           fullWidth
           margin="dense"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          required
         />
       </Box>
+
+      {/* Mensaje de Error */}
+      {error && (
+        <Typography color="error" align="center" sx={{ mb: 2 }}>
+          {error}
+        </Typography>
+      )}
 
       {/* Botón de Ingresar */}
       <StyledIngresarButton
