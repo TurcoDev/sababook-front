@@ -12,17 +12,27 @@ import PersonIcon from "@mui/icons-material/Person";
 import FavoriteIcon from "@mui/icons-material/Favorite";
 import ForumIcon from "@mui/icons-material/Forum";
 import EmojiEventsIcon from "@mui/icons-material/EmojiEvents";
+import DashboardIcon from "@mui/icons-material/Dashboard";
 import LogoutIcon from "@mui/icons-material/Logout";
 import { Link } from 'react-router-dom';
 
 export default function SideMenu({ open, onClose, active = "Inicio" }) {
-  const menuItems = [
+  // Obtenemos el rol del usuario desde el localStorage
+  const userRolId = localStorage.getItem('rol');
+
+  // Definimos los items base del menú
+  let menuItems = [
     { text: "Inicio", icon: <HomeIcon />, path: "/home" },
     { text: "Perfil", icon: <PersonIcon />, path: "/perfil" },
     { text: "Favoritos", icon: <FavoriteIcon />, path: "/favoritos" },
     { text: "Foros", icon: <ForumIcon />, path: "/foros" },
     { text: "Insignias", icon: <EmojiEventsIcon />, path: "/insignias" },
   ];
+
+  // Si el rol es '3' (administrador), añadimos el Dashboard al menú
+  if (userRolId === '3') {
+    menuItems.push({ text: "Dashboard", icon: <DashboardIcon />, path: "/dashboard" });
+  }
   
   // Nota: El item 'Salir' se maneja fuera del mapeo
 
