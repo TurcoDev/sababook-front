@@ -11,7 +11,7 @@ import {
   TableCell, 
   Pagination,
   IconButton,
-  styled, // 🚨 ESTO ES NECESARIO
+  styled,
   useTheme,
   CircularProgress,
   Button,
@@ -28,8 +28,8 @@ import { useNavigate } from 'react-router-dom';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 
-// 🚨 IMPORTACIÓN REQUERIDA (Necesitas la URL base para el fetch DELETE)
-const API_BASE_URL = 'http://localhost:3001/api/v1'; 
+
+const API_BASE_URL = 'http://localhost:3000/api/v1'; 
 
 // 1. Definición de las constantes
 const ROWS_PER_PAGE = 5;
@@ -42,7 +42,7 @@ const columns = [
   { id: 'editar', label: 'Acciones' }, 
 ];
 
-// 2. Componentes Estilizados (🚨 INCLUÍDOS PARA CORREGIR EL ERROR)
+
 const StyledTableContainer = styled(Paper)(({ theme }) => ({
   borderRadius: '16px', 
   overflow: 'hidden',

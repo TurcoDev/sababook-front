@@ -13,13 +13,12 @@ import {
   useTheme,
   Paper,
   Grid,
-  Snackbar, // 🚨 Importamos Snackbar
-  Alert,    // 🚨 Importamos Alert
-  CircularProgress // 🚨 Importamos CircularProgress
+  Snackbar, 
+  Alert,    
+  CircularProgress 
 } from '@mui/material';
 
 import { useParams, useNavigate } from 'react-router-dom'; 
-// 🚨 Importa API_BASE_URL (asumimos que la ruta es correcta, pero el error indica que no)
 import { API_BASE_URL } from "../environments/api"; 
 
 // --- Constante de Debugging (BACKEND EN 3000, AJUSTA el prefijo /api/v1 si es necesario) ---
@@ -111,7 +110,7 @@ const EditBookForm = () => {
     setSnackbar({ ...snackbar, open: false });
   };
   
-  // 🚨 Usamos la URL de debug para asegurar que se conecta al backend
+  // usamos la URL de debug para asegurar que se conecta al backend
   const apiBaseUrl = BACKEND_URL_DEBUG; 
 
 
@@ -186,7 +185,7 @@ const EditBookForm = () => {
     // La URL usa el puerto 3000 y el prefijo de la API
     const url = `${apiBaseUrl}/libros/${bookId}`;
 
-    // --- 🔑 SOLUCIÓN: Mapeamos 'imagenUrl' a 'portada_url' y limpiamos IDs ---
+    // ---  Mapeamos 'imagenUrl' a 'portada_url' y limpiamos IDs ---
     const payload = { ...formData };
     
     // 1. Eliminar IDs internos del componente
@@ -198,19 +197,19 @@ const EditBookForm = () => {
     if (payload.imagenUrl !== undefined) {
         payload.portada_url = payload.imagenUrl;
     }
-    delete payload.imagenUrl; // ¡CRUCIAL! Eliminamos el campo que causa el error
+    delete payload.imagenUrl; 
 
     try {
         console.log('Attempting PUT request to URL:', url);
         console.log('Clean payload being sent for update:', payload); 
         
         const response = await fetch(url, {
-            method: 'PUT', // Método HTTP para actualización
+            method: 'PUT', 
             headers: {
                 'Content-Type': 'application/json',
                 'Authorization': `Bearer ${token}`,
             },
-            body: JSON.stringify(payload), // <-- Usamos el payload limpio
+            body: JSON.stringify(payload), 
         });
 
         if (!response.ok) {
@@ -218,7 +217,7 @@ const EditBookForm = () => {
              throw new Error(`Error ${response.status}: Fallo la actualización. Mensaje: ${errorText || 'Error desconocido'}`);
         }
         
-        // 🚨 Notificación de éxito
+        // Notificación de éxito
         setSnackbar({ 
             open: true, 
             message: `✅ Libro "${formData.titulo}" actualizado exitosamente.`, 
@@ -227,7 +226,6 @@ const EditBookForm = () => {
         
         // Redirige después de un breve momento
         setTimeout(() => {
-            // --- 🔄 CAMBIO CLAVE: Redirigimos a la ruta de libros en lugar de /dashboard ---
             navigate('/dashboard'); 
         }, 1500);
 
@@ -246,7 +244,7 @@ const EditBookForm = () => {
     }
   };
 
-  // Manejador de Cancelar
+  
   const handleCancel = () => {
     navigate('/dashboard'); 
   };
