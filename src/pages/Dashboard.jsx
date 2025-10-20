@@ -38,7 +38,7 @@ const Dashboard = () => {
             sx={{ 
                 backgroundColor: '#FF6600', 
                 '&:hover': { backgroundColor: '#E05C00' },
-                textTransform: 'none' // Para que diga "Agregar" en lugar de "AGREGAR"
+                textTransform: 'none' 
             }}
         >
           Agregar
