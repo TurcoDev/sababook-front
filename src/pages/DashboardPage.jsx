@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { Box } from '@mui/material';
-
+import { Outlet } from 'react-router-dom';
 import Dashboard from '../components/Dashboard';
 import AppHeader from '../components/AppHeader';
 import SideMenu from '../components/SideMenu';
@@ -23,9 +23,9 @@ const DashboardPage = () => {
       <AppHeader onMenuClick={() => setMenuOpen(true)} title="Dashboard" subtitle="Panel de Administración" />
 
       <SideMenu open={menuOpen} onClose={() => setMenuOpen(false)} active="Dashboard" />
-      
+            <Outlet />
       <Dashboard />
-      
+  
     </Box>
   );
 };
