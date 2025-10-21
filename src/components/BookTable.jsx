@@ -14,22 +14,12 @@ import {
   styled,
   useTheme,
   CircularProgress,
-  Button,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  Snackbar,
-  Alert 
 } from '@mui/material';
 
-import { useNavigate } from 'react-router-dom'; 
-
+// Se eliminan imports relacionados con la API, Dialogs, Snackbar, y useNavigate
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 
-
-const API_BASE_URL = 'http://localhost:3000/api/v1'; 
 
 // 1. Definición de las constantes
 const ROWS_PER_PAGE = 5;
@@ -39,7 +29,7 @@ const columns = [
   { id: 'autor', label: 'Autor' },
   { id: 'genero', label: 'Género' },
   { id: 'nivel_educativo', label: 'Nivel Educativo' },
-  { id: 'editar', label: 'Acciones' }, 
+  { id: 'acciones', label: 'Acciones' }, // Renombrado a 'acciones' para claridad
 ];
 
 
@@ -69,16 +59,18 @@ const ActionButton = styled(IconButton)(({ theme }) => ({
 }));
 
 // 3. Componente Principal
-const BookTable = ({ books = [], isLoading, error, onBookUpdate }) => {
+// 💡 Acepta los nuevos handlers de edición y eliminación
+const BookTable = ({ 
+    books = [], 
+    isLoading, 
+    error, 
+    onEditBook, // 💡 Nuevo prop: función que abre el modal de edición en el padre
+    onDeleteBook, // 💡 Nuevo prop: función que ejecuta el DELETE en el padre
+}) => {
   const theme = useTheme();
-  const navigate = useNavigate(); 
   
-  // Estados de UI (Paginación y Eliminación)
+  // Estados de UI (Paginación)
   const [page, setPage] = useState(1);
-  const [openConfirm, setOpenConfirm] = useState(false);
-  const [libroToDeleteId, setLibroToDeleteId] = useState(null);
-  const [isDeleting, setIsDeleting] = useState(false);
-  const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' });
 
   // Lógica de Paginación
   const pageCount = Math.ceil(books.length / ROWS_PER_PAGE);
@@ -89,71 +81,20 @@ const BookTable = ({ books = [], isLoading, error, onBookUpdate }) => {
     setPage(newPage);
   };
  
-  const handleCloseSnackbar = (event, reason) => {
-    if (reason === 'clickaway') return;
-    setSnackbar({ ...snackbar, open: false });
-  };
-  
-const handleEdit = (libro_id) => {
-      console.log(`Editando libro ${libro_id}`);
-      navigate(`/libros/editar/${libro_id}`); 
+  // 💡 Handlers que DELEGAN la acción al componente padre (Dashboard)
+  const handleEdit = (book) => {
+      // Llama a la función del padre pasando todo el objeto 'book'
+      onEditBook(book); 
   }
   
   const handleDelete = (libro_id) => {
-    setLibroToDeleteId(libro_id);
-    setOpenConfirm(true);
+    // Llama a la función del padre pasando solo el ID
+    onDeleteBook(libro_id);
   }
-
-  const handleConfirmDelete = async () => {
-    if (!libroToDeleteId) return;
-
-    setOpenConfirm(false); 
-    setIsDeleting(true); 
-
-    try {
-        const token = localStorage.getItem('token');
-        if (!token) throw new Error("No autenticado. Por favor, inicia sesión.");
-
-        const url = `${API_BASE_URL}/libros/${libroToDeleteId}`;
-        const response = await fetch(url, {
-            method: 'DELETE',
-            headers: {
-                'Authorization': `Bearer ${token}`
-            }
-        });
-
-        if (!response.ok) {
-            const errorData = await response.json().catch(() => ({}));
-            throw new Error(errorData.message || `Fallo la eliminación (HTTP ${response.status})`);
-        }
-        
-        if(onBookUpdate) {
-            onBookUpdate(); 
-        }
-        
-        setSnackbar({ 
-            open: true, 
-            message: `✅ Libro ID ${libroToDeleteId} eliminado exitosamente.`, 
-            severity: 'success' 
-        });
-
-    } catch (error) {
-        setSnackbar({ 
-            open: true, 
-            message: `❌ Error al eliminar el libro: ${error.message || 'Error desconocido'}`, 
-            severity: 'error' 
-        });
-    } finally {
-        setIsDeleting(false); 
-        setLibroToDeleteId(null); 
-    }
-  }
-
-  const handleCloseConfirm = () => {
-      setOpenConfirm(false);
-      setLibroToDeleteId(null);
-  };
   
+  // 🚨 Nota: Toda la lógica de DELETE, confirmación (Dialog), Snackbar y estados de loading/error internos
+  // ha sido eliminada de este componente para simplificar y centralizar el estado en DashboardPage.jsx.
+
 
   //  Renderizado 
   return (
@@ -165,10 +106,9 @@ const handleEdit = (libro_id) => {
           <TableHead>
             <TableRow>
               {columns.map((column) => (
-                // 🚨 StyledTableCellHeader ESTÁ DEFINIDO
                 <StyledTableCellHeader 
                   key={column.id} 
-                  align={column.id === 'editar' ? 'center' : 'left'}
+                  align={column.id === 'acciones' ? 'center' : 'left'}
                 >
                   {column.label}
                 </StyledTableCellHeader>
@@ -177,13 +117,13 @@ const handleEdit = (libro_id) => {
           </TableHead>
           
           <TableBody>
-            {/* ... Lógica de carga, error y mapeo de filas ... */}
-            {isLoading || isDeleting ? (
+            {/* Se usa el prop isLoading que viene del Dashboard, que cubre fetch y acciones CRUD */}
+            {isLoading ? (
               <TableRow>
                 <TableCell colSpan={columns.length} align="center" sx={{ py: 5 }}>
                   <CircularProgress size={30} sx={{ color: theme.palette.button?.main || '#f25600' }} />
                   <Typography variant="subtitle1" color="textSecondary" sx={{ mt: 2 }}>
-                    {isDeleting ? 'Eliminando libro...' : 'Cargando libros...'}
+                    Cargando libros...
                   </Typography>
                 </TableCell>
               </TableRow>
@@ -196,15 +136,16 @@ const handleEdit = (libro_id) => {
                
                 <TableRow hover role="checkbox" tabIndex={-1} key={row.libro_id || row.id}> 
                   {columns.map((column) => {
-                    if (column.id === 'editar') {
+                    if (column.id === 'acciones') {
                       return (
                         <TableCell key={column.id} align="center"> 
                           <Box sx={{ display: 'flex', gap: 1, justifyContent: 'center' }}>
-                            {/* 🚨 ActionButton ESTÁ DEFINIDO */}
-                            <ActionButton onClick={() => handleEdit(row.libro_id || row.id)} title="Editar">
+                            {/* 💡 Llama a onEditBook del padre, pasando toda la fila (row) */}
+                            <ActionButton onClick={() => handleEdit(row)} title="Editar">
                               <EditIcon sx={{ fontSize: '1.1rem' }} />
                             </ActionButton>
                             
+                            {/* 💡 Llama a onDeleteBook del padre, pasando solo el ID */}
                             <ActionButton onClick={() => handleDelete(row.libro_id || row.id)} title="Eliminar">
                               <DeleteIcon sx={{ fontSize: '1.1rem' }} />
                             </ActionButton>
@@ -223,7 +164,7 @@ const handleEdit = (libro_id) => {
         </Table>
       </TableContainer>
 
-      {/* Footer y Paginación (sin cambios) */}
+      {/* Footer y Paginación */}
       {books.length > ROWS_PER_PAGE && !error && (
         <Box sx={{ 
           display: 'flex', 
@@ -256,30 +197,8 @@ const handleEdit = (libro_id) => {
         </Box>
       )}
       
-      {/* Modal de Confirmación y Snackbar */}
-      <Dialog open={openConfirm} onClose={handleCloseConfirm}>
-        <DialogTitle color="error">{"Confirmar Eliminación"}</DialogTitle>
-        <DialogContent>
-          <Typography variant="body1">
-            ¿Estás seguro de que deseas eliminar permanentemente el libro con ID **{libroToDeleteId}**? Esta acción no se puede deshacer.
-          </Typography>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleCloseConfirm} color="primary" disabled={isDeleting}>
-            Cancelar
-          </Button>
-          <Button onClick={handleConfirmDelete} color="error" variant="contained" autoFocus disabled={isDeleting} sx={{ minWidth: '100px' }}>
-            {isDeleting ? <CircularProgress size={24} color="inherit" /> : 'Eliminar'}
-          </Button>
-        </DialogActions>
-      </Dialog>
+      {/* 🚨 Se eliminan el Dialog de Confirmación y el Snackbar, que ahora están en DashboardPage.jsx */}
       
-      <Snackbar open={snackbar.open} autoHideDuration={6000} onClose={handleCloseSnackbar}>
-        <Alert onClose={handleCloseSnackbar} severity={snackbar.severity} sx={{ width: '100%' }}>
-          {snackbar.message}
-        </Alert>
-      </Snackbar>
-
     </StyledTableContainer>
   );
 };
