@@ -9,7 +9,7 @@ import {
   Box,
   IconButton,
 } from "@mui/material";
-
+import { useNavigate } from "react-router-dom";
 
 import FavoriteIcon from '@mui/icons-material/Favorite';
 import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
@@ -28,7 +28,10 @@ export default function BookCard({
   featured = false,
   isFavorite = false,
   onFavoriteToggle,
+  bookId,
+  libro_id,
 }) {
+  const navigate = useNavigate();
   return (
     <Card
       sx={{
@@ -171,11 +174,15 @@ export default function BookCard({
         >
           <Button
             variant="contained"
+            onClick={() => navigate(`/book-preview/${bookId || libro_id}`)}
             sx={{
               bgcolor: "#f25600",
               textTransform: "none",
               fontSize: featured ? "0.9rem" : "0.8rem",
               borderRadius: 2,
+              '&:hover': {
+                bgcolor: "#d64500",
+              },
             }}
           >
             Ver más
