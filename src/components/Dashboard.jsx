@@ -1,21 +1,23 @@
 import { useState, useEffect } from 'react';
 import { Box, Modal, Snackbar, Alert } from '@mui/material';
 
-import HeaderDashboard from './HeaderDashboard'; 
-import UserTable from './UserTable'; 
-import BookTable from './BookTable'; 
-import ForumTable from './ForumTable'; 
+import HeaderDashboard from './HeaderDashboard';
+import UserTable from './UserTable';
+import BookTable from './BookTable';
+import ForumTable from './ForumTable';
 import UserForm from './UserForm';
+import ForumForm from './ForumForm';
 import { API_BASE_URL } from '../environments/api';
 
-const DashboardContainer = Box; 
+const DashboardContainer = Box;
 
 const Dashboard = () => {
-  const [activeView, setActiveView] = useState('users'); 
+  const [activeView, setActiveView] = useState('users');
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [openCreateModal, setOpenCreateModal] = useState(false);
+  const [openForumModal, setOpenForumModal] = useState(false);
   const [snackbar, setSnackbar] = useState({ open: false, message: "", severity: "success" });
 
   // Mapeo de roles para la creación de usuarios
@@ -54,15 +56,16 @@ const Dashboard = () => {
   }, [activeView]);
 
   const handleNavigate = (viewName) => {
-      setActiveView(viewName);
+    setActiveView(viewName);
   };
-  
+
   const handleAddClick = () => {
     if (activeView === 'users') {
       setOpenCreateModal(true);
+    } else if (activeView === 'forums') {
+      setOpenForumModal(true);
     }
   };
-
   const handleCloseCreateModal = () => {
     setOpenCreateModal(false);
   };
@@ -78,7 +81,7 @@ const Dashboard = () => {
       const token = localStorage.getItem('token');
       const response = await fetch(`${API_BASE_URL}/api/v1/user`, {
         method: 'POST',
-        headers: { 
+        headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`
         },
@@ -88,7 +91,7 @@ const Dashboard = () => {
       if (!response.ok) throw new Error('Error al crear el usuario');
 
       // Para ver el nuevo usuario, volvemos a pedir la lista completa.
-      await fetchUsers(); 
+      await fetchUsers();
       handleCloseCreateModal();
       setSnackbar({ open: true, message: "Usuario creado correctamente", severity: "success" });
     } catch (error) {
@@ -96,6 +99,34 @@ const Dashboard = () => {
       setSnackbar({ open: true, message: "Error al crear el usuario", severity: "error" });
     }
   };
+
+  const handleSaveNewForum = async (forumData) => {
+    try {
+      const token = localStorage.getItem('token');
+      const response = await fetch(`${API_BASE_URL}/api/foros`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(forumData),
+      });
+
+      if (!response.ok) throw new Error('Error al crear el foro');
+
+      // Mostrar notificación de éxito
+      setSnackbar({ open: true, message: "Foro creado correctamente", severity: "success" });
+
+      // Cerrar el modal
+      setOpenForumModal(false);
+
+      // TODO: Opcional, actualizar lista de foros si ForumTable no lo hace solo
+    } catch (error) {
+      console.error("Error al crear foro:", error);
+      setSnackbar({ open: true, message: "Error al crear el foro", severity: "error" });
+    }
+  };
+
 
   const handleSnackbarClose = (event, reason) => {
     if (reason === 'clickaway') return;
@@ -107,10 +138,10 @@ const Dashboard = () => {
     switch (activeView) {
       case 'users':
         return (
-          <UserTable 
-            users={users} 
-            loading={loading} 
-            error={error} 
+          <UserTable
+            users={users}
+            loading={loading}
+            error={error}
             onUserUpdate={fetchUsers} // Pasamos una función para refrescar la lista
           />
         );
@@ -125,20 +156,20 @@ const Dashboard = () => {
 
 
   return (
-    <DashboardContainer 
-        sx={{ 
-            width: '100%', 
-            minHeight: '100vh', 
-            padding: 4, 
-            backgroundColor: '#FFFFFF', 
-            display: 'flex', 
-            flexDirection: 'column', 
-            alignItems: 'center' 
-        }}
+    <DashboardContainer
+      sx={{
+        width: '100%',
+        minHeight: '100vh',
+        padding: 4,
+        backgroundColor: '#FFFFFF',
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center'
+      }}
     >
-      
+
       {/* 1. Componente que agrupa la navegación y acciones */}
-      <HeaderDashboard 
+      <HeaderDashboard
         activeView={activeView}
         onNavigate={handleNavigate} // Con esto, los botones cambian la tabla
         onAddClick={handleAddClick}
@@ -163,13 +194,31 @@ const Dashboard = () => {
         </Box>
       </Modal>
 
+      <Modal open={openForumModal} onClose={() => setOpenForumModal(false)}>
+        <Box
+          sx={{
+            position: "absolute",
+            top: "50%",
+            left: "50%",
+            transform: "translate(-50%, -50%)",
+            outline: "none",
+          }}
+        >
+          <ForumForm
+            onSave={handleSaveNewForum}
+            onCancel={() => setOpenForumModal(false)}
+          />
+        </Box>
+      </Modal>
+
+
       {/* Snackbar para notificaciones */}
       <Snackbar open={snackbar.open} autoHideDuration={6000} onClose={handleSnackbarClose}>
         <Alert onClose={handleSnackbarClose} severity={snackbar.severity} sx={{ width: '100%' }}>
           {snackbar.message}
         </Alert>
       </Snackbar>
-      
+
     </DashboardContainer>
   );
 };
