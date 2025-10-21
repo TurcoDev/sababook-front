@@ -13,16 +13,10 @@ import {
   useTheme,
   Paper,
   Grid,
-  Snackbar, 
-  Alert,    
   CircularProgress 
 } from '@mui/material';
 
-import { useParams, useNavigate } from 'react-router-dom'; 
-import { API_BASE_URL } from "../environments/api"; 
-
-// --- Constante de Debugging (BACKEND EN 3000, AJUSTA el prefijo /api/v1 si es necesario) ---
-const BACKEND_URL_DEBUG = 'http://localhost:3000/api/v1'; 
+// NOTA: Se eliminan useParams y useNavigate ya que el formulario es llamado por un modal y no por una ruta.
 
 // --- Constantes de Opciones ---
 const GENEROS = ['Novela', 'Ficción', 'Ciencia Ficción', 'Poesía', 'Ensayo', 'Biografía'];
@@ -30,22 +24,22 @@ const NIVELES_EDUCATIVOS = ['Básico', 'Superior'];
 
 // --- Datos Iniciales del Libro ---
 const INITIAL_BOOK_DATA = {
-  id: '', 
+  libro_id: undefined, // Usamos este campo para la API
   titulo: '',
   autor: '',
   genero: '',
   nivel_educativo: '',
   descripcion: '',
-  imagenUrl: '',
+  imagenUrl: '', // Se mapea a 'portada_url' para el backend
 };
 
-// --- 2. Componentes Estilizados (Material UI) ---
+// --- Componentes Estilizados (Material UI) ---
 const FormContainer = styled(Paper)(({ theme }) => ({
   padding: theme.spacing(4),
   borderRadius: '16px',
   boxShadow: '0 8px 30px rgba(0, 0, 0, 0.1)',
   maxWidth: '900px',
-  margin: '40px auto',
+  // Quitamos el margin: '40px auto' ya que el modal lo centrará
 }));
 
 const PrimaryButton = styled(Button)(({ theme }) => ({
@@ -91,76 +85,30 @@ const StyledTextarea = styled(TextareaAutosize)(({ theme }) => ({
 
 // --- 3. Componente Funcional ---
 
-const EditBookForm = () => {
+// 💡 Ahora acepta props para el modo edición, guardado y cancelación
+const BookForm = ({ bookToEdit, onSave, onCancel, title }) => {
   
   const theme = useTheme();
-  const navigate = useNavigate();
-  // El parámetro en la URL es 'id' según la ruta '/libros/editar/:id', 
-  const { id: bookId } = useParams(); 
   
+  // 💡 ESTADO INICIAL: Mapea bookToEdit (si existe) o usa datos iniciales vacíos
   const [formData, setFormData] = useState(INITIAL_BOOK_DATA);
-  const [loading, setLoading] = useState(false); 
-  const [error, setError] = useState(null);
-  const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' });
-
-
-  // Manejador para cerrar el Snackbar
-  const handleCloseSnackbar = (event, reason) => {
-    if (reason === 'clickaway') return;
-    setSnackbar({ ...snackbar, open: false });
-  };
+  const [loading, setLoading] = useState(false); // Para manejar la carga local de la acción de guardar
   
-  // usamos la URL de debug para asegurar que se conecta al backend
-  const apiBaseUrl = BACKEND_URL_DEBUG; 
-
-
-  //  EFECTO: Cargar datos del libro específico (GET)
+  // 💡 EFECTO: Actualiza el formulario cuando cambia bookToEdit (al abrir el modal)
   useEffect(() => {
-    if (!bookId) return;
-
-    const fetchBook = async () => {
-      setLoading(true);
-      setError(null);
-      const token = localStorage.getItem('token');
-      
-      try {
-        // La URL ahora incluye el puerto 3000 y el prefijo de la API
-        const url = `${apiBaseUrl}/libros/${bookId}`;
-        console.log('Fetching book data from URL:', url); // DEBUG: Muestra la URL construida
-        
-        const response = await fetch(url, {
-            headers: {
-                'Authorization': `Bearer ${token}`,
-            },
-        });
-        
-        // MEJORA CLAVE DE DEBUGGING: Mostramos el status code si falla
-        if (!response.ok) {
-          throw new Error(`Error ${response.status}: El libro con ID '${bookId}' no se pudo cargar. URL intentada: ${url}`);
-        }
-        
-        const data = await response.json();
-        // Mapear los datos recibidos a formData. Asumimos que si viene 'portada_url' lo mapeamos a 'imagenUrl' para el frontend.
-        const mappedData = {
-          ...data,
-          id: data.id || data.libro_id,
+    if (bookToEdit) {
+      // Mapeamos los campos del objeto bookToEdit al formato del formulario
+      const mappedData = {
+          ...bookToEdit,
+          libro_id: bookToEdit.libro_id,
           // Mapeamos el campo de la DB (portada_url) al campo del formulario (imagenUrl)
-          imagenUrl: data.imagenUrl || data.portada_url || '' 
-        };
-
-        setFormData(prev => ({ ...prev, ...mappedData })); 
-
-      } catch (err) {
-        console.error("Error cargando libro:", err);
-        setError(err.message);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchBook(); 
-
-  }, [bookId]); 
+          imagenUrl: bookToEdit.imagenUrl || bookToEdit.portada_url || '' 
+      };
+      setFormData(mappedData);
+    } else {
+      setFormData(INITIAL_BOOK_DATA);
+    }
+  }, [bookToEdit]); 
 
   // Manejador de cambios en los campos del formulario
   const handleChange = (e) => {
@@ -168,118 +116,52 @@ const EditBookForm = () => {
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
-  //  Manejador de Guardado (PUT)
-  const handleSave = async (e) => {
+  // 💡 Manejador de Guardado (POST/PUT delegado al padre)
+  const handleFormSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-    setError(null);
-    setSnackbar({ open: false, message: '', severity: 'success' });
-
-    const token = localStorage.getItem('token'); 
-    if (!token) {
-        setError("No hay token de autenticación disponible. Por favor, inicia sesión de nuevo.");
-        setLoading(false);
-        return;
-    }
-    
-    // La URL usa el puerto 3000 y el prefijo de la API
-    const url = `${apiBaseUrl}/libros/${bookId}`;
 
     // ---  Mapeamos 'imagenUrl' a 'portada_url' y limpiamos IDs ---
     const payload = { ...formData };
     
     // 1. Eliminar IDs internos del componente
     delete payload.id; 
-    delete payload.libro_id; 
 
     // 2. Mapear 'imagenUrl' (frontend) a 'portada_url' (backend/DB)
-    // Esto resuelve el error "column "imagenurl" of relation "libro" does not exist"
     if (payload.imagenUrl !== undefined) {
         payload.portada_url = payload.imagenUrl;
     }
     delete payload.imagenUrl; 
-
+    
+    // Incluimos libro_id en el payload si estamos editando (crucial para que Dashboard use PUT)
+    if (bookToEdit && bookToEdit.libro_id) {
+        payload.libro_id = bookToEdit.libro_id;
+    }
+    
     try {
-        console.log('Attempting PUT request to URL:', url);
-        console.log('Clean payload being sent for update:', payload); 
+        // 💡 Llamamos al handler del componente padre (Dashboard) para que haga el API call
+        await onSave(payload);
         
-        const response = await fetch(url, {
-            method: 'PUT', 
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}`,
-            },
-            body: JSON.stringify(payload), 
-        });
-
-        if (!response.ok) {
-            const errorText = await response.text();
-             throw new Error(`Error ${response.status}: Fallo la actualización. Mensaje: ${errorText || 'Error desconocido'}`);
-        }
-        
-        // Notificación de éxito
-        setSnackbar({ 
-            open: true, 
-            message: `✅ Libro "${formData.titulo}" actualizado exitosamente.`, 
-            severity: 'success' 
-        });
-        
-        // Redirige después de un breve momento
-        setTimeout(() => {
-            navigate('/dashboard'); 
-        }, 1500);
-
-
     } catch (err) {
-        console.error("Error al actualizar el libro:", err);
-        setError(`Error al guardar: ${err.message}`);
-        setSnackbar({ 
-            open: true, 
-            message: `❌ Error al guardar: ${err.message}`, 
-            severity: 'error' 
-        });
-
+        // El componente padre ya maneja el Snackbar para errores
+        console.error("Error al guardar en el formulario:", err);
     } finally {
         setLoading(false);
     }
   };
 
-  
+  // 💡 La cancelación llama al prop onCancel
   const handleCancel = () => {
-    navigate('/dashboard'); 
+    onCancel(); 
   };
-
-  // Renderizado de carga y error
-  if (loading && formData.id === '') {
-    return (
-        <Box sx={{ p: 5, textAlign: 'center' }}>
-            <CircularProgress sx={{ mb: 2 }} />
-            <Typography>Cargando datos del libro...</Typography>
-        </Box>
-    );
-  }
-
-  if (error && !loading) {
-    return (
-        <Box sx={{ p: 5, textAlign: 'center' }}>
-            <Typography color="error" variant="h6" gutterBottom>
-                Error al cargar el libro
-            </Typography>
-            <Typography color="error">
-                Detalle: {error}
-            </Typography>
-        </Box>
-    );
-  }
-
-  // Si no estamos cargando y no hay un libro ID, o no se encontró el libro:
-  if (!bookId || (!loading && formData.id === '')) {
-    return <Box sx={{ p: 5, textAlign: 'center' }}><Typography color="error">🚨 ID de libro no proporcionado o el libro no existe en la base de datos.</Typography></Box>;
-  }
-
+  
+  // Renderizado
+  const currentTitle = title || (bookToEdit ? "Editar Libro" : "Crear Nuevo Libro");
+  const bookIdentifier = bookToEdit?.libro_id ? ` (ID: ${bookToEdit.libro_id})` : '';
 
   return (
-    <FormContainer component="form" onSubmit={handleSave}>
+    // 💡 Usa el nuevo handler unificado
+    <FormContainer component="form" onSubmit={handleFormSubmit}>
       
       <Box mb={4}>
         <Typography 
@@ -287,7 +169,7 @@ const EditBookForm = () => {
           fontWeight="bold" 
           sx={{ color: theme.palette.body?.main || '#4A4C52' }}
         >
-          Editar libro (ID: {bookId})
+          {currentTitle}{bookIdentifier}
         </Typography>
       </Box>
 
@@ -427,16 +309,9 @@ const EditBookForm = () => {
           {loading ? <CircularProgress size={24} color="inherit" /> : 'Guardar'}
         </PrimaryButton>
       </Box>
-      
-      {/* 🚨 Snackbar para notificaciones */}
-      <Snackbar open={snackbar.open} autoHideDuration={4000} onClose={handleCloseSnackbar}>
-        <Alert onClose={handleCloseSnackbar} severity={snackbar.severity} sx={{ width: '100%' }}>
-          {snackbar.message}
-        </Alert>
-      </Snackbar>
 
     </FormContainer>
   );
 };
 
-export default EditBookForm;
+export default BookForm;
