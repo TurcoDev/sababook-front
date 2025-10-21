@@ -1,10 +1,12 @@
 // src/pages/LoginPage.jsx
 
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Box } from '@mui/material';
 import { styled } from '@mui/system';
 import Login from '../components/Login';
 import logoImage from '../assets/logo.png';
+import { API_BASE_URL } from '../environments/api';
 import LoginForm from '../components/LoginForm';
 import Register from '../components/auth/Register';
 
@@ -21,6 +23,8 @@ const StyledPageContainer = styled(Box)(({ theme }) => ({
 
 const LoginPage = () => {
 
+  const navigate = useNavigate();
+  const [error, setError] = useState(null);
   const [view, setView] = useState('presentation');
   const logoUrl = logoImage;
 
@@ -33,8 +37,42 @@ const LoginPage = () => {
     console.log('Cambiando a vista de formulario de Login');
   };
 
-  const handleLoginSubmit = () => {
-    console.log('Usuario y contraseña enviados. Intentando iniciar sesión...');
+  const handleLoginSubmit = async ({ email, password }) => {
+    setError(null); // Limpiamos errores previos
+    console.log('Intentando iniciar sesión con:', { email });
+
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/v1/auth/login`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email, contrasena: password }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Error al iniciar sesión');
+      }
+
+      // Mostramos toda la data recibida para depuración
+      console.log("Login exitoso. Datos recibidos:", data);
+
+      // Guardamos el token en el almacenamiento local
+      localStorage.setItem('token', data.token);
+      localStorage.setItem('userId', data.userId);
+      // Corregimos la clave a 'rol' para que coincida con SideMenu.jsx
+      localStorage.setItem('rol', data.rol);
+
+      // Redirigimos al home
+      navigate('/home', { state: { fromLogin: true } });
+
+    } catch (err) {
+      // Hacemos el mensaje de error más descriptivo
+      const errorMessage = err.message.includes('Failed to fetch') ? 'No se pudo conectar con el servidor. ¿Está en ejecución?' : err.message;
+      setError(errorMessage);
+    }
   };
 
   const handleRegisterSubmit = (formData) => {
@@ -63,6 +101,7 @@ const LoginPage = () => {
       ) : view === 'login' ? (
         <LoginForm
           onLoginSubmit={handleLoginSubmit}
+          error={error}
         />
       ) : view === 'register' ? (
         <Register

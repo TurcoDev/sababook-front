@@ -9,7 +9,7 @@ import {
   Box,
   IconButton,
 } from "@mui/material";
-
+import { useNavigate } from "react-router-dom";
 
 import FavoriteIcon from '@mui/icons-material/Favorite';
 import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
@@ -20,12 +20,18 @@ const HORIZONTAL_PADDING = 2; // (Equivale a 16px en el tema de Material-UI)
 export default function BookCard({
   image,
   title,
+  autor,
+  gender,
+  description,
   rating,
   progress,
   featured = false,
   isFavorite = false,
   onFavoriteToggle,
+  bookId,
+  libro_id,
 }) {
+  const navigate = useNavigate();
   return (
     <Card
       sx={{
@@ -33,7 +39,7 @@ export default function BookCard({
         alignItems: "center",
         borderRadius: 3,
         boxShadow: "0 3px 10px rgba(0,0,0,0.1)",
-        bgcolor: "#fff",
+        bgcolor: "#ffffff",
         px: 3,
         py: 1.5,
         maxWidth: featured ? 500 : 320,
@@ -116,9 +122,24 @@ export default function BookCard({
           >
             {title}
           </Typography>
-
+          {/* Agrega autor, género y descripción */}
+          {autor && (
+            <Typography variant="body2" color="text.secondary" sx={{ mb: 0.5 }}>
+              <b>Autor:</b> {autor}
+            </Typography>
+          )}
+          {gender && (
+            <Typography variant="body2" color="text.secondary" sx={{ mb: 0.5 }}>
+              <b>Género:</b> {gender}
+            </Typography>
+          )}
+          {description && (
+            <Typography variant="body2" color="text.secondary" sx={{ mb: 0.5 }}>
+              {description}
+            </Typography>
+          )}
           <Rating
-            value={rating}
+            value={rating ?? 0}
             precision={0.5}
             readOnly
             size={featured ? "medium" : "small"}
@@ -129,11 +150,11 @@ export default function BookCard({
             fontWeight="bold"
             sx={{ mt: 0.2, mb: 1 }}
           >
-            {rating.toFixed(1)}
+            {rating?.toFixed(1)}
           </Typography>
           <Box mt={1}>
             <Chip
-              label={`${progress}%`}
+              label={`${progress ?? 0}%`}
               color="primary"
               size="small"
               sx={{ fontSize: "0.75rem" }}
@@ -153,11 +174,15 @@ export default function BookCard({
         >
           <Button
             variant="contained"
+            onClick={() => navigate(`/book-preview/${bookId || libro_id}`)}
             sx={{
               bgcolor: "#f25600",
               textTransform: "none",
               fontSize: featured ? "0.9rem" : "0.8rem",
               borderRadius: 2,
+              '&:hover': {
+                bgcolor: "#d64500",
+              },
             }}
           >
             Ver más

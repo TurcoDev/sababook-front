@@ -1,7 +1,9 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useLocation } from "react-router-dom";
 import {
   Box,
   Typography,
+  Modal,
 } from "@mui/material";
 
 
@@ -11,12 +13,8 @@ import SideMenu from "../components/SideMenu";
 import SearchBar from "../components/SearchBar";
 import FilterChips from "../components/FilterChips";
 import LibroImage from '../assets/libro.jpg'
-
-const INITIAL_BOOKS = [
-  { id: 1, title: "La Resistencia", rating: 4.7, progress: 90, isFavorite: true, image: LibroImage },
-  { id: 2, title: "El Principito", rating: 4.8, progress: 50, isFavorite: false, image: LibroImage },
-  { id: 3, title: "Rayuela", rating: 4.6, progress: 80, isFavorite: true, image: LibroImage },
-];
+import { API_BASE_URL } from "../environments/api";
+import WelcomeModal from "../components/WelcomeModal";
 
 
 const FEATURED_BOOK = {
@@ -31,8 +29,52 @@ const FEATURED_BOOK = {
 
 export default function Home() {
   const [menuOpen, setMenuOpen] = useState(false);
-  const [books, setBooks] = useState(INITIAL_BOOKS);
+  const [books, setBooks] = useState([]);
   const [featuredBook, setFeaturedBook] = useState(FEATURED_BOOK);
+  const [welcomeUser, setWelcomeUser] = useState(null);
+  const [isWelcomeModalOpen, setWelcomeModalOpen] = useState(false);
+  const location = useLocation();
+
+  useEffect(() => {
+    fetch(`${API_BASE_URL}/api/v1/libros`)
+      .then(res => res.json())
+      .then(data => {
+        setBooks(data);
+        console.log("Libros cargados:", data);
+      })
+      .catch(err => {
+        console.error("Error cargando libros:", err);
+      });
+  }, []);
+
+  // Efecto para mostrar el modal de bienvenida
+  useEffect(() => {
+    if (location.state?.fromLogin) {
+      const userId = localStorage.getItem('userId');
+      if (userId) {
+        // Hacemos un fetch para obtener los datos del usuario
+        const token = localStorage.getItem('token');
+        fetch(`${API_BASE_URL}/api/v1/user/${userId}`, {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        })
+          .then(res => {
+            if (!res.ok) throw new Error('La respuesta de la red no fue exitosa al obtener datos del usuario.');
+            return res.json();
+          })
+          .then(userData => {
+            setWelcomeUser(userData);
+            setWelcomeModalOpen(true);
+          })
+          .catch(err => console.error("Error al obtener datos del usuario:", err));
+      }
+      // Limpiamos el estado para que el modal no aparezca si se recarga la página
+      window.history.replaceState({}, document.title)
+    }
+  }, [location.state]);
+
+  const handleCloseWelcomeModal = () => setWelcomeModalOpen(false);
 
 
   const handleSearch = (query) => {
@@ -79,6 +121,12 @@ export default function Home() {
       {/* Drawer lateral */}
       <SideMenu open={menuOpen} onClose={() => setMenuOpen(false)} active="Inicio" />
 
+      {/* Modal de Bienvenida */}
+      <WelcomeModal
+        open={isWelcomeModalOpen}
+        onClose={handleCloseWelcomeModal}
+        user={welcomeUser}
+      />
 
       {/* SearchBar personalizada */}
       <Box mb={2}>
@@ -125,13 +173,18 @@ export default function Home() {
         {/*Mapear la lista de libros destacados */}
         {books.map((book) => (
           <BookCard
-            key={book.id}
-            image={book.image}
-            title={book.title}
+            key={book.libro_id}
+            image={book.portada_url}
+            autor={book.autor}
+            gender={book.genero}
+            title={book.titulo}
+            description={book.descripcion}
             rating={book.rating}
             progress={book.progress}
             isFavorite={book.isFavorite}
             onFavoriteToggle={() => handleFavoriteToggle(book.id, false)}
+            bookId={book.id}
+            libro_id={book.libro_id}
           />
         ))}
 
