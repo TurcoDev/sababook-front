@@ -1,5 +1,5 @@
 import React from "react";
-import { Routes, Route} from 'react-router-dom'; 
+import { Routes, Route } from 'react-router-dom';
 
 // Importaciones de Páginas
 import Home from "./pages/Home";
@@ -8,9 +8,9 @@ import Favs from "./pages/Favs";
 import Profile from "./pages/Profile";
 import DashboardPage from "./pages/DashboardPage";
 import BookDetailsPage from "./pages/BookDetailsPage";
+import BookPreview from "./pages/BookPreview";
 import MyComments from "./pages/MyComments";
 import Comments from "./pages/Comments";
-
 
 function App() {
   return (
@@ -26,6 +26,7 @@ function App() {
 
       {/* Ruta principal de administración */}
       <Route path="/dashboard" element={<DashboardPage />} />
+
 
 
 
