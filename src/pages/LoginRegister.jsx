@@ -16,8 +16,8 @@ const StyledPageContainer = styled(Box)(({ theme }) => ({
   flexDirection: 'column',
   alignItems: 'center',
   justifyContent: 'center',
-  minHeight: '100vh', 
-  backgroundColor: '#FFFFFF', 
+  minHeight: '100vh',
+  backgroundColor: '#FFFFFF',
   padding: theme.spacing(3),
 }));
 
@@ -56,9 +56,6 @@ const LoginPage = () => {
         throw new Error(data.error || 'Error al iniciar sesión');
       }
 
-      // Mostramos toda la data recibida para depuración
-      console.log("Login exitoso. Datos recibidos:", data);
-
       // Guardamos el token en el almacenamiento local
       localStorage.setItem('token', data.token);
       localStorage.setItem('userId', data.userId);
@@ -86,11 +83,11 @@ const LoginPage = () => {
   };
   return (
     <StyledPageContainer>
-      
-      <img 
-        src={logoUrl} 
-        alt="La gran OCASION Logo" 
-        style={{ maxWidth: '100%', height: 'auto', marginBottom: '40px', display: 'block', width: '350px' }} 
+
+      <img
+        src={logoUrl}
+        alt="La gran OCASION Logo"
+        style={{ maxWidth: '100%', height: 'auto', marginBottom: '40px', display: 'block', width: '350px' }}
       />
       {view === 'presentation' ? (
         <Login
