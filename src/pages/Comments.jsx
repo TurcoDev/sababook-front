@@ -20,6 +20,7 @@ import ChatBubbleOutlineIcon from '@mui/icons-material/ChatBubbleOutline';
 
 import AppHeader from '../components/AppHeader';
 import SideMenu from '../components/SideMenu';
+import RatingAndCommentForm from '../components/RatingAndCommentForm';
 
 
 // --- CONFIGURACIÓN DE TEMA ---
@@ -143,6 +144,7 @@ const CommentInputFormMUI = ({ onCommentSubmit, onCancel }) => {
 function BookDetailsPageMUI() {
     const [menuOpen, setMenuOpen] = useState(false);
     const [isCommenting, setIsCommenting] = useState(false);
+    const [isRating, setIsRating] = useState(false);
     const [comments, setComments] = useState(INITIAL_COMMENTS);
 
 
@@ -155,11 +157,31 @@ function BookDetailsPageMUI() {
         const submittedComment = {
             ...newComment,
             id: Date.now(),
-            name: "Usuario Actual", 
+            name: "Usuario Actual",
         };
         setComments([submittedComment, ...comments]); // Agrega el nuevo al inicio
-        setIsCommenting(false); 
+        setIsCommenting(false);
         console.log("Comentario publicado:", submittedComment);
+    };
+
+    const handleRatingSubmit = async (ratingData) => {
+        // Verificar si el usuario ya ha comentado
+        const userHasCommented = comments.some(comment => comment.name === "Usuario Actual");
+
+        if (userHasCommented) {
+            alert("Ya has enviado una calificación para este libro. Solo puedes enviar una por usuario.");
+            setIsRating(false);
+            return;
+        }
+
+        const submittedRating = {
+            ...ratingData,
+            id: Date.now(),
+            name: "Usuario Actual",
+        };
+        setComments([submittedRating, ...comments]); // Agrega el nuevo al inicio
+        setIsRating(false);
+        console.log("Calificación enviada:", submittedRating);
     };
 
     return (
@@ -184,7 +206,7 @@ function BookDetailsPageMUI() {
             {/* BOTÓN COMENTAR O FORMULARIO */}
             {/* ------------------------------------------- */}
             <Box sx={{ borderTop: '1px solid #eee', pt: 3, maxWidth: 600, margin: '0 auto' }}>
-                {!isCommenting ? (
+                {!isCommenting && !isRating ? (
                     <Box> {/* Contenedor para el botón y el texto de puntuación */}
                         {/* 1. Botón "Comentar" (tal cual el mockup de Figma) */}
                         <Button
@@ -213,20 +235,28 @@ function BookDetailsPageMUI() {
                             Comentar
                         </Button>
                         {/* 2. Texto "¿Cómo puntuamos?" a la derecha */}
-                        <Typography 
-                            variant="caption" 
-                            color="text.secondary" 
+                        <Typography
+                            variant="caption"
+                            color="text.secondary"
+                            onClick={() => setIsRating(true)}
                             // Propiedades para alinear a la derecha y aplicar estilo de enlace
                             sx={{ display: 'block', textAlign: 'right', mt: 1, cursor: 'pointer', '&:hover': { textDecoration: 'underline' } }}
                         >
                             ¿Cómo puntuamos?
                         </Typography>
                     </Box>
-                ) : (
+                ) : isCommenting ? (
                     // 2. Componente para futuros comentarios (Formulario)
-                    <CommentInputFormMUI 
-                        onCommentSubmit={handleCommentSubmit} 
+                    <CommentInputFormMUI
+                        onCommentSubmit={handleCommentSubmit}
                         onCancel={() => setIsCommenting(false)}
+                    />
+                ) : (
+                    // 3. Componente para calificación y comentario
+                    <RatingAndCommentForm
+                        onSubmit={handleRatingSubmit}
+                        onBack={() => setIsRating(false)}
+                        hasUserCommented={comments.some(comment => comment.name === "Usuario Actual")}
                     />
                 )}
             </Box>
