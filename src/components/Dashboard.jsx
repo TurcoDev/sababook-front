@@ -1,36 +1,26 @@
 import { useState, useEffect } from 'react';
 import { Box, Modal, Snackbar, Alert } from '@mui/material';
 
-<<<<<<< HEAD
+
 import HeaderDashboard from './HeaderDashboard';
 import UserTable from './UserTable';
 import BookTable from './BookTable';
 import ForumTable from './ForumTable';
-=======
-
-import HeaderDashboard from './HeaderDashboard'; 
-import UserTable from './UserTable'; 
-import BookTable from './BookTable'; 
-import ForumTable from './ForumTable'; 
->>>>>>> 25c05dd0618697441719df3b3d6dd89dc69b83da
 import UserForm from './UserForm';
 import ForumForm from './ForumForm';
 import { API_BASE_URL } from '../environments/api';
 
+
 const DashboardContainer = Box;
 
 const Dashboard = () => {
-<<<<<<< HEAD
   const [activeView, setActiveView] = useState('users');
-=======
-  const [activeView, setActiveView] = useState('users'); 
-  
+
   // --- ESTADOS DE USUARIOS y LIBROS (Ahora son específicos) ---
->>>>>>> 25c05dd0618697441719df3b3d6dd89dc69b83da
   const [users, setUsers] = useState([]);
   const [userLoading, setUserLoading] = useState(true);
   const [userError, setUserError] = useState(null);
-  
+
   const [books, setBooks] = useState([]);
   const [booksLoading, setBooksLoading] = useState(true);
   const [booksError, setBooksError] = useState(null);
@@ -38,6 +28,11 @@ const Dashboard = () => {
   const [openCreateModal, setOpenCreateModal] = useState(false);
   const [openForumModal, setOpenForumModal] = useState(false);
   const [snackbar, setSnackbar] = useState({ open: false, message: "", severity: "success" });
+
+  // --- 🧩 ESTADOS DE FOROS
+  const [forums, setForums] = useState([]);
+  const [forumsLoading, setForumsLoading] = useState(true);
+  const [forumsError, setForumsError] = useState(null);
 
   // Mapeo de roles para la creación de usuarios
   const rolMapping = {
@@ -49,73 +44,92 @@ const Dashboard = () => {
   // --- FUNCIÓN FETCH PARA USUARIOS 
   const fetchUsers = async () => {
     try {
-        setUserLoading(true);
-        setUserError(null);
-        const token = localStorage.getItem('token');
-        
-        const res = await fetch(`${API_BASE_URL}/api/v1/user`, {
-            headers: { 'Authorization': `Bearer ${token}` }
-        });
-        if (!res.ok) { 
-            if (res.status === 403) throw new Error("Acceso denegado. No tienes permisos para ver esta página.");
-            throw new Error("Error al cargar los usuarios"); 
-        }
-        const data = await res.json();
-        setUsers(data);
-    } catch (err) { 
-        setUserError(err.message); 
-    } finally { 
-        setUserLoading(false); 
+      setUserLoading(true);
+      setUserError(null);
+      const token = localStorage.getItem('token');
+
+      const res = await fetch(`${API_BASE_URL}/api/v1/user`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      if (!res.ok) {
+        if (res.status === 403) throw new Error("Acceso denegado. No tienes permisos para ver esta página.");
+        throw new Error("Error al cargar los usuarios");
+      }
+      const data = await res.json();
+      setUsers(data);
+    } catch (err) {
+      setUserError(err.message);
+    } finally {
+      setUserLoading(false);
     }
   };
-  
-  // --- FUNCIÓN FETCH PARA LIBROS 
-  const fetchBooks = async () => { 
-    try {
-        setBooksLoading(true);
-        setBooksError(null);
-        const token = localStorage.getItem('token');
-        if (!token) throw new Error("No autenticado.");
 
-        const res = await fetch(`${API_BASE_URL}/api/v1/libros`, { 
-            headers: { 'Authorization': `Bearer ${token}` }
-        });
-        if (!res.ok) { 
-            if (res.status === 403) throw new Error("Acceso denegado.");
-            throw new Error("Error al cargar los libros"); 
-        }
-        const data = await res.json();
-        setBooks(data);
-    } catch (err) { 
-        setBooksError(err.message); 
-    } finally { 
-        setBooksLoading(false); 
+  // --- FUNCIÓN FETCH PARA LIBROS 
+  const fetchBooks = async () => {
+    try {
+      setBooksLoading(true);
+      setBooksError(null);
+      const token = localStorage.getItem('token');
+      if (!token) throw new Error("No autenticado.");
+
+      const res = await fetch(`${API_BASE_URL}/api/v1/libros`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      if (!res.ok) {
+        if (res.status === 403) throw new Error("Acceso denegado.");
+        throw new Error("Error al cargar los libros");
+      }
+      const data = await res.json();
+      setBooks(data);
+    } catch (err) {
+      setBooksError(err.message);
+    } finally {
+      setBooksLoading(false);
+    }
+  };
+
+  const fetchForums = async () => {
+    try {
+      setForumsLoading(true);
+      setForumsError(null);
+      const token = localStorage.getItem('token');
+      const res = await fetch(`${API_BASE_URL}/api/v1/foro`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+
+      if (!res.ok) {
+        if (res.status === 403) throw new Error("Acceso denegado.");
+        throw new Error("Error al cargar los foros");
+      }
+
+      const data = await res.json();
+      setForums(data);
+    } catch (err) {
+      setForumsError(err.message);
+    } finally {
+      setForumsLoading(false);
     }
   };
 
   // --- useEffect para Cargar Datos ---
+
   useEffect(() => {
     if (activeView === 'users') {
       fetchUsers();
     } else if (activeView === 'books') {
       fetchBooks();
+    } else if (activeView === 'forums') {
+      fetchForums(); // 👈 añadimos esta línea
     }
   }, [activeView]);
 
-<<<<<<< HEAD
+
+  // --- HANDLERS 
   const handleNavigate = (viewName) => {
     setActiveView(viewName);
   };
 
   const handleAddClick = () => {
-=======
-  // --- HANDLERS 
-  const handleNavigate = (viewName) => { 
-    setActiveView(viewName); 
-  };
-
-  const handleAddClick = () => { 
->>>>>>> 25c05dd0618697441719df3b3d6dd89dc69b83da
     if (activeView === 'users') {
       setOpenCreateModal(true);
     } else if (activeView === 'forums') {
@@ -123,17 +137,12 @@ const Dashboard = () => {
     }
     // NOTA: Se necesitaría lógica adicional aquí para la creación de libros
   };
-<<<<<<< HEAD
+
   const handleCloseCreateModal = () => {
     setOpenCreateModal(false);
-=======
-
-  const handleCloseCreateModal = () => { 
-    setOpenCreateModal(false); 
->>>>>>> 25c05dd0618697441719df3b3d6dd89dc69b83da
   };
 
-  const handleSaveNewUser = async (formData) => { 
+  const handleSaveNewUser = async (formData) => {
     const dataToSend = { ...formData };
     dataToSend.rol_id = rolMapping[dataToSend.rol];
     dataToSend.contrasena = dataToSend.password;
@@ -153,12 +162,7 @@ const Dashboard = () => {
 
       if (!response.ok) throw new Error('Error al crear el usuario');
 
-<<<<<<< HEAD
-      // Para ver el nuevo usuario, volvemos a pedir la lista completa.
       await fetchUsers();
-=======
-      await fetchUsers(); 
->>>>>>> 25c05dd0618697441719df3b3d6dd89dc69b83da
       handleCloseCreateModal();
       setSnackbar({ open: true, message: "Usuario creado correctamente", severity: "success" });
     } catch (error) {
@@ -167,11 +171,10 @@ const Dashboard = () => {
     }
   };
 
-<<<<<<< HEAD
   const handleSaveNewForum = async (forumData) => {
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`${API_BASE_URL}/api/foros`, {
+      const response = await fetch(`${API_BASE_URL}/api/v1/foro`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -182,13 +185,11 @@ const Dashboard = () => {
 
       if (!response.ok) throw new Error('Error al crear el foro');
 
-      // Mostrar notificación de éxito
       setSnackbar({ open: true, message: "Foro creado correctamente", severity: "success" });
-
-      // Cerrar el modal
       setOpenForumModal(false);
 
-      // TODO: Opcional, actualizar lista de foros si ForumTable no lo hace solo
+      // 🔁 recargar lista de foros
+      fetchForums();
     } catch (error) {
       console.error("Error al crear foro:", error);
       setSnackbar({ open: true, message: "Error al crear el foro", severity: "error" });
@@ -197,9 +198,6 @@ const Dashboard = () => {
 
 
   const handleSnackbarClose = (event, reason) => {
-=======
-  const handleSnackbarClose = (event, reason) => { 
->>>>>>> 25c05dd0618697441719df3b3d6dd89dc69b83da
     if (reason === 'clickaway') return;
     setSnackbar({ ...snackbar, open: false });
   };
@@ -209,39 +207,29 @@ const Dashboard = () => {
     switch (activeView) {
       case 'users':
         return (
-<<<<<<< HEAD
           <UserTable
             users={users}
-            loading={loading}
-            error={error}
-            onUserUpdate={fetchUsers} // Pasamos una función para refrescar la lista
-=======
-          <UserTable 
-            users={users} 
-            loading={userLoading} 
-            error={userError} 
-            onUserUpdate={fetchUsers} 
->>>>>>> 25c05dd0618697441719df3b3d6dd89dc69b83da
+            loading={userLoading}
+            error={userError}
+            onUserUpdate={fetchUsers}
           />
         );
       case 'books':
         return (
-          <BookTable 
-            books={books} 
-            isLoading={booksLoading} 
-            error={booksError} 
-            onBookUpdate={fetchBooks} 
+          <BookTable
+            books={books}
+            isLoading={booksLoading}
+            error={booksError}
+            onBookUpdate={fetchBooks}
           />
         );
       case 'forums':
-        return <ForumTable />;
-      default:
         return (
-          <UserTable 
-            users={users} 
-            loading={userLoading} 
-            error={userError} 
-            onUserUpdate={fetchUsers} 
+          <ForumTable
+            forums={forums}
+            loading={forumsLoading}
+            error={forumsError}
+            onForumUpdate={fetchForums}
           />
         );
     }
@@ -264,7 +252,7 @@ const Dashboard = () => {
       {/* 1. Componente que agrupa la navegación y acciones */}
       <HeaderDashboard
         activeView={activeView}
-        onNavigate={handleNavigate} 
+        onNavigate={handleNavigate}
         onAddClick={handleAddClick}
       />
 

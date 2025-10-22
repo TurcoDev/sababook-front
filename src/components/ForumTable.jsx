@@ -56,31 +56,12 @@ const ActionButton = styled(IconButton)(({ theme }) => ({
   },
 }));
 
-const ForumTable = () => {
+const ForumTable = ({ forums, loading, error, onForumUpdate }) => {
   const theme = useTheme();
-  const [forums, setForums] = useState([]);
-  const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(1);
-
   const pageCount = Math.ceil(forums.length / ROWS_PER_PAGE);
   const startIndex = (page - 1) * ROWS_PER_PAGE;
   const currentForums = forums.slice(startIndex, startIndex + ROWS_PER_PAGE);
-
-  useEffect(() => {
-    const fetchForums = async () => {
-      try {
-        const res = await fetch('http://localhost:3000/api/foros');
-        const data = await res.json();
-        setForums(data);
-      } catch (error) {
-        console.error('Error al cargar foros:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchForums();
-  }, []);
 
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
@@ -92,22 +73,17 @@ const ForumTable = () => {
     if (!nuevoTitulo || !nuevaDescripcion) return;
 
     try {
-      const res = await fetch(`http://localhost:3000/api/foros/${id}`, {
+      const res = await fetch(`http://localhost:3000/api/v1/foro/${id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ titulo: nuevoTitulo, descripcion: nuevaDescripcion }),
       });
 
       if (res.ok) {
-        const foroActualizado = await res.json();
-        setForums((prev) =>
-          prev.map((foro) =>
-            foro.foro_id === id ? { ...foro, titulo: nuevoTitulo, descripcion: nuevaDescripcion } : foro
-          )
-        );
-        console.log('Foro actualizado');
+        console.log('✅ Foro actualizado correctamente');
+        onForumUpdate(); // 👉 Actualiza la lista en Dashboard
       } else {
-        console.error('Error al actualizar el foro');
+        console.error('❌ Error al actualizar el foro');
       }
     } catch (error) {
       console.error('❌ Error al actualizar foro:', error);
@@ -116,16 +92,17 @@ const ForumTable = () => {
 
   const handleDelete = async (id) => {
     if (!window.confirm('¿Estás seguro de eliminar este foro?')) return;
+
     try {
-      const res = await fetch(`http://localhost:3000/api/foros/${id}`, {
+      const res = await fetch(`http://localhost:3000/api/v1/foro/${id}`, {
         method: 'DELETE',
       });
 
       if (res.ok) {
-        setForums((prev) => prev.filter((foro) => foro.foro_id !== id));
-        console.log(`Foro ${id} eliminado`);
+        console.log(`✅ Foro ${id} eliminado`);
+        onForumUpdate(); // 👉 vuelve a cargar los foros actualizados
       } else {
-        console.error('Error al eliminar el foro');
+        console.error('❌ Error al eliminar el foro');
       }
     } catch (error) {
       console.error('❌ Error al eliminar foro:', error);
