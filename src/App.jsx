@@ -15,7 +15,7 @@ import Comments from "./pages/Comments";
 function App() {
   return (
     <Routes>
-      <Route path="/" element={<Comments />} />
+      <Route path="/" element={<LoginPage />} />
       <Route path="/home" element={<Home />} />
       <Route path="/favoritos" element={<Favs />} />
       <Route path="/perfil" element={<Profile />} />
