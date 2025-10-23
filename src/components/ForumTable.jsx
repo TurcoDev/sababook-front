@@ -1,47 +1,37 @@
 // src/components/ForumTable.jsx
 
-import React, { useState } from 'react';
-import { 
-  Box, 
-  Typography, 
-  Paper, 
-  TableContainer, 
-  Table, 
-  TableHead, 
-  TableBody, 
-  TableRow, 
-  TableCell, 
+import React, { useState, useEffect } from 'react';
+import {
+  Box,
+  Typography,
+  Paper,
+  TableContainer,
+  Table,
+  TableHead,
+  TableBody,
+  TableRow,
+  TableCell,
   Pagination,
   IconButton,
   styled,
   useTheme,
 } from '@mui/material';
 
-import EditIcon from '@mui/icons-material/Edit'; // Ícono de edición
-import DeleteIcon from '@mui/icons-material/Delete'; // Ícono de eliminación
+import EditIcon from '@mui/icons-material/Edit';
+import DeleteIcon from '@mui/icons-material/Delete';
 
-// 1. Datos de Ejemplo para Foros
 const ROWS_PER_PAGE = 5;
 
-const forums = [
-  { id: 1, titulo: '...', fecha: '10-09-2025', creador: 'Ana García' },
-  { id: 2, titulo: '...', fecha: '05-09-2025', creador: 'Pedro López' },
-  { id: 3, titulo: '...', fecha: '01-09-2025', creador: 'María Díaz' },
-  { id: 4, titulo: '...', fecha: '28-08-2025', creador: 'Javier Ruíz' },
-  { id: 5, titulo: '...', fecha: '20-08-2025', creador: 'Laura Pérez' },
-];
-
-// Definición de las columnas de la tabla de foros
 const columns = [
   { id: 'titulo', label: 'Título' },
-  { id: 'fecha', label: 'Fecha' },
-  { id: 'creador', label: 'Creador' },
-  { id: 'editar', label: 'Editar' }, // Columna para los botones
+  { id: 'fecha_creacion', label: 'Fecha' },
+  { id: 'creador_id', label: 'Creador' },
+  { id: 'editar', label: 'Editar' },
 ];
 
-// 2. Componentes Estilizados (Reutilizados de UserTable/BookTable)
+// Estilos
 const StyledTableContainer = styled(Paper)(({ theme }) => ({
-  borderRadius: '16px', 
+  borderRadius: '16px',
   overflow: 'hidden',
   boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
   margin: theme.spacing(3),
@@ -59,38 +49,72 @@ const StyledTableCellHeader = styled(TableCell)(({ theme }) => ({
 const ActionButton = styled(IconButton)(({ theme }) => ({
   backgroundColor: theme.palette.button?.main || '#f25600',
   color: '#FFFFFF',
-  borderRadius: '8px', 
+  borderRadius: '8px',
   padding: '6px',
   '&:hover': {
     backgroundColor: '#cc4800',
   },
 }));
 
-const ForumTable = () => {
+const ForumTable = ({ forums, loading, error, onForumUpdate }) => {
   const theme = useTheme();
   const [page, setPage] = useState(1);
   const pageCount = Math.ceil(forums.length / ROWS_PER_PAGE);
-
   const startIndex = (page - 1) * ROWS_PER_PAGE;
   const currentForums = forums.slice(startIndex, startIndex + ROWS_PER_PAGE);
 
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
   };
-  
-  const handleEdit = (id) => console.log(`Editando foro ${id}`);
-  const handleDelete = (id) => console.log(`Eliminando foro ${id}`);
+
+  const handleEdit = async (id) => {
+    const nuevoTitulo = prompt('Nuevo título:');
+    const nuevaDescripcion = prompt('Nueva descripción:');
+    if (!nuevoTitulo || !nuevaDescripcion) return;
+
+    try {
+      const res = await fetch(`http://localhost:3000/api/v1/foro/${id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ titulo: nuevoTitulo, descripcion: nuevaDescripcion }),
+      });
+
+      if (res.ok) {
+        console.log('✅ Foro actualizado correctamente');
+        onForumUpdate(); // 👉 Actualiza la lista en Dashboard
+      } else {
+        console.error('❌ Error al actualizar el foro');
+      }
+    } catch (error) {
+      console.error('❌ Error al actualizar foro:', error);
+    }
+  };
+
+  const handleDelete = async (id) => {
+    if (!window.confirm('¿Estás seguro de eliminar este foro?')) return;
+
+    try {
+      const res = await fetch(`http://localhost:3000/api/v1/foro/${id}`, {
+        method: 'DELETE',
+      });
+
+      if (res.ok) {
+        console.log(`✅ Foro ${id} eliminado`);
+        onForumUpdate(); // 👉 vuelve a cargar los foros actualizados
+      } else {
+        console.error('❌ Error al eliminar el foro');
+      }
+    } catch (error) {
+      console.error('❌ Error al eliminar foro:', error);
+    }
+  };
+
+  if (loading) return <Typography sx={{ padding: 3 }}>Cargando foros...</Typography>;
 
   return (
     <StyledTableContainer>
-      
-      {/* Título "Foros" */}
       <Box sx={{ padding: theme.spacing(3), borderBottom: `1px solid ${theme.palette.grey[100]}` }}>
-        <Typography 
-          variant="h5" 
-          fontWeight="bold" 
-          sx={{ color: theme.palette.body?.main || '#4A4C52' }}
-        >
+        <Typography variant="h5" fontWeight="bold" sx={{ color: theme.palette.body?.main || '#4A4C52' }}>
           Foros
         </Typography>
       </Box>
@@ -100,8 +124,8 @@ const ForumTable = () => {
           <TableHead>
             <TableRow>
               {columns.map((column) => (
-                <StyledTableCellHeader 
-                  key={column.id} 
+                <StyledTableCellHeader
+                  key={column.id}
                   align={column.id === 'editar' ? 'center' : 'left'}
                 >
                   {column.label}
@@ -109,32 +133,27 @@ const ForumTable = () => {
               ))}
             </TableRow>
           </TableHead>
-          
+
           <TableBody>
             {currentForums.map((row) => (
-              <TableRow hover role="checkbox" tabIndex={-1} key={row.id}>
+              <TableRow hover role="checkbox" tabIndex={-1} key={row.foro_id}>
                 {columns.map((column) => {
                   if (column.id === 'editar') {
                     return (
                       <TableCell key={column.id} align="center">
                         <Box sx={{ display: 'flex', gap: 1, justifyContent: 'center' }}>
-                          <ActionButton onClick={() => handleEdit(row.id)} title="Editar">
+                          <ActionButton onClick={() => handleEdit(row.foro_id)} title="Editar">
                             <EditIcon sx={{ fontSize: '1.1rem' }} />
                           </ActionButton>
-                          <ActionButton onClick={() => handleDelete(row.id)} title="Eliminar">
+                          <ActionButton onClick={() => handleDelete(row.foro_id)} title="Eliminar">
                             <DeleteIcon sx={{ fontSize: '1.1rem' }} />
                           </ActionButton>
                         </Box>
                       </TableCell>
                     );
                   }
-                  
-                  const value = row[column.id];
-                  return (
-                    <TableCell key={column.id}>
-                      {value}
-                    </TableCell>
-                  );
+
+                  return <TableCell key={column.id}>{row[column.id]}</TableCell>;
                 })}
               </TableRow>
             ))}
@@ -142,11 +161,10 @@ const ForumTable = () => {
         </Table>
       </TableContainer>
 
-      {/* Footer y Paginación (Mismos estilos que las tablas anteriores) */}
-      <Box sx={{ 
-        display: 'flex', 
-        justifyContent: 'flex-end', 
-        alignItems: 'center', 
+      <Box sx={{
+        display: 'flex',
+        justifyContent: 'flex-end',
+        alignItems: 'center',
         padding: theme.spacing(2),
         borderTop: `1px solid ${theme.palette.grey[100]}`
       }}>
@@ -166,13 +184,12 @@ const ForumTable = () => {
               },
             },
             '& .MuiPaginationItem-root': {
-                borderRadius: '20px',
-                margin: '0 4px',
+              borderRadius: '20px',
+              margin: '0 4px',
             }
           }}
         />
       </Box>
-
     </StyledTableContainer>
   );
 };

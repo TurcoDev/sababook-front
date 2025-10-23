@@ -34,16 +34,16 @@ const DashboardLayout = ({ children }) => {
 
   return (
     <Box sx={{ backgroundColor: '#F0F0F0', minHeight: '100vh', padding: theme.spacing(2) }}>
-      
+
       {/* HEADER SUPERIOR */}
       <AppBar position="static" color="transparent" elevation={0} sx={{ p: 1 }}>
         <Toolbar disableGutters sx={{ justifyContent: 'space-between' }}>
           {/* Mockup del logo/perfil */}
           <Box sx={{ display: 'flex', alignItems: 'center' }}>
             {/* El avatar de la imagen */}
-            <Box component="img" src="/ruta-a-la-imagen-del-avatar.png" 
-                 alt="Avatar" 
-                 sx={{ width: 50, height: 50, borderRadius: '50%', mr: 1, objectFit: 'cover' }} 
+            <Box component="img" src="/ruta-a-la-imagen-del-avatar.png"
+              alt="Avatar"
+              sx={{ width: 50, height: 50, borderRadius: '50%', mr: 1, objectFit: 'cover' }}
             />
             {/* Aquí iría el título si se necesitara, pero lo omitimos para ser fiel a la imagen */}
           </Box>
@@ -60,7 +60,7 @@ const DashboardLayout = ({ children }) => {
           {/* El botón 'Usuarios' está activo */}
           <NavButton active>Usuarios</NavButton>
           <NavButton>Libros</NavButton>
-          <NavButton>Fotos</NavButton>
+          <NavButton>Foros</NavButton>
         </Box>
 
         {/* CONTENIDO PRINCIPAL (Recibido como children) */}
