@@ -15,10 +15,20 @@ const BookDetailsPage = () => {
   const [book, setBook] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [user, setUser] = useState(null); //se agrega
   const navigate = useNavigate();
 
-  useEffect(() => {
-    setLoading(true);
+    useEffect(() => {
+    const storedName = localStorage.getItem("username");
+    if (storedName) {
+        setUser({ nombre: storedName }); // lo guardamos como objeto
+    }
+    }, []);
+
+
+    useEffect(() => {
+
+ setLoading(true);
     fetch(`${API_BASE_URL}/api/v1/libros/${id}`)
       .then(res => {
         if (!res.ok) throw new Error('No se encontró el libro.');
@@ -33,6 +43,7 @@ const BookDetailsPage = () => {
         setLoading(false);
       });
   }, [id]);
+
 
   const authorStyle = {
     fontWeight: 900,
@@ -72,11 +83,12 @@ const BookDetailsPage = () => {
         boxShadow: theme.shadows[10],
       }}
     >
-      <AppHeader
+      
+       <AppHeader
         onMenuClick={handleMenuToggle}
-        title={`Bienvenida, ${book.userName || "Usuario"}`}
+        title={`Bienvenida, ${user?.nombre || "Usuario"}`}
         subtitle={book.date || "Fecha desconocida"}
-      />
+        />
 
       <Box sx={{ pt: 0 }}>
         <Box display="flex" alignItems="flex-start" gap={2} mb={3}>

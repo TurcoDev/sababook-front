@@ -41,7 +41,7 @@ const handleLoginSubmit = async ({ email, password }) => {
   setError(null); // Limpia errores previos
 
   try {
-    // Paso 1: Login inicial
+    // Se agrega
     const response = await fetch(`${API_BASE_URL}/api/v1/auth/login`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -89,7 +89,7 @@ const handleLoginSubmit = async ({ email, password }) => {
 
   const handleRegisterSubmit = (formData) => {
     console.log('Datos de registro enviados:', formData);
-    // Aquí puedes implementar la lógica para registrar al usuario
+    
   };
 
   const handleBackToLogin = () => {
