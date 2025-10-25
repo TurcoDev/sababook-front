@@ -169,7 +169,7 @@ export default function Home() {
             autor={book.autor}
             gender={book.genero}
             title={book.titulo}
-            description={book.descripcion}
+          //  description={book.descripcion}
             rating={book.rating}
             progress={book.progress}
             isFavorite={book.isFavorite}

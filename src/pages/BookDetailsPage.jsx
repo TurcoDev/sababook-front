@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Box, Typography, Rating, Divider, Chip, useTheme } from '@mui/material';
 import StarIcon from '@mui/icons-material/Star';
 import { useNavigate, useParams } from 'react-router-dom';
-
+import SideMenu from '../components/SideMenu';
 import NavButton from '../components/NavButton';
 import AppHeader from '../components/AppHeader';
 import { API_BASE_URL } from '../environments/api';
@@ -17,7 +17,7 @@ const BookDetailsPage = () => {
   const [error, setError] = useState(null);
   const [user, setUser] = useState(null); //se agrega
   const navigate = useNavigate();
-
+  const [menuOpen, setMenuOpen] = useState(false);
     useEffect(() => {
     const storedName = localStorage.getItem("username");
     if (storedName) {
@@ -63,7 +63,8 @@ const BookDetailsPage = () => {
 
   const handleCommentClick = () => console.log(`Comentar para libro ID: ${id}`);
   const handleViewCommentsClick = () => navigate(`/book/${id}/comments`);
-  const handleMenuToggle = () => console.log("Abrir SideMenu");
+ const handleMenuToggle = () => setMenuOpen(true); 
+const handleMenuClose = () => setMenuOpen(false); 
 
   if (loading) return <div>Cargando...</div>;
   if (error) return <div>{error}</div>;
@@ -75,12 +76,13 @@ const BookDetailsPage = () => {
   return (
     <Box
       sx={{
-        minHeight: '100vh',
-        backgroundColor: theme.palette.common.white,
-        p: 2,
+        width: '100%',
         maxWidth: 1000,
+        minHeight: '100vh',
         margin: '0 auto',
-        boxShadow: theme.shadows[10],
+        py: 2,
+        px: 1,
+        backgroundColor: theme.palette.common.white,
       }}
     >
       
@@ -89,7 +91,11 @@ const BookDetailsPage = () => {
         title={`Bienvenida, ${user?.nombre || "Usuario"}`}
         subtitle={book.date || "Fecha desconocida"}
         />
-
+<SideMenu 
+ open={menuOpen} 
+  onClose={handleMenuClose} 
+ active="Inicio" 
+/>
       <Box sx={{ pt: 0 }}>
         <Box display="flex" alignItems="flex-start" gap={2} mb={3}>
           <Box sx={{ position: 'relative' }}>
