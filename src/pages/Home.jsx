@@ -1,11 +1,9 @@
 import { useState, useEffect } from "react";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import {
   Box,
   Typography,
-  Modal,
 } from "@mui/material";
-
 
 import AppHeader from "../components/AppHeader"; 
 import BookCard from "../components/BookCard";
@@ -16,7 +14,6 @@ import LibroImage from '../assets/libro.jpg'
 import { API_BASE_URL } from "../environments/api";
 import WelcomeModal from "../components/WelcomeModal";
 
-
 const FEATURED_BOOK = {
   id: 0,
   title: "La Campana de Cristal",
@@ -26,7 +23,6 @@ const FEATURED_BOOK = {
   image: LibroImage
 };
 
-
 export default function Home() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [books, setBooks] = useState([]);
@@ -34,6 +30,14 @@ export default function Home() {
   const [welcomeUser, setWelcomeUser] = useState(null);
   const [isWelcomeModalOpen, setWelcomeModalOpen] = useState(false);
   const location = useLocation();
+  const navigate = useNavigate();
+
+  const [username, setUsername] = useState('');
+
+    useEffect(() => {
+      const storedUser = localStorage.getItem('username');
+      if (storedUser) setUsername(storedUser);
+    }, []);
 
   useEffect(() => {
     fetch(`${API_BASE_URL}/api/v1/libros`)
@@ -47,12 +51,10 @@ export default function Home() {
       });
   }, []);
 
-  // Efecto para mostrar el modal de bienvenida
   useEffect(() => {
     if (location.state?.fromLogin) {
       const userId = localStorage.getItem('userId');
       if (userId) {
-        // Hacemos un fetch para obtener los datos del usuario
         const token = localStorage.getItem('token');
         fetch(`${API_BASE_URL}/api/v1/user/${userId}`, {
           headers: {
@@ -69,17 +71,14 @@ export default function Home() {
           })
           .catch(err => console.error("Error al obtener datos del usuario:", err));
       }
-      // Limpiamos el estado para que el modal no aparezca si se recarga la página
       window.history.replaceState({}, document.title)
     }
   }, [location.state]);
 
   const handleCloseWelcomeModal = () => setWelcomeModalOpen(false);
 
-
   const handleSearch = (query) => {
     console.log("Buscando:", query);
-    // aca se haria la llamada a la API
   };
 
   const handleFavoriteToggle = (bookId, isFeatured = false) => {
@@ -100,6 +99,10 @@ export default function Home() {
     }
   };
 
+  const handleVerMas = (bookId) => {
+    navigate(`/bookdetails/${bookId}`);
+  };
+
   return (
     <Box
       py={2}
@@ -110,35 +113,25 @@ export default function Home() {
         margin: "0 auto"
       }}
     >
-
-  
       <AppHeader
         onMenuClick={() => setMenuOpen(true)}
-        title="Bienvenida, Lucía"
+        title={`Bienvenida, ${username || 'Usuario'}`}
         subtitle="Miércoles, Septiembre 17, 2025"
       />
-
-      {/* Drawer lateral */}
+      
       <SideMenu open={menuOpen} onClose={() => setMenuOpen(false)} active="Inicio" />
 
-      {/* Modal de Bienvenida */}
       <WelcomeModal
         open={isWelcomeModalOpen}
         onClose={handleCloseWelcomeModal}
         user={welcomeUser}
       />
 
-      {/* SearchBar personalizada */}
       <Box mb={2}>
         <SearchBar onSearch={handleSearch} />
       </Box>
 
-
-      {/* Chips de filtros*/}
       <FilterChips />
-
-
-      {/* Recomendado semanal */}
 
       <Typography variant="h4" fontWeight="bold" color="secondary" mb={1}>
         Recomendado semanal
@@ -153,10 +146,9 @@ export default function Home() {
           progress={featuredBook.progress}
           isFavorite={featuredBook.isFavorite}
           onFavoriteToggle={() => handleFavoriteToggle(featuredBook.id, true)}
+          onVerMas={() => handleVerMas(featuredBook.id)}
         />
       </Box>
-
-      {/* Destacados */}
 
       <Typography variant="h4" fontWeight="bold" color="secondary" mt={3} mb={1}>
         Destacados
@@ -170,7 +162,6 @@ export default function Home() {
           gap: 4,
         }}
       >
-        {/*Mapear la lista de libros destacados */}
         {books.map((book) => (
           <BookCard
             key={book.libro_id}
@@ -185,9 +176,9 @@ export default function Home() {
             onFavoriteToggle={() => handleFavoriteToggle(book.id, false)}
             bookId={book.id}
             libro_id={book.libro_id}
+            onVerMas={() => handleVerMas(book.id)}
           />
         ))}
-
       </Box>
     </Box>
   );

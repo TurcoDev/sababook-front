@@ -174,7 +174,7 @@ export default function BookCard({
         >
           <Button
             variant="contained"
-            onClick={() => navigate(`/book-preview/${bookId || libro_id}`)}
+            onClick={() => navigate(`/book/${bookId || libro_id}`)}
             sx={{
               bgcolor: "#f25600",
               textTransform: "none",

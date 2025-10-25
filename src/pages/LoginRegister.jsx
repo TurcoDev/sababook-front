@@ -37,44 +37,59 @@ const LoginPage = () => {
     console.log('Cambiando a vista de formulario de Login');
   };
 
-  const handleLoginSubmit = async ({ email, password }) => {
-    setError(null); // Limpiamos errores previos
-    console.log('Intentando iniciar sesión con:', { email });
+const handleLoginSubmit = async ({ email, password }) => {
+  setError(null); // Limpia errores previos
 
-    try {
-      const response = await fetch(`${API_BASE_URL}/api/v1/auth/login`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ email, contrasena: password }),
-      });
+  try {
+    // Se agrega
+    const response = await fetch(`${API_BASE_URL}/api/v1/auth/login`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, contrasena: password }),
+    });
 
-      const data = await response.json();
+    const data = await response.json();
 
-      if (!response.ok) {
-        throw new Error(data.error || 'Error al iniciar sesión');
-      }
-
-      // Guardamos el token en el almacenamiento local
-      localStorage.setItem('token', data.token);
-      localStorage.setItem('userId', data.userId);
-      // Corregimos la clave a 'rol' para que coincida con SideMenu.jsx
-      localStorage.setItem('rol', data.rol);
-
-      // Redirigimos al home
-      navigate('/home', { state: { fromLogin: true } });
-
-    } catch (err) {
-      // Hacemos el mensaje de error más descriptivo
-      const errorMessage = err.message.includes('Failed to fetch') ? 'No se pudo conectar con el servidor. ¿Está en ejecución?' : err.message;
-      setError(errorMessage);
+    if (!response.ok) {
+      throw new Error(data.error || 'Error al iniciar sesión');
     }
-  };
+
+    // Guardar los datos básicos
+    localStorage.setItem('token', data.token);
+    localStorage.setItem('userId', data.userId);
+    localStorage.setItem('rol', data.rol);
+
+    // Paso 2: Obtener el nombre real usando userId
+    const profileResponse = await fetch(`${API_BASE_URL}/api/v1/user/${data.userId}`, {
+      headers: { 
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${data.token}`
+      }
+    });
+    const profileData = await profileResponse.json();
+
+    if (!profileResponse.ok) {
+      throw new Error(profileData.error || 'No se pudo obtener el perfil del usuario');
+    }
+
+    // Guardar el nombre en localStorage (ajusta el campo si cambia)
+    localStorage.setItem('username', profileData.nombre);
+
+    // Navegar a Home
+    navigate('/home', { state: { fromLogin: true } });
+
+  } catch (err) {
+    const errorMessage =
+      err.message.includes('Failed to fetch')
+        ? 'No se pudo conectar con el servidor. ¿Está en ejecución?'
+        : err.message;
+    setError(errorMessage);
+  }
+};
 
   const handleRegisterSubmit = (formData) => {
     console.log('Datos de registro enviados:', formData);
-    // Aquí puedes implementar la lógica para registrar al usuario
+    
   };
 
   const handleBackToLogin = () => {
