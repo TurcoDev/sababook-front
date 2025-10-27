@@ -33,32 +33,34 @@ const Insignias = () => {
       sx={{
         maxWidth: 400, // Ancho típico de un móvil
         margin: '0 auto',
-        minHeight: '100vh',
+        height: '100vh',
         backgroundColor: '#f5f5f5', // Fondo general sutil
+        display: 'flex',
+        flexDirection: 'column',
       }}
     >
 
       {/* 1. COMPONENTE DE ENCABEZADO */}
       <Encabezado nombreUsuario={usuarioActual} />
 
-      <Box sx={{ paddingY: 2 }}>
+      <Box sx={{ flex: 1 }}>
 
         {/* Paper contenedor con estilo similar a CommentSection */}
-        <Paper elevation={3} sx={{ p: { xs: 2, md: 3 }, borderRadius: '12px', mt: 2, mx: 2 }}>
+        <Paper sx={{ mx: 0, flex: 1, height: '100%', display: 'flex', flexDirection: 'column' }}>
 
           <Typography
-            variant="h5"
+            variant="subtitle1"
             fontWeight="bold"
             gutterBottom
             sx={{ color: theme.palette.body?.main || '#4A4C52' }}
           >
-            Mis insignias ({insigniasUsuario.length})
+            Insignias
           </Typography>
           <Divider sx={{ mb: 3 }} />
 
           {/* 2. COMPONENTES DE LAS CUATRO INSIGNIAS */}
           {insigniasUsuario.map((insignia, index) => (
-            <Box key={index} sx={{ marginBottom: 2 }}> {/* Espacio entre insignias */}
+            <Box key={index} sx={{ marginBottom: 4 }}>
               <InsigniaUnica nombreInsignia={insignia} />
             </Box>
           ))}

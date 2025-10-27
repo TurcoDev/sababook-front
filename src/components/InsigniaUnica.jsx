@@ -4,24 +4,47 @@ import { Box, Typography, Divider, Avatar, ListItem, ListItemAvatar, ListItemTex
 import StarIcon from '@mui/icons-material/Star'; // Ícono de ejemplo
 
 const InsigniaUnica = ({ nombreInsignia }) => {
-  
-  // Todas las insignias usan el mismo color primario del tema
-  const getInsigniaProps = (nombre) => {
-    return {
-        bgColor: 'primary.main', // Todas usan el color primario (marrón)
-        icon: <StarIcon />
-    };
-  };
+
+   // Función para obtener propiedades específicas de cada insignia
+   const getInsigniaProps = (nombre) => {
+     switch (nombre) {
+       case 'Crítico Literario':
+         return {
+           bgColor: 'transparent',
+           icon: '📚' // Un libro como emoji
+         };
+       case 'Comentarista Apasionado':
+         return {
+           bgColor: 'transparent',
+           icon: '💬' // Globo de diálogo con puntos suspensivos
+         };
+       case 'Fan de Libros':
+         return {
+           bgColor: 'transparent',
+           icon: '⭐' // Estrella amarilla
+         };
+       case 'Pionero de la Novedad':
+         return {
+           bgColor: 'transparent',
+           icon: '🔥' // Fuego como pico o novedad
+         };
+       default:
+         return {
+           bgColor: 'primary.main',
+           icon: <StarIcon />
+         };
+     }
+   };
 
   const { bgColor, icon } = getInsigniaProps(nombreInsignia);
 
   return (
-    <Box sx={{ backgroundColor: 'background.paper' }}>
-      <ListItem sx={{ paddingX: 2 }}>
+    <Box sx={{ backgroundColor: '#dad8d8ff', padding: 1, borderRadius: 1 }}>
+      <ListItem sx={{ padding: 0 }}>
         
         {/* Círculo de la Insignia (Avatar) */}
-        <ListItemAvatar>
-          <Avatar sx={{ bgcolor: bgColor, color: 'text.primary' }}>
+        <ListItemAvatar sx={{ minWidth: 40 }}>
+          <Avatar sx={{ bgcolor: bgColor, color: 'text.primary', width: 32, height: 32, fontSize: '1.25rem' }}>
             {icon}
           </Avatar>
         </ListItemAvatar>
@@ -29,17 +52,13 @@ const InsigniaUnica = ({ nombreInsignia }) => {
         {/* Nombre de la Insignia */}
         <ListItemText
           primary={
-            <Typography variant="body1" fontWeight="medium">
+            <Typography variant="body2" fontWeight="medium">
               {nombreInsignia}
             </Typography>
           }
           sx={{ marginY: 0 }}
         />
       </ListItem>
-      
-      {/* Separador que no incluye el espacio del Avatar (variant="inset") */}
-      <Divider variant="inset" component="li" sx={{ ml: '72px', mr: 2 }} />
-      {/* ml: '72px' = el ancho del Avatar + margen, alineando el separador con el texto */}
     </Box>
   );
 };

@@ -1,26 +1,32 @@
 // components/Encabezado.jsx
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Box, Typography, Divider } from '@mui/material';
 
 const Encabezado = ({ nombreUsuario }) => {
+  const [fechaActual, setFechaActual] = useState('');
+
+  useEffect(() => {
+    const actualizarFecha = () => {
+      const ahora = new Date();
+      const opciones = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+      setFechaActual(ahora.toLocaleDateString('es-ES', opciones));
+    };
+
+    actualizarFecha();
+    const intervalo = setInterval(actualizarFecha, 60000); // Actualizar cada minuto
+
+    return () => clearInterval(intervalo);
+  }, []);
+
   return (
-    <Box 
+    <Box
       sx={{
+        width: '100%',
         padding: 2,
         backgroundColor: 'background.paper',
         boxShadow: 1, // Sombra sutil para destacar el encabezado
       }}
     >
-      
-      {/* Fecha */}
-      <Typography 
-        variant="caption" 
-        color="text.secondary" 
-        display="block"
-        mb={0.5}
-      >
-        Miércoles, Octubre 24, 2025
-      </Typography>
       
       {/* Bienvenida y Nombre */}
       <Typography
@@ -36,6 +42,16 @@ const Encabezado = ({ nombreUsuario }) => {
         >
             {nombreUsuario}
         </Box>
+      </Typography>
+
+      {/* Fecha */}
+      <Typography
+        variant="caption"
+        color="text.secondary"
+        display="block"
+        mt={0.5}
+      >
+        {fechaActual}
       </Typography>
 
       {/* Separador inferior */}
