@@ -46,7 +46,7 @@ const Insignias = () => {
       <Box sx={{ flex: 1 }}>
 
         {/* Paper contenedor con estilo similar a CommentSection */}
-        <Paper sx={{ mx: 0, flex: 1, height: '100%', display: 'flex', flexDirection: 'column' }}>
+        <Paper sx={{ mx: 0, px: 0, flex: 1, height: '100%', display: 'flex', flexDirection: 'column', borderRadius: 0, boxShadow: 'none' }}>
 
           <Typography
             variant="subtitle1"
@@ -56,7 +56,6 @@ const Insignias = () => {
           >
             Insignias
           </Typography>
-          <Divider sx={{ mb: 3 }} />
 
           {/* 2. COMPONENTES DE LAS CUATRO INSIGNIAS */}
           {insigniasUsuario.map((insignia, index) => (

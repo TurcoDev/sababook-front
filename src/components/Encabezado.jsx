@@ -24,7 +24,6 @@ const Encabezado = ({ nombreUsuario }) => {
         width: '100%',
         padding: 2,
         backgroundColor: 'background.paper',
-        boxShadow: 1, // Sombra sutil para destacar el encabezado
       }}
     >
       
@@ -54,8 +53,6 @@ const Encabezado = ({ nombreUsuario }) => {
         {fechaActual}
       </Typography>
 
-      {/* Separador inferior */}
-      <Divider sx={{ mt: 2 }} /> 
     </Box>
   );
 };

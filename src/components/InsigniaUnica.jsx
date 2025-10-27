@@ -39,7 +39,7 @@ const InsigniaUnica = ({ nombreInsignia }) => {
   const { bgColor, icon } = getInsigniaProps(nombreInsignia);
 
   return (
-    <Box sx={{ backgroundColor: '#dad8d8ff', padding: 1, borderRadius: 1 }}>
+    <Box sx={{ backgroundColor: '#f7f7f7ff', padding: 1, mx: 0, mr: 8, boxShadow: '0 2px 4px rgba(0,0,0,0.4)' }}>
       <ListItem sx={{ padding: 0 }}>
         
         {/* Círculo de la Insignia (Avatar) */}
@@ -52,7 +52,7 @@ const InsigniaUnica = ({ nombreInsignia }) => {
         {/* Nombre de la Insignia */}
         <ListItemText
           primary={
-            <Typography variant="body2" fontWeight="medium">
+            <Typography variant="body2" fontWeight="medium" textAlign="center">
               {nombreInsignia}
             </Typography>
           }
