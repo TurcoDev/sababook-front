@@ -32,7 +32,7 @@ const Encabezado = ({ nombreUsuario }) => {
         variant="h5"
         component="h1"
         fontWeight="bold"
-        color="body.main" // Usa el color body del tema
+        color="primary.main" // Usa el color primary del tema
       >
         Bienvenida,
         <Box
