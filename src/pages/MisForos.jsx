@@ -8,7 +8,7 @@ const MisForos = () => {
 
   useEffect(() => {
     // Asegúrate de usar la URL correcta de tu backend
-    fetch('http://localhost:3000/api/foros/mios') // cambia esta URL según tu backend
+    fetch('http://localhost:3000/api/v1/foro') // cambia esta URL según tu backend
       .then(res => res.json())
       .then(data => {
         setForos(data);
