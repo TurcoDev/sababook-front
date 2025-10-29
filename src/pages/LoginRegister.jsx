@@ -101,7 +101,7 @@ const handleLoginSubmit = async ({ email, password }) => {
 
       <img
         src={logoUrl}
-        alt="La gran OCASION Logo"
+        alt="La gran OCASIÓN Logo"
         style={{ maxWidth: '100%', height: 'auto', marginBottom: '40px', display: 'block', width: '350px' }}
       />
       {view === 'presentation' ? (

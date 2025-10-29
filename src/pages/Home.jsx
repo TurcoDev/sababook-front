@@ -115,8 +115,13 @@ export default function Home() {
     >
       <AppHeader
         onMenuClick={() => setMenuOpen(true)}
-        title={`Bienvenida, ${username || 'Usuario'}`}
-        subtitle="Miércoles, Septiembre 17, 2025"
+        title={`Hola, ${username || 'Usuario'}`}
+        subtitle={new Date().toLocaleDateString('es-ES', { 
+          weekday: 'long', 
+          year: 'numeric', 
+          month: 'long', 
+          day: 'numeric' 
+        })}
       />
       
       <SideMenu open={menuOpen} onClose={() => setMenuOpen(false)} active="Inicio" />
@@ -128,7 +133,7 @@ export default function Home() {
       />
 
       <Box mb={2}>
-        <SearchBar onSearch={handleSearch} />
+        {/* <SearchBar onSearch={handleSearch} /> */}
       </Box>
 
       <FilterChips />
@@ -170,7 +175,7 @@ export default function Home() {
             gender={book.genero}
             title={book.titulo}
           //  description={book.descripcion}
-            rating={book.rating}
+            rating={book.calificacion_promedio}
             progress={book.progress}
             isFavorite={book.isFavorite}
             onFavoriteToggle={() => handleFavoriteToggle(book.id, false)}

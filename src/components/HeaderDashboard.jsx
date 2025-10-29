@@ -55,7 +55,7 @@ const HeaderDashboard = ({
         alignItems: 'center', 
         marginBottom: 2, 
       }}>
-        <SearchBar /> 
+        {/* <SearchBar />  */}
 
         <StyledAddButton onClick={onAddClick}>
           {getAddButtonText(activeView)}
