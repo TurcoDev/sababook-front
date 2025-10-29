@@ -16,7 +16,7 @@ import Insignias from "./pages/Insignias";
 function App() {
   return (
     <Routes>
-      <Route path="/" element={<Insignias />} /> {/* Temporalmente muestra Insignias en la ruta principal */}
+      <Route path="/" element={<LoginPage />} /> {/* Temporalmente muestra Insignias en la ruta principal */}
       <Route path="/login" element={<LoginPage />} />
       <Route path="/home" element={<Home />} />
       <Route path="/favoritos" element={<Favs />} />

@@ -4,7 +4,7 @@ import { Box, Typography, Paper, Divider } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 
 // Importa los componentes de la carpeta 'components'
-import Encabezado from '../components/Encabezado';
+import AppHeader from '../components/AppHeader';
 import InsigniaUnica from '../components/InsigniaUnica';
 
 const Insignias = () => {
@@ -42,7 +42,11 @@ const Insignias = () => {
     >
 
       {/* 1. COMPONENTE DE ENCABEZADO */}
-      <Encabezado nombreUsuario={usuarioActual} />
+     <AppHeader
+             onMenuClick={() => setMenuOpen(true)}
+             title={`Hola, ${username || 'Usuario'}`}
+             subtitle="Miércoles, Septiembre 17, 2025"
+           />
 
       <Box sx={{ flex: 1, overflowY: 'auto' }}>
 
