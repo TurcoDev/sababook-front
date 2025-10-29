@@ -37,16 +37,17 @@ const Insignias = () => {
         backgroundColor: '#f5f5f5', // Fondo general sutil
         display: 'flex',
         flexDirection: 'column',
+        overflowY: 'auto',
       }}
     >
 
       {/* 1. COMPONENTE DE ENCABEZADO */}
       <Encabezado nombreUsuario={usuarioActual} />
 
-      <Box sx={{ flex: 1 }}>
+      <Box sx={{ flex: 1, overflowY: 'auto' }}>
 
         {/* Paper contenedor con estilo similar a CommentSection */}
-        <Paper sx={{ mx: 0, px: 0, flex: 1, height: '100%', display: 'flex', flexDirection: 'column', borderRadius: 0, boxShadow: 'none' }}>
+        <Paper sx={{ mx: 0, px: 0, display: 'flex', flexDirection: 'column', borderRadius: 0, boxShadow: 'none' }}>
 
           <Typography
             variant="subtitle1"
