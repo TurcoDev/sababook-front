@@ -44,7 +44,7 @@ const SearchBar = ({ onSearch }) => {
   return (
     <StyledFormControl variant="outlined">
       <OutlinedInput
-        placeholder="Buscar libros, autores o géneros..."
+        placeholder="Buscar por título, autor o género (separados por coma)..."
         value={query}
         onChange={(e) => setQuery(e.target.value)}
         onKeyDown={handleKeyPress}
