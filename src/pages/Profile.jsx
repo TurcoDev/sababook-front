@@ -1,10 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Box, Button, styled, Avatar, Typography } from '@mui/material';
 import { useNavigate } from 'react-router-dom'; 
 
 import AppHeader from '../components/AppHeader'; 
 import SideMenu from '../components/SideMenu';
-import UserProfileForm from '../components/UserProfileForm'; 
+import UserProfileForm from '../components/UserProfileForm';
+import { useAuth } from '../hooks/useAuth'; 
 
 const StyledButton = styled(Button)(({ theme }) => ({
   backgroundColor: theme.palette.button?.main || '#f25600',
@@ -22,16 +23,26 @@ const StyledButton = styled(Button)(({ theme }) => ({
 
 const Profile = () => { 
   const navigate = useNavigate(); 
+  const { user, updateUser } = useAuth();
   const [menuOpen, setMenuOpen] = useState(false);
   const [currentView, setCurrentView] = useState('menu'); 
   
-
   const [userData, setUserData] = useState({
-    userName: "Lucía Gómez",
-    userEmail: "lucia.gomez@mail.com",
+    userName: "",
+    userEmail: "",
     avatarUrl: "https://i.pravatar.cc/150?img=1",
   });
 
+  // Sincronizar userData con el usuario del contexto
+  useEffect(() => {
+    if (user) {
+      setUserData({
+        userName: user.nombre || "",
+        userEmail: user.email || "",
+        avatarUrl: user.avatar_url || "https://i.pravatar.cc/150?img=1",
+      });
+    }
+  }, [user]);
  
   const { userName, userEmail, avatarUrl } = userData;
 
@@ -46,10 +57,17 @@ const Profile = () => {
   // Funciones para cambiar de vista
   const handleModifyProfileClick = () => setCurrentView('form');
   const handleCancel = () => setCurrentView('menu');
-  const handleSave = () => {
-    // Aquí iría la lógica para enviar userData a la API
-    console.log("Datos guardados. Volviendo al menú.");
-    handleCancel();
+  const handleSave = async (updatedData) => {
+    // Enviar userData actualizado a la API
+    const result = await updateUser(updatedData);
+    
+    if (result.success) {
+      console.log("Datos guardados exitosamente");
+      handleCancel();
+    } else {
+      console.error("Error al guardar:", result.error);
+      // Aquí podrías mostrar un mensaje de error al usuario
+    }
   };
   
 
@@ -66,7 +84,8 @@ const Profile = () => {
       // Muestra el formulario de edición
       return (
         <UserProfileForm 
-          userName={userName} 
+          userName={userName}
+          userEmail={userEmail}
           onCancel={handleCancel}
           onSave={handleSave}
           onAvatarChange={handleChangeAvatar} 

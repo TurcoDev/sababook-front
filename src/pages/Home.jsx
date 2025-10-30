@@ -13,13 +13,14 @@ import FilterChips from "../components/FilterChips";
 import LibroImage from '../assets/libro.jpg'
 import { API_BASE_URL } from "../environments/api";
 import WelcomeModal from "../components/WelcomeModal";
+import { useAuth } from "../hooks/useAuth";
 
 const FEATURED_BOOK = {
   id: 0,
-  title: "La Campana de Cristal",
-  rating: 4.2,
+  title: "La gran ocasión",
+  rating: 5,
   progress: 80,
-  isFavorite: false,
+  isFavorite: true,
   image: LibroImage
 };
 
@@ -27,17 +28,10 @@ export default function Home() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [books, setBooks] = useState([]);
   const [featuredBook, setFeaturedBook] = useState(FEATURED_BOOK);
-  const [welcomeUser, setWelcomeUser] = useState(null);
   const [isWelcomeModalOpen, setWelcomeModalOpen] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
-
-  const [username, setUsername] = useState('');
-
-    useEffect(() => {
-      const storedUser = localStorage.getItem('username');
-      if (storedUser) setUsername(storedUser);
-    }, []);
+  const { user } = useAuth();
 
   useEffect(() => {
     fetch(`${API_BASE_URL}/api/v1/libros`)
@@ -45,6 +39,10 @@ export default function Home() {
       .then(data => {
         setBooks(data);
         console.log("Libros cargados:", data);
+        const featured = data.find(book => book.titulo === "La gran ocasión");
+        if (featured) {
+          setFeaturedBook(featured);
+        }
       })
       .catch(err => {
         console.error("Error cargando libros:", err);
@@ -52,34 +50,13 @@ export default function Home() {
   }, []);
 
   useEffect(() => {
-    if (location.state?.fromLogin) {
-      const userId = localStorage.getItem('userId');
-      if (userId) {
-        const token = localStorage.getItem('token');
-        fetch(`${API_BASE_URL}/api/v1/user/${userId}`, {
-          headers: {
-            'Authorization': `Bearer ${token}`
-          }
-        })
-          .then(res => {
-            if (!res.ok) throw new Error('La respuesta de la red no fue exitosa al obtener datos del usuario.');
-            return res.json();
-          })
-          .then(userData => {
-            setWelcomeUser(userData);
-            setWelcomeModalOpen(true);
-          })
-          .catch(err => console.error("Error al obtener datos del usuario:", err));
-      }
-      window.history.replaceState({}, document.title)
+    if (location.state?.fromLogin && user) {
+      setWelcomeModalOpen(true);
+      window.history.replaceState({}, document.title);
     }
-  }, [location.state]);
+  }, [location.state, user]);
 
   const handleCloseWelcomeModal = () => setWelcomeModalOpen(false);
-
-  const handleSearch = (query) => {
-    console.log("Buscando:", query);
-  };
 
   const handleFavoriteToggle = (bookId, isFeatured = false) => {
     if (isFeatured) {
@@ -115,8 +92,13 @@ export default function Home() {
     >
       <AppHeader
         onMenuClick={() => setMenuOpen(true)}
-        title={`Bienvenida, ${username || 'Usuario'}`}
-        subtitle="Miércoles, Septiembre 17, 2025"
+        title={`Hola, ${user?.nombre || 'Usuario'}`}
+        subtitle={new Date().toLocaleDateString('es-ES', { 
+          weekday: 'long', 
+          year: 'numeric', 
+          month: 'long', 
+          day: 'numeric' 
+        })}
       />
       
       <SideMenu open={menuOpen} onClose={() => setMenuOpen(false)} active="Inicio" />
@@ -124,11 +106,11 @@ export default function Home() {
       <WelcomeModal
         open={isWelcomeModalOpen}
         onClose={handleCloseWelcomeModal}
-        user={welcomeUser}
+        user={user}
       />
 
       <Box mb={2}>
-        <SearchBar onSearch={handleSearch} />
+        {/* <SearchBar onSearch={handleSearch} /> */}
       </Box>
 
       <FilterChips />
@@ -140,9 +122,9 @@ export default function Home() {
       <Box display="flex" justifyContent="left" mt={2} mb={3}>
         <BookCard
           featured
-          image={featuredBook.image}
-          title={featuredBook.title}
-          rating={featuredBook.rating}
+          image={featuredBook.portada_url || LibroImage}
+          title={featuredBook.titulo}
+          rating={featuredBook.calificacion_promedio}
           progress={featuredBook.progress}
           isFavorite={featuredBook.isFavorite}
           onFavoriteToggle={() => handleFavoriteToggle(featuredBook.id, true)}
@@ -170,7 +152,7 @@ export default function Home() {
             gender={book.genero}
             title={book.titulo}
           //  description={book.descripcion}
-            rating={book.rating}
+            rating={book.calificacion_promedio}
             progress={book.progress}
             isFavorite={book.isFavorite}
             onFavoriteToggle={() => handleFavoriteToggle(book.id, false)}
