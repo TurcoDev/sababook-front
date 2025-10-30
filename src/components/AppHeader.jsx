@@ -8,7 +8,7 @@ export default function AppHeader({ onMenuClick, title, subtitle }) {
     <Box
       display="flex"
       alignItems="center"
-      justifyContent="space-between" // Clave para separar izquierda y derecha
+      justifyContent="space-between"
       mb={3} // Dejamos un margen inferior estándar para separarlo del contenido
     >
       {/* BLOQUE IZQUIERDO: Menú y Texto */}
