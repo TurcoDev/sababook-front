@@ -10,6 +10,7 @@ import DashboardPage from "./pages/DashboardPage";
 import BookDetailsPage from "./pages/BookDetailsPage";
 import MyComments from "./pages/MyComments";
 import Comments from "./pages/Comments";
+import Insignias from "./pages/Insignias";
 import { ProtectedRoute } from "./components/ProtectedRoute";
 
 function App() {
@@ -59,6 +60,12 @@ function App() {
       <Route path="/dashboard" element={
         <ProtectedRoute>
           <DashboardPage />
+        </ProtectedRoute>
+      } />
+
+      <Route path="/insignias" element={
+        <ProtectedRoute>
+          <Insignias />
         </ProtectedRoute>
       } />
 
