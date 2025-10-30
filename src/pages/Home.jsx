@@ -17,10 +17,10 @@ import { useAuth } from "../hooks/useAuth";
 
 const FEATURED_BOOK = {
   id: 0,
-  title: "La Campana de Cristal",
-  rating: 4.2,
+  title: "La gran ocasión",
+  rating: 5,
   progress: 80,
-  isFavorite: false,
+  isFavorite: true,
   image: LibroImage
 };
 
@@ -39,6 +39,10 @@ export default function Home() {
       .then(data => {
         setBooks(data);
         console.log("Libros cargados:", data);
+        const featured = data.find(book => book.titulo === "La gran ocasión");
+        if (featured) {
+          setFeaturedBook(featured);
+        }
       })
       .catch(err => {
         console.error("Error cargando libros:", err);
@@ -118,9 +122,9 @@ export default function Home() {
       <Box display="flex" justifyContent="left" mt={2} mb={3}>
         <BookCard
           featured
-          image={featuredBook.image}
-          title={featuredBook.title}
-          rating={featuredBook.rating}
+          image={featuredBook.portada_url || LibroImage}
+          title={featuredBook.titulo}
+          rating={featuredBook.calificacion_promedio}
           progress={featuredBook.progress}
           isFavorite={featuredBook.isFavorite}
           onFavoriteToggle={() => handleFavoriteToggle(featuredBook.id, true)}
