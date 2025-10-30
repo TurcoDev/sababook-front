@@ -1,5 +1,5 @@
 // Insignias.jsx
-import React from 'react';
+import React, { useState } from 'react';
 import { Box, Typography, Paper, Divider } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 
@@ -9,13 +9,13 @@ import InsigniaUnica from '../components/InsigniaUnica';
 
 const Insignias = () => {
   const theme = useTheme();
+  const [menuOpen, setMenuOpen] = useState(false);
 
   // ----------------------------------------------------
   // DATOS DINÁMICOS (Se simula la obtención de datos del usuario)
   // ----------------------------------------------------
 
-  // Nombre para el encabezado (para pruebas, puede ser 'Desarrollador', 'Andei', 'Lucia')
-  const usuarioActual = 'Desarrollador';
+  const username = 'Desarrollador'; // Simulación de usuario logueado
 
   // Las cuatro insignias que el usuario tiene
   const insigniasUsuario = [
@@ -24,7 +24,7 @@ const Insignias = () => {
     'Fan de Libros',
     'Pionero de la Novedad'
   ];
-  
+
   // ----------------------------------------------------
 
   return (
