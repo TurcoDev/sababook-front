@@ -275,13 +275,25 @@ const Dashboard = () => {
   const handleSaveNewForum = async (forumData) => {
     try {
       const token = localStorage.getItem('token');
+
+      // 🔹 Obtener el ID del usuario desde el token o desde tu estado de usuario
+      // Supongamos que lo guardaste en localStorage
+      const creador_id = localStorage.getItem('userId');
+
+      const forumToSend = {
+        ...forumData,
+        creador_id: parseInt(creador_id)  // asegúrate de que sea número
+      };
+
+      console.log("Datos del foro que se enviarán:", forumToSend);
+
       const response = await fetch(`${API_BASE_URL}/api/v1/foro`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`
         },
-        body: JSON.stringify(forumData),
+        body: JSON.stringify(forumToSend),
       });
 
       if (!response.ok) throw new Error('Error al crear el foro');
@@ -289,7 +301,6 @@ const Dashboard = () => {
       setSnackbar({ open: true, message: "Foro creado correctamente", severity: "success" });
       setOpenForumModal(false);
 
-      // 🔁 recargar lista de foros
       fetchForums();
     } catch (error) {
       console.error("Error al crear foro:", error);
@@ -432,14 +443,25 @@ const Dashboard = () => {
         </Box>
       </Modal>
 
-      <Modal open={openForumDetail} onClose={() => setOpenForumDetail(false)}>
+      <Modal
+        open={openForumDetail}
+        onClose={() => setOpenForumDetail(false)}
+        sx={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+        }}
+      >
         <Box
           sx={{
-            position: "absolute",
-            top: "50%",
-            left: "50%",
-            transform: "translate(-50%, -50%)",
-            outline: "none",
+            width: "90%",
+            maxWidth: "700px",
+            bgcolor: "background.paper",
+            borderRadius: "8px",
+            boxShadow: 24,
+            p: 4,
+            maxHeight: "85vh",
+            overflowY: "auto",
           }}
         >
           {selectedForumId && (
