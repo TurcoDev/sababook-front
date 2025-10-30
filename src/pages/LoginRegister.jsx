@@ -6,9 +6,9 @@ import { Box } from '@mui/material';
 import { styled } from '@mui/system';
 import Login from '../components/Login';
 import logoImage from '../assets/logo.png';
-import { API_BASE_URL } from '../environments/api';
 import LoginForm from '../components/LoginForm';
 import Register from '../components/auth/Register';
+import { useAuth } from '../hooks/useAuth';
 
 
 const StyledPageContainer = styled(Box)(({ theme }) => ({
@@ -24,6 +24,7 @@ const StyledPageContainer = styled(Box)(({ theme }) => ({
 const LoginPage = () => {
 
   const navigate = useNavigate();
+  const { login } = useAuth();
   const [error, setError] = useState(null);
   const [view, setView] = useState('presentation');
   const logoUrl = logoImage;
@@ -41,49 +42,16 @@ const handleLoginSubmit = async ({ email, password }) => {
   setError(null); // Limpia errores previos
 
   try {
-    // Se agrega
-    const response = await fetch(`${API_BASE_URL}/api/v1/auth/login`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email, contrasena: password }),
-    });
-
-    const data = await response.json();
-
-    if (!response.ok) {
-      throw new Error(data.error || 'Error al iniciar sesión');
+    const result = await login(email, password);
+    
+    if (result.success) {
+      // Navegar a Home
+      navigate('/home', { state: { fromLogin: true } });
+    } else {
+      setError(result.error);
     }
-
-    // Guardar los datos básicos
-    localStorage.setItem('token', data.token);
-    localStorage.setItem('userId', data.userId);
-    localStorage.setItem('rol', data.rol);
-
-    // Paso 2: Obtener el nombre real usando userId
-    const profileResponse = await fetch(`${API_BASE_URL}/api/v1/user/${data.userId}`, {
-      headers: { 
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${data.token}`
-      }
-    });
-    const profileData = await profileResponse.json();
-
-    if (!profileResponse.ok) {
-      throw new Error(profileData.error || 'No se pudo obtener el perfil del usuario');
-    }
-
-    // Guardar el nombre en localStorage (ajusta el campo si cambia)
-    localStorage.setItem('username', profileData.nombre);
-
-    // Navegar a Home
-    navigate('/home', { state: { fromLogin: true } });
-
-  } catch (err) {
-    const errorMessage =
-      err.message.includes('Failed to fetch')
-        ? 'No se pudo conectar con el servidor. ¿Está en ejecución?'
-        : err.message;
-    setError(errorMessage);
+  } catch {
+    setError('Error inesperado al iniciar sesión');
   }
 };
 
@@ -101,7 +69,7 @@ const handleLoginSubmit = async ({ email, password }) => {
 
       <img
         src={logoUrl}
-        alt="La gran OCASION Logo"
+        alt="La gran OCASIÓN Logo"
         style={{ maxWidth: '100%', height: 'auto', marginBottom: '40px', display: 'block', width: '350px' }}
       />
       {view === 'presentation' ? (

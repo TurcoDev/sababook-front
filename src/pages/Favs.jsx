@@ -73,7 +73,7 @@ export default function Favs() {
 
       {/* SearchBar personalizada */}
       <Box mb={2}>
-        <SearchBar onSearch={handleSearch} />
+        {/* <SearchBar onSearch={handleSearch} /> */}
       </Box>
       
       {/* Favs */}
