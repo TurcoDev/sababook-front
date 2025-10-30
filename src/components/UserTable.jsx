@@ -16,6 +16,7 @@ import {
   Pagination,
   useTheme,
   Snackbar,
+  styled,
   Alert,
 } from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
@@ -25,7 +26,15 @@ import UserForm from "./UserForm";
 import ConfirmationModal from "./ConfirmationModal";
 
 const ROWS_PER_PAGE = 5;
-
+const ActionButton = styled(IconButton)(({ theme }) => ({
+  backgroundColor: theme.palette.button?.main || '#f25600',
+  color: '#FFFFFF',
+  borderRadius: '8px',
+  padding: '6px',
+  '&:hover': {
+    backgroundColor: '#cc4800',
+  },
+}));
 export default function UserTable({ users, loading, error, onUserUpdate }) {
   const theme = useTheme();
   const [openModal, setOpenModal] = useState(false);
@@ -213,12 +222,12 @@ export default function UserTable({ users, loading, error, onUserUpdate }) {
                 <TableCell>{user.nivel_educativo || "-"}</TableCell>
                 <TableCell align="center">
                   <Box sx={{ display: "flex", gap: 1, justifyContent: "center" }}>
-                    <IconButton onClick={() => handleEdit(user.usuario_id)} title="Editar" size="small">
-                      <EditIcon />
-                    </IconButton>
-                    <IconButton onClick={() => handleDelete(user.usuario_id)} title="Eliminar" size="small" color="error">
-                      <DeleteIcon />
-                    </IconButton>
+                    <ActionButton onClick={() => handleEdit(user.usuario_id)} title="Editar" size="small">
+                      <EditIcon sx={{ fontSize: '1.1rem' }}/>
+                    </ActionButton>
+                    <ActionButton onClick={() => handleDelete(user.usuario_id)} title="Eliminar" size="small" color="error">
+                      <DeleteIcon sx={{ fontSize: '1.1rem' }}/>
+                    </ActionButton>
                   </Box>
                 </TableCell>
               </TableRow>
