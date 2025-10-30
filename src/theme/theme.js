@@ -17,14 +17,6 @@ const theme = createTheme({
   },
   typography: {
     fontFamily: "Roboto, Arial, sans-serif",
-    h5: {
-      fontWeight: 700,
-      color: "#653A1B", // Color primary para títulos h5
-    },
-    subtitle1: {
-      fontWeight: 600,
-      color: "#4A4C52", // Color body para subtítulos
-    },
   },
 });
 
