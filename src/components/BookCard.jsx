@@ -152,14 +152,14 @@ export default function BookCard({
           >
             {rating?.toFixed(1)}
           </Typography>
-          <Box mt={1}>
+          {/* <Box mt={1}>
             <Chip
               label={`${progress ?? 0}%`}
               color="primary"
               size="small"
               sx={{ fontSize: "0.75rem" }}
             />
-          </Box>
+          </Box> */}
         </Box>
 
         <Box

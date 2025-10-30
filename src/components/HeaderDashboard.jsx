@@ -55,18 +55,19 @@ const HeaderDashboard = ({
         alignItems: 'center', 
         marginBottom: 2, 
       }}>
-        <SearchBar /> 
+        {/* <SearchBar />  */}
 
+      </Box>
+
+      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+      {/* Título de la tabla actual */}
+      <Typography variant="h4" fontWeight="bold" sx={{ color: '#555555', mb: 2 }}>
+          {currentTitle}
+      </Typography>
         <StyledAddButton onClick={onAddClick}>
           {getAddButtonText(activeView)}
         </StyledAddButton>
       </Box>
-      
-      {/* Título de la tabla actual */}
-      <Typography variant="h4" fontWeight="bold" sx={{ color: '#555555', mb: 2 }}>
-          {/* 🛑 ¡USAMOS LA VARIABLE currentTitle EN LUGAR DE activeView.charAt(0)...! 🛑 */}
-          {currentTitle}
-      </Typography>
     </Box>
   );
 };
