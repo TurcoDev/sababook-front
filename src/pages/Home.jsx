@@ -13,6 +13,7 @@ import FilterChips from "../components/FilterChips";
 import LibroImage from '../assets/libro.jpg'
 import { API_BASE_URL } from "../environments/api";
 import WelcomeModal from "../components/WelcomeModal";
+import { useAuth } from "../hooks/useAuth";
 
 const FEATURED_BOOK = {
   id: 0,
@@ -27,17 +28,10 @@ export default function Home() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [books, setBooks] = useState([]);
   const [featuredBook, setFeaturedBook] = useState(FEATURED_BOOK);
-  const [welcomeUser, setWelcomeUser] = useState(null);
   const [isWelcomeModalOpen, setWelcomeModalOpen] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
-
-  const [username, setUsername] = useState('');
-
-    useEffect(() => {
-      const storedUser = localStorage.getItem('username');
-      if (storedUser) setUsername(storedUser);
-    }, []);
+  const { user } = useAuth();
 
   useEffect(() => {
     fetch(`${API_BASE_URL}/api/v1/libros`)
@@ -52,34 +46,13 @@ export default function Home() {
   }, []);
 
   useEffect(() => {
-    if (location.state?.fromLogin) {
-      const userId = localStorage.getItem('userId');
-      if (userId) {
-        const token = localStorage.getItem('token');
-        fetch(`${API_BASE_URL}/api/v1/user/${userId}`, {
-          headers: {
-            'Authorization': `Bearer ${token}`
-          }
-        })
-          .then(res => {
-            if (!res.ok) throw new Error('La respuesta de la red no fue exitosa al obtener datos del usuario.');
-            return res.json();
-          })
-          .then(userData => {
-            setWelcomeUser(userData);
-            setWelcomeModalOpen(true);
-          })
-          .catch(err => console.error("Error al obtener datos del usuario:", err));
-      }
-      window.history.replaceState({}, document.title)
+    if (location.state?.fromLogin && user) {
+      setWelcomeModalOpen(true);
+      window.history.replaceState({}, document.title);
     }
-  }, [location.state]);
+  }, [location.state, user]);
 
   const handleCloseWelcomeModal = () => setWelcomeModalOpen(false);
-
-  const handleSearch = (query) => {
-    console.log("Buscando:", query);
-  };
 
   const handleFavoriteToggle = (bookId, isFeatured = false) => {
     if (isFeatured) {
@@ -115,7 +88,7 @@ export default function Home() {
     >
       <AppHeader
         onMenuClick={() => setMenuOpen(true)}
-        title={`Hola, ${username || 'Usuario'}`}
+        title={`Hola, ${user?.nombre || 'Usuario'}`}
         subtitle={new Date().toLocaleDateString('es-ES', { 
           weekday: 'long', 
           year: 'numeric', 
@@ -129,7 +102,7 @@ export default function Home() {
       <WelcomeModal
         open={isWelcomeModalOpen}
         onClose={handleCloseWelcomeModal}
-        user={welcomeUser}
+        user={user}
       />
 
       <Box mb={2}>

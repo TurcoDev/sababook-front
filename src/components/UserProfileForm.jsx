@@ -1,7 +1,7 @@
-import { Box, Typography, TextField, Button, Avatar, IconButton } from '@mui/material'; // ⬅️ ¡Añadidos Avatar e IconButton!
-import React from 'react';
+import { Box, Typography, TextField, Button, Avatar, IconButton } from '@mui/material';
+import React, { useState } from 'react';
 
-// 1. Definimos los avatares aquí, sin el 'export'
+// Definimos los avatares predeterminados
 const DEFAULT_AVATARS = [
   "https://i.pravatar.cc/150?img=1",
   "https://i.pravatar.cc/150?img=2",
@@ -11,13 +11,34 @@ const DEFAULT_AVATARS = [
   "https://i.pravatar.cc/150?img=6",
 ];
 
-
-// El formulario recibe la función para cambiar el avatar y la URL actual
-export default function UserProfileForm({ userName, onCancel, onSave, onAvatarChange, currentAvatarUrl }) {
+export default function UserProfileForm({ 
+  userName, 
+  userEmail, 
+  currentAvatarUrl, 
+  onCancel, 
+  onSave, 
+  onAvatarChange 
+}) {
+    const [formData, setFormData] = useState({
+        nombre: userName || '',
+        email: userEmail || '',
+        avatar_url: currentAvatarUrl || DEFAULT_AVATARS[0]
+    });
     
     // Función para manejar el clic en un avatar predeterminado
     const handleAvatarSelect = (url) => {
-        onAvatarChange(url); // Llama a la función que actualiza el estado en Profile.jsx
+        setFormData(prev => ({ ...prev, avatar_url: url }));
+        if (onAvatarChange) {
+            onAvatarChange(url);
+        }
+    };
+
+    const handleInputChange = (field, value) => {
+        setFormData(prev => ({ ...prev, [field]: value }));
+    };
+
+    const handleSubmit = () => {
+        onSave(formData);
     };
     
     return (
@@ -44,8 +65,7 @@ export default function UserProfileForm({ userName, onCancel, onSave, onAvatarCh
                         key={url} 
                         onClick={() => handleAvatarSelect(url)}
                         sx={{
-                            // Destacamos el avatar seleccionado
-                            border: url === currentAvatarUrl ? '3px solid #f25600' : '3px solid transparent',
+                            border: url === formData.avatar_url ? '3px solid #f25600' : '3px solid transparent',
                             padding: 0,
                         }}
                     >
@@ -57,20 +77,29 @@ export default function UserProfileForm({ userName, onCancel, onSave, onAvatarCh
                 ))}
             </Box>
 
-         
+            {/* CAMPOS DEL FORMULARIO */}
             <TextField 
                 label="Nombre Completo" 
-                defaultValue={userName} 
+                value={formData.nombre}
+                onChange={(e) => handleInputChange('nombre', e.target.value)}
                 fullWidth 
                 margin="normal" 
             />
-            {/* ... otros campos ... */}
+
+            <TextField 
+                label="Correo Electrónico" 
+                value={formData.email}
+                onChange={(e) => handleInputChange('email', e.target.value)}
+                fullWidth 
+                margin="normal"
+                type="email"
+            />
 
             <Box sx={{ mt: 3, display: 'flex', justifyContent: 'space-between', gap: 2 }}>
                 <Button variant="outlined" onClick={onCancel} fullWidth>
                     Cancelar
                 </Button>
-                <Button variant="contained" onClick={onSave} color="primary" fullWidth>
+                <Button variant="contained" onClick={handleSubmit} color="primary" fullWidth>
                     Guardar Cambios
                 </Button>
             </Box>
