@@ -88,8 +88,8 @@ const handleMenuClose = () => setMenuOpen(false);
       
        <AppHeader
         onMenuClick={handleMenuToggle}
-        title={`Bienvenida, ${user?.nombre || "Usuario"}`}
-        subtitle={book.date || "Fecha desconocida"}
+        title={`Detalles del libro`}
+        subtitle={ "Descubrí su esencia y su autor"}
         />
 <SideMenu 
  open={menuOpen} 

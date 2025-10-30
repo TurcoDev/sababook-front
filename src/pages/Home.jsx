@@ -15,19 +15,28 @@ import { API_BASE_URL } from "../environments/api";
 import WelcomeModal from "../components/WelcomeModal";
 import { useAuth } from "../hooks/useAuth";
 
-const FEATURED_BOOK = {
-  id: 0,
-  title: "La gran ocasión",
-  rating: 5,
-  progress: 80,
-  isFavorite: true,
-  image: LibroImage
+// --- Constantes de Configuración ---
+// ID del libro que quieres destacar
+const FEATURED_BOOK_ID = 9; 
+
+// Constante de libro por defecto, usando las propiedades de la API
+const DEFAULT_FEATURED_BOOK = {
+  // Ponemos ambos IDs en null/0 para indicar que el dato real aún no ha cargado
+  id: null, 
+  libro_id: null, 
+  titulo: "Cargando...",
+  calificacion_promedio: 0,
+  isFavorite: false,
+  portada_url: LibroImage
 };
+// -----------------------------------
+
 
 export default function Home() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [books, setBooks] = useState([]);
-  const [featuredBook, setFeaturedBook] = useState(FEATURED_BOOK);
+  // Inicializamos con DEFAULT_FEATURED_BOOK
+  const [featuredBook, setFeaturedBook] = useState(DEFAULT_FEATURED_BOOK); 
   const [isWelcomeModalOpen, setWelcomeModalOpen] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
@@ -39,9 +48,23 @@ export default function Home() {
       .then(data => {
         setBooks(data);
         console.log("Libros cargados:", data);
-        const featured = data.find(book => book.titulo === "La gran ocasión");
+        
+        // 1. Buscamos por 'libro_id' o 'id' para ser más robustos
+        const featured = data.find(book => 
+            book.libro_id === FEATURED_BOOK_ID || book.id === FEATURED_BOOK_ID
+        ); 
+        
         if (featured) {
-          setFeaturedBook(featured);
+          // 2. Si se encuentra, aseguramos que 'id' y 'libro_id' tengan un valor, 
+          // usando el que exista para evitar 'undefined' en el JSX.
+          const actualId = featured.id || featured.libro_id;
+
+          setFeaturedBook({
+            ...featured,
+            id: actualId,
+            libro_id: featured.libro_id || featured.id, // Para asegurar que ambos campos existan
+            isFavorite: featured.isFavorite || false
+          });
         }
       })
       .catch(err => {
@@ -67,7 +90,7 @@ export default function Home() {
     } else {
       setBooks(prevBooks =>
         prevBooks.map(book => {
-          if (book.id === bookId) {
+          if ((book.id === bookId) || (book.libro_id === bookId)) {
             return { ...book, isFavorite: !book.isFavorite };
           }
           return book;
@@ -77,7 +100,12 @@ export default function Home() {
   };
 
   const handleVerMas = (bookId) => {
-    navigate(`/bookdetails/${bookId}`);
+    if (bookId) {
+        navigate(`/bookdetails/${bookId}`);
+    } else {
+        // Este console.error solo se verá si la verificación en el JSX falla
+        console.error("ERROR de Navegación: ID de libro es nulo o indefinido."); 
+    }
   };
 
   return (
@@ -120,16 +148,20 @@ export default function Home() {
       </Typography>
 
       <Box display="flex" justifyContent="left" mt={2} mb={3}>
-        <BookCard
-          featured
-          image={featuredBook.portada_url || LibroImage}
-          title={featuredBook.titulo}
-          rating={featuredBook.calificacion_promedio}
-          progress={featuredBook.progress}
-          isFavorite={featuredBook.isFavorite}
-          onFavoriteToggle={() => handleFavoriteToggle(featuredBook.id, true)}
-          onVerMas={() => handleVerMas(featuredBook.id)}
-        />
+       <BookCard
+  featured
+  image={featuredBook.portada_url || LibroImage}
+  title={featuredBook.titulo}
+  rating={featuredBook.calificacion_promedio || featuredBook.rating}
+  isFavorite={featuredBook.isFavorite}
+  onFavoriteToggle={() =>
+    (featuredBook.id || featuredBook.libro_id) &&
+    handleFavoriteToggle(featuredBook.id || featuredBook.libro_id, true)
+  }
+  bookId={featuredBook.id || featuredBook.libro_id}
+  libro_id={featuredBook.libro_id}
+/>
+
       </Box>
 
       <Typography variant="h4" fontWeight="bold" color="secondary" mt={3} mb={1}>
@@ -151,14 +183,14 @@ export default function Home() {
             autor={book.autor}
             gender={book.genero}
             title={book.titulo}
-          //  description={book.descripcion}
             rating={book.calificacion_promedio}
             progress={book.progress}
             isFavorite={book.isFavorite}
-            onFavoriteToggle={() => handleFavoriteToggle(book.id, false)}
+            // Mismo fallback de ID para la lista
+            onFavoriteToggle={() => handleFavoriteToggle(book.id || book.libro_id, false)} 
             bookId={book.id}
             libro_id={book.libro_id}
-            onVerMas={() => handleVerMas(book.id)}
+            onVerMas={() => handleVerMas(book.id || book.libro_id)}
           />
         ))}
       </Box>
