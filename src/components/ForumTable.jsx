@@ -56,7 +56,7 @@ const ActionButton = styled(IconButton)(({ theme }) => ({
   },
 }));
 
-const ForumTable = ({ forums, loading, error, onForumUpdate }) => {
+const ForumTable = ({ forums, loading, error, onForumUpdate, onForumClick }) => {
   const theme = useTheme();
   const [page, setPage] = useState(1);
   const pageCount = Math.ceil(forums.length / ROWS_PER_PAGE);
@@ -136,7 +136,13 @@ const ForumTable = ({ forums, loading, error, onForumUpdate }) => {
 
           <TableBody>
             {currentForums.map((row) => (
-              <TableRow hover role="checkbox" tabIndex={-1} key={row.foro_id}>
+              <TableRow
+                hover
+                key={row.foro_id}
+                onClick={() => onForumClick && onForumClick(row.foro_id)}
+                sx={{ cursor: "pointer" }}
+              >
+
                 {columns.map((column) => {
                   if (column.id === 'editar') {
                     return (
