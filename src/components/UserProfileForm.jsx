@@ -1,15 +1,26 @@
 import { Box, Typography, TextField, Button, Avatar, IconButton } from '@mui/material';
 import React, { useState } from 'react';
 
-// Definimos los avatares predeterminados
-const DEFAULT_AVATARS = [
-  "https://i.pravatar.cc/150?img=1",
-  "https://i.pravatar.cc/150?img=2",
-  "https://i.pravatar.cc/150?img=3",
-  "https://i.pravatar.cc/150?img=4",
-  "https://i.pravatar.cc/150?img=5",
-  "https://i.pravatar.cc/150?img=6",
+// --- Constantes para generar los avatares predeterminados ---
+// El estilo de DiceBear a utilizar (por ejemplo, 'adventurer', 'bottts', 'micah')
+const DICEBEAR_STYLE = 'adventurer';
+
+// Las "semillas" (seeds) para generar avatares únicos
+const SEEDS = [
+  "Ryker", 
+  "Kimberly", 
+  "Max", 
+  "Mackenzie", 
+  "Zoe", 
+  "Leo"
 ];
+
+// Genera el array de URLs utilizando las constantes
+const DEFAULT_AVATARS = SEEDS.map(seed => 
+  `https://api.dicebear.com/7.x/${DICEBEAR_STYLE}/svg?seed=${seed}`
+);
+// ------------------------------------------------------------
+
 
 export default function UserProfileForm({ 
   userName, 
@@ -19,6 +30,7 @@ export default function UserProfileForm({
   onSave, 
   onAvatarChange 
 }) {
+    // Usamos el primer avatar por defecto si no se proporciona uno actual
     const [formData, setFormData] = useState({
         nombre: userName || '',
         email: userEmail || '',
@@ -44,7 +56,7 @@ export default function UserProfileForm({
     return (
         <Box sx={{ maxWidth: '400px', margin: '0 auto', p: 2 }}>
             <Typography variant="h6" gutterBottom>
-                Editar Perfil de {userName}
+                Editar Perfil de **{userName}**
             </Typography>
 
             {/* SECCIÓN DE SELECCIÓN DE AVATAR */}
@@ -60,6 +72,9 @@ export default function UserProfileForm({
                     mb: 3 
                 }}
             >
+                {/* Asegúrate de que DEFAULT_AVATARS esté declarado
+                  antes de usarlo aquí.
+                */}
                 {DEFAULT_AVATARS.map((url) => (
                     <IconButton 
                         key={url} 
@@ -67,10 +82,12 @@ export default function UserProfileForm({
                         sx={{
                             border: url === formData.avatar_url ? '3px solid #f25600' : '3px solid transparent',
                             padding: 0,
+                            borderRadius: '50%', // Para que el borde siga la forma del Avatar
                         }}
                     >
                         <Avatar 
                             src={url} 
+                            alt={`Avatar para ${url.split('seed=')[1]}`} // Alt text más descriptivo
                             sx={{ width: 56, height: 56 }} 
                         />
                     </IconButton>
@@ -96,10 +113,24 @@ export default function UserProfileForm({
             />
 
             <Box sx={{ mt: 3, display: 'flex', justifyContent: 'space-between', gap: 2 }}>
-                <Button variant="outlined" onClick={onCancel} fullWidth>
+                <Button variant="outlined" onClick={onCancel} fullWidth sx={{ 
+                        borderColor: '#f25600', 
+                        color: '#f25600',        
+                        '&:hover': {
+                            borderColor: '#f25600', // Mantener el color del borde en hover
+                            backgroundColor: 'rgba(242, 86, 0, 0.04)', // Efecto de hover ligero
+                        }
+                    }}
+                >
                     Cancelar
                 </Button>
-                <Button variant="contained" onClick={handleSubmit} color="primary" fullWidth>
+                <Button variant="contained" onClick={handleSubmit}  fullWidth sx={{ 
+                        backgroundColor: '#f25600', 
+                        color: 'white',             
+                        '&:hover': {
+                            backgroundColor: '#cc4800', 
+                        }
+                    }}>
                     Guardar Cambios
                 </Button>
             </Box>
