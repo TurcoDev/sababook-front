@@ -42,7 +42,7 @@ const HeaderDashboard = ({
     <Box sx={{ width: '100%', maxWidth: '1200px', margin: '0 auto', mb: 4}}>
       
       {/* 1. BARRA DE NAVEGACIÓN (Llamada a NavButton) */}
-      <Box sx={{ display: 'flex', gap: 2, marginBottom: 4 }}>
+      <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2, marginBottom: 4 }}>
         <NavButton onClick={() => onNavigate('users')} isActive={activeView === 'users'}>Usuarios</NavButton>
         <NavButton onClick={() => onNavigate('books')} isActive={activeView === 'books'}>Libros</NavButton>
         <NavButton onClick={() => onNavigate('forums')} isActive={activeView === 'forums'}>Foros</NavButton>
@@ -51,7 +51,7 @@ const HeaderDashboard = ({
       {/* 2. BARRA DE ACCIONES (SearchBar y Botón Agregar) */}
       <Box sx={{ 
         display: 'flex', 
-        justifyContent: 'space-between', 
+        justifyContent: 'space-between',
         alignItems: 'center', 
         marginBottom: 2, 
       }}>

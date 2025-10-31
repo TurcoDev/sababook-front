@@ -1,5 +1,3 @@
-// src/pages/DashboardPage.jsx
-
 import React, { useState } from 'react';
 import { Box } from '@mui/material';
 import { Outlet } from 'react-router-dom';
@@ -14,6 +12,7 @@ const DashboardPage = () => {
     <Box sx={{ 
       minHeight: '100vh', 
       backgroundColor: '#FFFFFF',
+      boxSizing: 'border-box',
       width: '100%', 
       maxWidth: 1200, // Un ancho máximo para que no se estire demasiado en pantallas grandes
       margin: "0 auto",
