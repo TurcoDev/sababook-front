@@ -1,54 +1,43 @@
 import { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import {
-  Box,
-  Typography,
-} from "@mui/material";
+import { Box } from "@mui/material";
 
-import AppHeader from "../components/AppHeader"; 
-import BookCard from "../components/BookCard";
+// Importaciones de Componentes de Presentación
+import AppHeader from "../components/AppHeader";
 import SideMenu from "../components/SideMenu";
-import SearchBar from "../components/SearchBar";
 import FilterChips from "../components/FilterChips";
-import LibroImage from '../assets/libro.jpg'
-import { API_BASE_URL } from "../environments/api";
 import WelcomeModal from "../components/WelcomeModal";
-import { useAuth } from "../hooks/useAuth";
+import FeaturedBookSection from "../components/FeaturedBookSection"; 
+import BookListSection from "../components/BookListSection";
 
-const FEATURED_BOOK = {
-  id: 0,
-  title: "La gran ocasión",
-  rating: 5,
-  progress: 80,
-  isFavorite: true,
-  image: LibroImage
-};
+// Importaciones de Lógica (Custom Hooks)
+import { useAuth } from "../hooks/useAuth";
+import { useBookData } from "../hooks/useBookData"; // NUEVO: Lógica de carga de libros
+import { useFavorites } from "../hooks/useFavorites"; // Lógica de manejo de favoritos
+
 
 export default function Home() {
+  // --- Estados de UI ---
   const [menuOpen, setMenuOpen] = useState(false);
-  const [books, setBooks] = useState([]);
-  const [featuredBook, setFeaturedBook] = useState(FEATURED_BOOK);
   const [isWelcomeModalOpen, setWelcomeModalOpen] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
   const { user } = useAuth();
+  
+  // --- LÓGICA DE DATOS: Llamada a Custom Hooks ---
+  // 1. Hook para cargar los datos y manejar sus estados
+  const { books, setBooks, featuredBook, setFeaturedBook } = useBookData();
 
-  useEffect(() => {
-    fetch(`${API_BASE_URL}/api/v1/libros`)
-      .then(res => res.json())
-      .then(data => {
-        setBooks(data);
-        console.log("Libros cargados:", data);
-        const featured = data.find(book => book.titulo === "La gran ocasión");
-        if (featured) {
-          setFeaturedBook(featured);
-        }
-      })
-      .catch(err => {
-        console.error("Error cargando libros:", err);
-      });
-  }, []);
-
+  // 2. Hook para manejar la interacción de favoritos
+  const { handleFavoriteToggle } = useFavorites(
+    books, 
+    setBooks, 
+    featuredBook, 
+    setFeaturedBook
+  );
+  // -----------------------------------------------
+  
+  // --- Lógica de Modal de Bienvenida  ---
   useEffect(() => {
     if (location.state?.fromLogin && user) {
       setWelcomeModalOpen(true);
@@ -58,28 +47,16 @@ export default function Home() {
 
   const handleCloseWelcomeModal = () => setWelcomeModalOpen(false);
 
-  const handleFavoriteToggle = (bookId, isFeatured = false) => {
-    if (isFeatured) {
-      setFeaturedBook(prevBook => ({
-        ...prevBook,
-        isFavorite: !prevBook.isFavorite
-      }));
+  // --- Lógica de Navegación  ---
+  const handleVerMas = (bookId) => {
+    if (bookId) {
+        navigate(`/bookdetails/${bookId}`);
     } else {
-      setBooks(prevBooks =>
-        prevBooks.map(book => {
-          if (book.id === bookId) {
-            return { ...book, isFavorite: !book.isFavorite };
-          }
-          return book;
-        })
-      );
+        console.error("ERROR de Navegación: ID de libro es nulo o indefinido.");
     }
   };
-
-  const handleVerMas = (bookId) => {
-    navigate(`/bookdetails/${bookId}`);
-  };
-
+  
+  // --- RENDERIZADO ---
   return (
     <Box
       py={2}
@@ -93,75 +70,34 @@ export default function Home() {
       <AppHeader
         onMenuClick={() => setMenuOpen(true)}
         title={`Hola, ${user?.nombre || 'Usuario'}`}
-        subtitle={new Date().toLocaleDateString('es-ES', { 
-          weekday: 'long', 
-          year: 'numeric', 
-          month: 'long', 
-          day: 'numeric' 
+        subtitle={new Date().toLocaleDateString('es-ES', {
+          weekday: 'long',
+          year: 'numeric',
+          month: 'long',
+          day: 'numeric'
         })}
       />
-      
-      <SideMenu open={menuOpen} onClose={() => setMenuOpen(false)} active="Inicio" />
 
-      <WelcomeModal
-        open={isWelcomeModalOpen}
-        onClose={handleCloseWelcomeModal}
-        user={user}
-      />
+      <SideMenu open={menuOpen} onClose={() => setMenuOpen(false)} active="Inicio" />
+      <WelcomeModal open={isWelcomeModalOpen} onClose={handleCloseWelcomeModal} user={user} />
 
       <Box mb={2}>
         {/* <SearchBar onSearch={handleSearch} /> */}
       </Box>
-
+      
       <FilterChips />
 
-      <Typography variant="h4" fontWeight="bold" color="secondary" mb={1}>
-        Recomendado semanal
-      </Typography>
+      <FeaturedBookSection 
+        featuredBook={featuredBook}
+        handleFavoriteToggle={handleFavoriteToggle}
+        handleVerMas={handleVerMas}
+      />
 
-      <Box display="flex" justifyContent="left" mt={2} mb={3}>
-        <BookCard
-          featured
-          image={featuredBook.portada_url || LibroImage}
-          title={featuredBook.titulo}
-          rating={featuredBook.calificacion_promedio}
-          progress={featuredBook.progress}
-          isFavorite={featuredBook.isFavorite}
-          onFavoriteToggle={() => handleFavoriteToggle(featuredBook.id, true)}
-          onVerMas={() => handleVerMas(featuredBook.id)}
-        />
-      </Box>
-
-      <Typography variant="h4" fontWeight="bold" color="secondary" mt={3} mb={1}>
-        Destacados
-      </Typography>
-
-      <Box
-        sx={{
-          display: "flex",
-          flexWrap: "wrap",
-          justifyContent: "center",
-          gap: 4,
-        }}
-      >
-        {books.map((book) => (
-          <BookCard
-            key={book.libro_id}
-            image={book.portada_url}
-            autor={book.autor}
-            gender={book.genero}
-            title={book.titulo}
-          //  description={book.descripcion}
-            rating={book.calificacion_promedio}
-            progress={book.progress}
-            isFavorite={book.isFavorite}
-            onFavoriteToggle={() => handleFavoriteToggle(book.id, false)}
-            bookId={book.id}
-            libro_id={book.libro_id}
-            onVerMas={() => handleVerMas(book.id)}
-          />
-        ))}
-      </Box>
+      <BookListSection
+        books={books}
+        handleFavoriteToggle={handleFavoriteToggle}
+        handleVerMas={handleVerMas}
+      />
     </Box>
   );
 }

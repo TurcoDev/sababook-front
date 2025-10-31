@@ -168,7 +168,7 @@ const Profile = () => {
       <AppHeader
         onMenuClick={() => setMenuOpen(true)}
         title={currentView === 'menu' ? "Mi Perfil" : "Modificar Perfil"} 
-        subtitle={currentView === 'menu' ? `Bienvenida, ${userName}` : "Edita tus datos personales"}
+        subtitle={currentView === 'menu' ? `Hola, ${userName}` : "Edita tus datos personales"}
       />
       
       <SideMenu open={menuOpen} onClose={() => setMenuOpen(false)} active="Perfil" />
