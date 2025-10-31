@@ -21,9 +21,15 @@ const BookDetailsPage = () => {
     useEffect(() => {
     const storedName = localStorage.getItem("username");
     if (storedName) {
-        setUser({ nombre: storedName }); // lo guardamos como objeto
+        setUser({ nombre: storedName }); 
     }
     }, []);
+
+  const [opinions, setOpinions] = useState([]); 
+  const [showCommentBox, setShowCommentBox] = useState(false);
+  const [newComment, setNewComment] = useState('');
+  const [newRating, setNewRating] = useState(0);
+
 
 
     useEffect(() => {
@@ -44,6 +50,15 @@ const BookDetailsPage = () => {
       });
   }, [id]);
 
+        useEffect(() => {
+      if (!id) return;
+      fetch(`${API_BASE_URL}/api/v1/opinion/libro/${id}`)
+        .then(res => res.json())
+        .then(data => setOpinions(data))
+        .catch(err => console.error('Error cargando opiniones:', err));
+    }, [id]);
+
+
 
   const authorStyle = {
     fontWeight: 900,
@@ -61,16 +76,16 @@ const BookDetailsPage = () => {
     lineHeight: 1,
   };
 
-  const handleCommentClick = () => console.log(`Comentar para libro ID: ${id}`);
+  const handleCommentClick = () => setShowCommentBox(!showCommentBox);
   const handleViewCommentsClick = () => navigate(`/book/${id}/comments`);
- const handleMenuToggle = () => setMenuOpen(true); 
-const handleMenuClose = () => setMenuOpen(false); 
+  const handleMenuToggle = () => setMenuOpen(true); 
+  const handleMenuClose = () => setMenuOpen(false); 
 
   if (loading) return <div>Cargando...</div>;
   if (error) return <div>{error}</div>;
   if (!book) return <div>No se encontró el libro.</div>;
 
-  // Validar URL imagen para evitar src=""
+ 
   const coverImageSrc = book.coverImage?.trim() || book.portada_url?.trim() || null;
 
   return (
@@ -91,15 +106,15 @@ const handleMenuClose = () => setMenuOpen(false);
         title={`Detalles del libro`}
         subtitle={ "Descubrí su esencia y su autor"}
         />
-<SideMenu 
- open={menuOpen} 
-  onClose={handleMenuClose} 
- active="Inicio" 
-/>
-      <Box sx={{ pt: 0 }}>
-        <Box display="flex" alignItems="flex-start" gap={2} mb={3}>
-          <Box sx={{ position: 'relative' }}>
-            {coverImageSrc ? (
+        <SideMenu 
+        open={menuOpen} 
+          onClose={handleMenuClose} 
+        active="Inicio" 
+        />
+        <Box sx={{ pt: 0 }}>
+          <Box display="flex" alignItems="flex-start" gap={2} mb={3}>
+            <Box sx={{ position: 'relative' }}>
+              {coverImageSrc ? (
               <Box
                 component="img"
                 src={coverImageSrc}
@@ -179,6 +194,88 @@ const handleMenuClose = () => setMenuOpen(false);
         >
           Comentar
         </NavButton>
+
+        {showCommentBox && (
+              <Box
+                sx={{
+                  mt: 2,
+                  p: 2,
+                  borderRadius: '12px',
+                  bgcolor: theme.palette.grey[100],
+                  border: `1px solid ${theme.palette.grey[300]}`,
+                }}
+              >
+                <Typography variant="subtitle2" fontWeight="bold" mb={1}>
+                  Escribe tu opinión
+                </Typography>
+                <Rating
+                  value={newRating}
+                  onChange={(e, newValue) => setNewRating(newValue)}
+                  sx={{ mb: 1 }}
+                />
+                <textarea
+                  value={newComment}
+                  onChange={(e) => setNewComment(e.target.value)}
+                  placeholder="Escribe tu comentario..."
+                  style={{
+                    width: '100%',
+                    minHeight: '80px',
+                    padding: '8px',
+                    borderRadius: '8px',
+                    border: `1px solid ${theme.palette.grey[300]}`,
+                    resize: 'none',
+                  }}
+                />
+                <NavButton
+                  onClick={async () => {
+                    if (!newComment.trim() || newRating === 0) {
+                      alert('Por favor, escribe un comentario y selecciona una calificación.');
+                      return;
+                    }
+
+                   
+                    const payload = {
+                        libro_id: Number(id),
+                        usuario_id: Number(user?.id), // debe existir user.id con el id numérico
+                        calificacion: newRating,
+                        comentario: newComment,
+                      };
+
+
+                    try {
+                      const res = await fetch(`${API_BASE_URL}/api/v1/opinion`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload),
+                      });
+
+                      if (!res.ok) throw new Error('Error al guardar el comentario.');
+
+                      const savedOpinion = await res.json();
+                      setOpinions((prev) => [savedOpinion, ...prev]);
+                      setNewComment('');
+                      setNewRating(0);
+                      setShowCommentBox(false);
+                    } catch (err) {
+                      console.error(err);
+                      alert('No se pudo guardar el comentario.');
+                    }
+                  }}
+                  sx={{
+                    mt: 2,
+                    width: '100%',
+                    bgcolor: ORANGE_COLOR + ' !important',
+                    color: 'white',
+                    fontWeight: 'bold',
+                    borderRadius: '8px !important',
+                    '&:hover': { bgcolor: '#cc4800' + ' !important' },
+                  }}
+                >
+                  Publicar comentario
+                </NavButton>
+              </Box>
+            )}
+
 
         <Divider sx={{ my: 3 }} />
         <Box textAlign="left" mt={2}>
