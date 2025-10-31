@@ -6,6 +6,8 @@ import SideMenu from '../components/SideMenu';
 import NavButton from '../components/NavButton';
 import AppHeader from '../components/AppHeader';
 import { API_BASE_URL } from '../environments/api';
+import { useAuth } from "../hooks/useAuth";
+
 
 const ORANGE_COLOR = '#FF6633';
 
@@ -15,26 +17,34 @@ const BookDetailsPage = () => {
   const [book, setBook] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [user, setUser] = useState(null); //se agrega
   const navigate = useNavigate();
   const [menuOpen, setMenuOpen] = useState(false);
-    useEffect(() => {
-    const storedName = localStorage.getItem("username");
-    if (storedName) {
-        setUser({ nombre: storedName }); 
-    }
-    }, []);
-
-  const [opinions, setOpinions] = useState([]); 
+  const { user } = useAuth();
+  const [opinions, setOpinions] = useState([
+    {
+      id: 1,
+      usuario: { nombre: "Pablo", rol: "Docente" },
+      calificacion: 5,
+      comentario: "Un libro sensible, para pensar...",
+      destacado: true,
+    },
+    {
+      id: 2,
+      usuario: { nombre: "Federica", rol: "Alumno" },
+      calificacion: 5,
+      comentario: "Un libro emocionante y profundo.",
+      destacado: true,
+    },
+  ]);
   const [showCommentBox, setShowCommentBox] = useState(false);
   const [newComment, setNewComment] = useState('');
   const [newRating, setNewRating] = useState(0);
 
 
-
-    useEffect(() => {
-
- setLoading(true);
+  // Cargar detalles del libro
+  // TODO: Esto podria obtenerse del componente padre y evitariamos otra llamada
+  useEffect(() => {
+    setLoading(true);
     fetch(`${API_BASE_URL}/api/v1/libros/${id}`)
       .then(res => {
         if (!res.ok) throw new Error('No se encontró el libro.');
@@ -42,6 +52,8 @@ const BookDetailsPage = () => {
       })
       .then(data => {
         setBook(data);
+        console.log(data);
+
         setLoading(false);
       })
       .catch(err => {
@@ -50,13 +62,24 @@ const BookDetailsPage = () => {
       });
   }, [id]);
 
-        useEffect(() => {
-      if (!id) return;
-      fetch(`${API_BASE_URL}/api/v1/opinion/libro/${id}`)
-        .then(res => res.json())
-        .then(data => setOpinions(data))
-        .catch(err => console.error('Error cargando opiniones:', err));
-    }, [id]);
+  // Cargar opiniones del libro
+  useEffect(() => {
+    if (!id) return;
+    // TODO: este endpoint no existe aún en el backend
+    fetch(`${API_BASE_URL}/api/v1/opinion/libro/${id}`)
+      .then(res => res.json())
+      .then(data => {
+        setOpinions(data)
+      })
+      .catch(err => {
+        console.error('Error cargando opiniones:', err)
+
+        // Si no hay opiniones, ponemos  una de ejemplo
+        // TODO: eliminar esto cuando el backend devuelva opiniones reales
+        console.log('Opiniones cargadas:', opinions);
+
+      });
+  }, [id]);
 
 
 
@@ -78,14 +101,14 @@ const BookDetailsPage = () => {
 
   const handleCommentClick = () => setShowCommentBox(!showCommentBox);
   const handleViewCommentsClick = () => navigate(`/book/${id}/comments`);
-  const handleMenuToggle = () => setMenuOpen(true); 
-  const handleMenuClose = () => setMenuOpen(false); 
+  const handleMenuToggle = () => setMenuOpen(true);
+  const handleMenuClose = () => setMenuOpen(false);
 
   if (loading) return <div>Cargando...</div>;
   if (error) return <div>{error}</div>;
   if (!book) return <div>No se encontró el libro.</div>;
 
- 
+
   const coverImageSrc = book.coverImage?.trim() || book.portada_url?.trim() || null;
 
   return (
@@ -100,21 +123,21 @@ const BookDetailsPage = () => {
         backgroundColor: theme.palette.common.white,
       }}
     >
-      
-       <AppHeader
+
+      <AppHeader
         onMenuClick={handleMenuToggle}
         title={`Detalles del libro`}
-        subtitle={ "Descubrí su esencia y su autor"}
-        />
-        <SideMenu 
-        open={menuOpen} 
-          onClose={handleMenuClose} 
-        active="Inicio" 
-        />
-        <Box sx={{ pt: 0 }}>
-          <Box display="flex" alignItems="flex-start" gap={2} mb={3}>
-            <Box sx={{ position: 'relative' }}>
-              {coverImageSrc ? (
+        subtitle={"Descubrí su esencia y su autor"}
+      />
+      <SideMenu
+        open={menuOpen}
+        onClose={handleMenuClose}
+        active="Inicio"
+      />
+      <Box sx={{ pt: 0 }}>
+        <Box display="flex" alignItems="flex-start" gap={2} mb={3}>
+          <Box sx={{ position: 'relative' }}>
+            {coverImageSrc ? (
               <Box
                 component="img"
                 src={coverImageSrc}
@@ -133,21 +156,11 @@ const BookDetailsPage = () => {
 
           <Box flexGrow={1} textAlign="left" pt={1}>
             <Typography sx={authorStyle}>
-              {book.author || book.autor}
-            </Typography>
-            <Typography variant="h6" color="text.primary" sx={{ mb: 0.5 }}>
               {book.title || book.titulo}
             </Typography>
-            <Box display="flex" alignItems="center" gap={1}>
-              <Chip
-                label={book.status || `${book.progress || "0"}%`}
-                size="small"
-                sx={{
-                  fontWeight: 'bold',
-                  bgcolor: theme.palette.grey[200],
-                }}
-              />
-            </Box>
+            <Typography variant="h6" color="text.primary" sx={{ mb: 0.5 }}>
+              {book.author || book.autor}
+            </Typography>
           </Box>
         </Box>
 
@@ -156,10 +169,10 @@ const BookDetailsPage = () => {
         <Box textAlign="left" mb={2}>
           <Box display="flex" alignItems="flex-end" gap={1}>
             <Typography sx={ratingTextStyle}>
-              {(book.rating || 0).toFixed(1)}
+              {(book.calificacion_promedio || 0).toFixed(1)}
             </Typography>
             <Rating
-              value={book.rating || 0}
+              value={book.calificacion_promedio || 0}
               precision={0.1}
               readOnly
               icon={<StarIcon sx={{ color: ORANGE_COLOR }} />}
@@ -196,85 +209,87 @@ const BookDetailsPage = () => {
         </NavButton>
 
         {showCommentBox && (
-              <Box
-                sx={{
-                  mt: 2,
-                  p: 2,
-                  borderRadius: '12px',
-                  bgcolor: theme.palette.grey[100],
-                  border: `1px solid ${theme.palette.grey[300]}`,
-                }}
-              >
-                <Typography variant="subtitle2" fontWeight="bold" mb={1}>
-                  Escribe tu opinión
-                </Typography>
-                <Rating
-                  value={newRating}
-                  onChange={(e, newValue) => setNewRating(newValue)}
-                  sx={{ mb: 1 }}
-                />
-                <textarea
-                  value={newComment}
-                  onChange={(e) => setNewComment(e.target.value)}
-                  placeholder="Escribe tu comentario..."
-                  style={{
-                    width: '100%',
-                    minHeight: '80px',
-                    padding: '8px',
-                    borderRadius: '8px',
-                    border: `1px solid ${theme.palette.grey[300]}`,
-                    resize: 'none',
-                  }}
-                />
-                <NavButton
-                  onClick={async () => {
-                    if (!newComment.trim() || newRating === 0) {
-                      alert('Por favor, escribe un comentario y selecciona una calificación.');
-                      return;
-                    }
-
-                   
-                    const payload = {
-                        libro_id: Number(id),
-                        usuario_id: Number(user?.id), // debe existir user.id con el id numérico
-                        calificacion: newRating,
-                        comentario: newComment,
-                      };
+          <Box
+            sx={{
+              mt: 2,
+              p: 2,
+              borderRadius: '12px',
+              bgcolor: theme.palette.grey[100],
+              border: `1px solid ${theme.palette.grey[300]}`,
+            }}
+          >
+            <Typography variant="subtitle2" fontWeight="bold" mb={1}>
+              Escribe tu opinión
+            </Typography>
+            <Rating
+              value={newRating}
+              onChange={(e, newValue) => setNewRating(newValue)}
+              sx={{ mb: 1 }}
+            />
+            <textarea
+              value={newComment}
+              onChange={(e) => setNewComment(e.target.value)}
+              placeholder="Escribe tu comentario..."
+              style={{
+                width: '100%',
+                minHeight: '80px',
+                padding: '8px',
+                borderRadius: '8px',
+                border: `1px solid ${theme.palette.grey[300]}`,
+                resize: 'none',
+              }}
+            />
+            <NavButton
+              onClick={async () => {
+                if (!newComment.trim() || newRating === 0) {
+                  alert('Por favor, escribe un comentario y selecciona una calificación.');
+                  return;
+                }
 
 
-                    try {
-                      const res = await fetch(`${API_BASE_URL}/api/v1/opinion`, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify(payload),
-                      });
+                const payload = {
+                  libro_id: Number(id),
+                  usuario_id: user.usuario_id, // debe existir user.id con el id numérico
+                  calificacion: newRating,
+                  comentario: newComment,
+                };
 
-                      if (!res.ok) throw new Error('Error al guardar el comentario.');
 
-                      const savedOpinion = await res.json();
-                      setOpinions((prev) => [savedOpinion, ...prev]);
-                      setNewComment('');
-                      setNewRating(0);
-                      setShowCommentBox(false);
-                    } catch (err) {
-                      console.error(err);
-                      alert('No se pudo guardar el comentario.');
-                    }
-                  }}
-                  sx={{
-                    mt: 2,
-                    width: '100%',
-                    bgcolor: ORANGE_COLOR + ' !important',
-                    color: 'white',
-                    fontWeight: 'bold',
-                    borderRadius: '8px !important',
-                    '&:hover': { bgcolor: '#cc4800' + ' !important' },
-                  }}
-                >
-                  Publicar comentario
-                </NavButton>
-              </Box>
-            )}
+                try {
+                  const token = localStorage.getItem('token');
+                  if (!token) throw new Error("No autenticado.");
+                  const res = await fetch(`${API_BASE_URL}/api/v1/opinion`, {
+                    method: 'POST',
+                    headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload),
+                  });
+
+                  if (!res.ok) throw new Error('Error al guardar el comentario.');
+
+                  const savedOpinion = await res.json();
+                  setOpinions((prev) => [savedOpinion, ...prev]);
+                  setNewComment('');
+                  setNewRating(0);
+                  setShowCommentBox(false);
+                } catch (err) {
+                  console.error(err);
+                  alert('No se pudo guardar el comentario.');
+                }
+              }}
+              sx={{
+                mt: 2,
+                width: '100%',
+                bgcolor: ORANGE_COLOR + ' !important',
+                color: 'white',
+                fontWeight: 'bold',
+                borderRadius: '8px !important',
+                '&:hover': { bgcolor: '#cc4800' + ' !important' },
+              }}
+            >
+              Publicar comentario
+            </NavButton>
+          </Box>
+        )}
 
 
         <Divider sx={{ my: 3 }} />
@@ -283,36 +298,43 @@ const BookDetailsPage = () => {
           <Typography variant="body2" paragraph color="text.secondary" sx={{ mb: 3 }}>
             {book.description || book.descripcion}
           </Typography>
-
-          <Box sx={{
-            p: 1.5, my: 3, borderRadius: '12px', bgcolor: theme.palette.common.white,
-            border: `1px solid ${theme.palette.grey[300]}`, boxShadow: 'none',
-          }}>
-            <Box display="flex" justifyContent="space-between" alignItems="center">
-              <Box>
-                <Typography variant="body2" fontWeight="bold">Pablo</Typography>
-                <Typography variant="caption" color="text.secondary">Docente</Typography>
+          {/* TODO: ageregar esto para que si no existen opiniones no se muestre nada */}
+          {/* opinions.length > 0 && */}
+          {opinions?.map((opinion) => {
+            // console.log(opinion);
+            return (
+              <Box key={opinion.id} sx={{
+                p: 1.5, my: 3, borderRadius: '12px', bgcolor: theme.palette.common.white,
+                border: `1px solid ${theme.palette.grey[300]}`, boxShadow: 'none',
+              }}>
+                <Box display="flex" justifyContent="space-between" alignItems="center">
+                  <Box>
+                    <Typography variant="body2" fontWeight="bold">{opinion.usuario.nombre}</Typography>
+                    <Typography variant="caption" color="text.secondary">{opinion.usuario.rol}</Typography>
+                  </Box>
+                  <Rating value={opinion.calificacion} readOnly size="small" />
+                </Box>
+                <Typography variant="body2" mt={1} sx={{ fontStyle: 'italic', color: theme.palette.text.primary }}>
+                  {opinion.comentario}
+                </Typography>
+                <Box display="flex" justifyContent="flex-end" mt={1}>
+                  {opinion.destacado && (
+                    <Typography
+                      variant="caption"
+                      fontWeight="bold"
+                      sx={{
+                        color: ORANGE_COLOR,
+                        fontSize: '0.65rem',
+                        textTransform: 'uppercase',
+                      }}
+                    >
+                      Comentario destacado
+                    </Typography>
+                  )}
+                </Box>
               </Box>
-              <Rating value={5} readOnly size="small" />
-            </Box>
-            <Typography variant="body2" mt={1} sx={{ fontStyle: 'italic', color: theme.palette.text.primary }}>
-              "Un libro sensible, para pensar..."
-            </Typography>
-            <Box display="flex" justifyContent="flex-end" mt={1}>
-              <Typography
-                variant="caption"
-                fontWeight="bold"
-                sx={{
-                  color: ORANGE_COLOR,
-                  fontSize: '0.65rem',
-                  textTransform: 'uppercase',
-                }}
-              >
-                Comentario destacado
-              </Typography>
-            </Box>
-          </Box>
-
+            );
+          })}
           <NavButton
             onClick={handleViewCommentsClick}
             variant="outlined"

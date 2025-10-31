@@ -28,9 +28,6 @@ export default function SideMenu({ open, onClose, active = "Inicio" }) {
   const navigate = useNavigate();
   const userRolId = localStorage.getItem('rol');
 
-  // Para depurar: verifica en la consola del navegador qué valor tiene 'rol'
-  console.log("Rol de usuario desde localStorage:", userRolId);
-
   let menuItems;
 
   if (userRolId == '3') {
