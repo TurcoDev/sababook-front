@@ -41,8 +41,10 @@ const ForumForm = ({ onSave, onCancel }) => {
                 />
 
                 <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 2 }}>
-                    <Button onClick={onCancel}>Cancelar</Button>
-                    <Button type="submit" variant="contained" color="primary">Guardar</Button>
+                    <Button onClick={onCancel} variant="outlined">Cancelar</Button>
+                    <Button type="submit" variant="contained" sx={{ backgroundColor: "button.main" }}>
+                        Guardar Cambios
+                    </Button>
                 </Box>
             </form>
         </Paper>
