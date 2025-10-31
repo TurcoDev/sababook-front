@@ -159,7 +159,7 @@ export default function MyComments() {
             <AppHeader
                 onMenuClick={() => setMenuOpen(true)}
                 title="Mis Comentarios" 
-                subtitle=""
+                subtitle="Tu voz en la comunidad lectora."
             />
             
             <SideMenu open={menuOpen} onClose={() => setMenuOpen(false)} active="Perfil" />
