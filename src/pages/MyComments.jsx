@@ -126,7 +126,7 @@ export default function MyComments() {
     const handleConfirmDelete = () => {
         setDialogOpen(false);
         if (commentToDelete !== null) {
-            // ⚠️ AQUÍ IRÍA LA LLAMADA AL MÉTODO DELETE DE LA API 
+            //  AQUÍ IRÍA LA LLAMADA AL MÉTODO DELETE DE LA API 
             console.log(`Eliminando comentario con ID: ${commentToDelete}`);
             
             // Lógica optimista/local: Eliminar el comentario de la lista de estado
@@ -159,10 +159,10 @@ export default function MyComments() {
             <AppHeader
                 onMenuClick={() => setMenuOpen(true)}
                 title="Mis Comentarios" 
-                subtitle="Bienvenida, Lucía"
+                subtitle=""
             />
             
-            <SideMenu open={menuOpen} onClose={() => setMenuOpen(false)} active="Comentarios" />
+            <SideMenu open={menuOpen} onClose={() => setMenuOpen(false)} active="Perfil" />
 
             <Box mb={2}>
                 <SearchBar onSearch={handleSearch} />
