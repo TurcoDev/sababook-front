@@ -135,78 +135,68 @@ const BookDetailsPage = () => {
         active="Inicio"
       />
       <Box sx={{ pt: 0 }}>
-        <Box display="flex" alignItems="flex-start" gap={2} mb={3}>
-          <Box sx={{ position: 'relative' }}>
-            {coverImageSrc ? (
-              <Box
-                component="img"
-                src={coverImageSrc}
-                alt={`Cubierta de ${book.title || book.titulo}`}
-                sx={{
-                  width: '100px',
-                  height: '150px',
-                  objectFit: 'cover',
-                  borderRadius: '8px',
-                  border: `2px solid #D32F2F`,
-                  boxShadow: theme.shadows[4],
-                }}
-              />
-            ) : null}
-          </Box>
+           {/* === PORTADA + DETALLES DEL LIBRO === */}
+<Box display="flex" alignItems="flex-start" gap={2} mb={3}>
+  {/* Portada */}
+  <Box sx={{ position: 'relative' }}>
+    {coverImageSrc && (
+      <Box
+        component="img"
+        src={coverImageSrc}
+        alt={`Cubierta de ${book.title || book.titulo}`}
+        sx={{
+          width: '100px',
+          height: '150px',
+          objectFit: 'cover',
+          borderRadius: '8px',
+          border: `2px solid #D32F2F`,
+          boxShadow: theme.shadows[4],
+        }}
+      />
+    )}
+  </Box>
 
-          <Box flexGrow={1} textAlign="left" pt={1}>
-            <Typography sx={authorStyle}>
-              {book.title || book.titulo}
-            </Typography>
-            <Typography variant="h6" color="text.primary" sx={{ mb: 0.5 }}>
-              {book.author || book.autor}
-            </Typography>
-          </Box>
-        </Box>
+  {/* Detalles del libro (título, autor, calificación) */}
+  <Box flexGrow={1} textAlign="left" pt={1}>
+    <Typography sx={authorStyle}>
+      {book.title || book.titulo}
+    </Typography>
+    <Typography variant="h6" color="text.primary" sx={{ mb: 1 }}>
+      {book.author || book.autor}
+    </Typography>
 
-        <Divider sx={{ my: 3 }} />
+    {/* Calificación debajo del título */}
+    <Box display="flex" alignItems="center" gap={1}>
+      <Typography
+        sx={{
+          fontSize: "1.2rem",
+          fontWeight: 700,
+          color: "#FF6633",
+        }}
+      >
+        {(book.calificacion_promedio || 0).toFixed(1)}
+      </Typography>
+      <Rating
+        value={book.calificacion_promedio || 0}
+        precision={0.1}
+        readOnly
+        size="small"
+        sx={{ color: "#FF6633" }}
+      />
+    </Box>
+  </Box>
+</Box>
+
+
+        
 
         <Box textAlign="left" mb={2}>
-          <Box display="flex" alignItems="flex-end" gap={1}>
-            <Typography sx={ratingTextStyle}>
-              {(book.calificacion_promedio || 0).toFixed(1)}
-            </Typography>
-            <Rating
-              value={book.calificacion_promedio || 0}
-              precision={0.1}
-              readOnly
-              icon={<StarIcon sx={{ color: ORANGE_COLOR }} />}
-              emptyIcon={<StarIcon sx={{ color: theme.palette.grey[300] }} />}
-              size="small"
-              sx={{ mb: 0.5 }}
-            />
-          </Box>
+          
 
-          <Typography variant="subtitle2" fontWeight="medium" color="text.secondary" sx={{ mt: 0.5 }}>
-            Calificación Promedio
-          </Typography>
-          <Typography variant="caption" color="text.secondary" display="block">
-            ¿Qué piensan?
-          </Typography>
+          
         </Box>
 
-        <NavButton
-          onClick={handleCommentClick}
-          variant="contained"
-          sx={{
-            width: '100%',
-            m: '0 0 3px 0 !important',
-            p: '12px 20px',
-            bgcolor: ORANGE_COLOR + ' !important',
-            color: 'white',
-            fontWeight: 'bold',
-            borderRadius: '8px !important',
-            boxShadow: `0 4px 10px rgba(255, 102, 51, 0.4)`,
-            '&:hover': { bgcolor: '#cc4800' + ' !important' },
-          }}
-        >
-          Comentar
-        </NavButton>
+        
 
         {showCommentBox && (
           <Box
@@ -356,6 +346,24 @@ const BookDetailsPage = () => {
           >
             Ver todos los comentarios
           </NavButton>
+
+          <NavButton
+          onClick={handleCommentClick}
+          variant="contained"
+          sx={{
+            width: '100%',
+            m: '0 0 3px 0 !important',
+            p: '12px 20px',
+            bgcolor: ORANGE_COLOR + ' !important',
+            color: 'white',
+            fontWeight: 'bold',
+            borderRadius: '8px !important',
+            boxShadow: `0 4px 10px rgba(255, 102, 51, 0.4)`,
+            '&:hover': { bgcolor: '#cc4800' + ' !important' },
+          }}
+        >
+          Comentar
+        </NavButton>
         </Box>
       </Box>
     </Box>
