@@ -1,29 +1,62 @@
-import { Box, Typography, TextField, Button, Avatar, IconButton } from '@mui/material'; // ⬅️ ¡Añadidos Avatar e IconButton!
-import React from 'react';
+import { Box, Typography, TextField, Button, Avatar, IconButton } from '@mui/material';
+import React, { useState } from 'react';
 
-// 1. Definimos los avatares aquí, sin el 'export'
-const DEFAULT_AVATARS = [
-  "https://i.pravatar.cc/150?img=1",
-  "https://i.pravatar.cc/150?img=2",
-  "https://i.pravatar.cc/150?img=3",
-  "https://i.pravatar.cc/150?img=4",
-  "https://i.pravatar.cc/150?img=5",
-  "https://i.pravatar.cc/150?img=6",
+// --- Constantes para generar los avatares predeterminados ---
+// El estilo de DiceBear a utilizar (por ejemplo, 'adventurer', 'bottts', 'micah')
+const DICEBEAR_STYLE = 'adventurer';
+
+// Las "semillas" (seeds) para generar avatares únicos
+const SEEDS = [
+  "Ryker", 
+  "Kimberly", 
+  "Max", 
+  "Mackenzie", 
+  "Zoe", 
+  "Leo"
 ];
 
+// Genera el array de URLs utilizando las constantes
+const DEFAULT_AVATARS = SEEDS.map(seed => 
+  `https://api.dicebear.com/7.x/${DICEBEAR_STYLE}/svg?seed=${seed}`
+);
+// ------------------------------------------------------------
 
-// El formulario recibe la función para cambiar el avatar y la URL actual
-export default function UserProfileForm({ userName, onCancel, onSave, onAvatarChange, currentAvatarUrl }) {
+
+export default function UserProfileForm({ 
+  userName, 
+  userEmail, 
+  currentAvatarUrl, 
+  onCancel, 
+  onSave, 
+  onAvatarChange 
+}) {
+    // Usamos el primer avatar por defecto si no se proporciona uno actual
+    const [formData, setFormData] = useState({
+        nombre: userName || '',
+        email: userEmail || '',
+        avatar_url: currentAvatarUrl || DEFAULT_AVATARS[0]
+    });
     
     // Función para manejar el clic en un avatar predeterminado
     const handleAvatarSelect = (url) => {
-        onAvatarChange(url); // Llama a la función que actualiza el estado en Profile.jsx
+        setFormData(prev => ({ ...prev, avatar_url: url }));
+        if (onAvatarChange) {
+            onAvatarChange(url);
+        }
+    };
+
+    const handleInputChange = (field, value) => {
+        setFormData(prev => ({ ...prev, [field]: value }));
+    };
+
+    const handleSubmit = () => {
+        onSave(formData);
     };
     
     return (
         <Box sx={{ maxWidth: '400px', margin: '0 auto', p: 2 }}>
             <Typography variant="h6" gutterBottom>
-                Editar Perfil de {userName}
+                Editar Perfil de **{userName}**
             </Typography>
 
             {/* SECCIÓN DE SELECCIÓN DE AVATAR */}
@@ -39,38 +72,65 @@ export default function UserProfileForm({ userName, onCancel, onSave, onAvatarCh
                     mb: 3 
                 }}
             >
+                {/* Asegúrate de que DEFAULT_AVATARS esté declarado
+                  antes de usarlo aquí.
+                */}
                 {DEFAULT_AVATARS.map((url) => (
                     <IconButton 
                         key={url} 
                         onClick={() => handleAvatarSelect(url)}
                         sx={{
-                            // Destacamos el avatar seleccionado
-                            border: url === currentAvatarUrl ? '3px solid #f25600' : '3px solid transparent',
+                            border: url === formData.avatar_url ? '3px solid #f25600' : '3px solid transparent',
                             padding: 0,
+                            borderRadius: '50%', // Para que el borde siga la forma del Avatar
                         }}
                     >
                         <Avatar 
                             src={url} 
+                            alt={`Avatar para ${url.split('seed=')[1]}`} // Alt text más descriptivo
                             sx={{ width: 56, height: 56 }} 
                         />
                     </IconButton>
                 ))}
             </Box>
 
-         
+            {/* CAMPOS DEL FORMULARIO */}
             <TextField 
                 label="Nombre Completo" 
-                defaultValue={userName} 
+                value={formData.nombre}
+                onChange={(e) => handleInputChange('nombre', e.target.value)}
                 fullWidth 
                 margin="normal" 
             />
-            {/* ... otros campos ... */}
+
+            <TextField 
+                label="Correo Electrónico" 
+                value={formData.email}
+                onChange={(e) => handleInputChange('email', e.target.value)}
+                fullWidth 
+                margin="normal"
+                type="email"
+            />
 
             <Box sx={{ mt: 3, display: 'flex', justifyContent: 'space-between', gap: 2 }}>
-                <Button variant="outlined" onClick={onCancel} fullWidth>
+                <Button variant="outlined" onClick={onCancel} fullWidth sx={{ 
+                        borderColor: '#f25600', 
+                        color: '#f25600',        
+                        '&:hover': {
+                            borderColor: '#f25600', // Mantener el color del borde en hover
+                            backgroundColor: 'rgba(242, 86, 0, 0.04)', // Efecto de hover ligero
+                        }
+                    }}
+                >
                     Cancelar
                 </Button>
-                <Button variant="contained" onClick={onSave} color="primary" fullWidth>
+                <Button variant="contained" onClick={handleSubmit}  fullWidth sx={{ 
+                        backgroundColor: '#f25600', 
+                        color: 'white',             
+                        '&:hover': {
+                            backgroundColor: '#cc4800', 
+                        }
+                    }}>
                     Guardar Cambios
                 </Button>
             </Box>

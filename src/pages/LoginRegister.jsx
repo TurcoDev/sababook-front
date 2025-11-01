@@ -6,9 +6,9 @@ import { Box } from '@mui/material';
 import { styled } from '@mui/system';
 import Login from '../components/Login';
 import logoImage from '../assets/logo.png';
-import { API_BASE_URL } from '../environments/api';
 import LoginForm from '../components/LoginForm';
 import Register from '../components/auth/Register';
+import { useAuth } from '../hooks/useAuth';
 
 
 const StyledPageContainer = styled(Box)(({ theme }) => ({
@@ -16,14 +16,15 @@ const StyledPageContainer = styled(Box)(({ theme }) => ({
   flexDirection: 'column',
   alignItems: 'center',
   justifyContent: 'center',
-  minHeight: '100vh', 
-  backgroundColor: '#FFFFFF', 
+  minHeight: '100vh',
+  backgroundColor: '#FFFFFF',
   padding: theme.spacing(3),
 }));
 
 const LoginPage = () => {
 
   const navigate = useNavigate();
+  const { login } = useAuth();
   const [error, setError] = useState(null);
   const [view, setView] = useState('presentation');
   const logoUrl = logoImage;
@@ -37,47 +38,26 @@ const LoginPage = () => {
     console.log('Cambiando a vista de formulario de Login');
   };
 
-  const handleLoginSubmit = async ({ email, password }) => {
-    setError(null); // Limpiamos errores previos
-    console.log('Intentando iniciar sesión con:', { email });
+const handleLoginSubmit = async ({ email, password }) => {
+  setError(null); // Limpia errores previos
 
-    try {
-      const response = await fetch(`${API_BASE_URL}/api/v1/auth/login`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ email, contrasena: password }),
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.error || 'Error al iniciar sesión');
-      }
-
-      // Mostramos toda la data recibida para depuración
-      console.log("Login exitoso. Datos recibidos:", data);
-
-      // Guardamos el token en el almacenamiento local
-      localStorage.setItem('token', data.token);
-      localStorage.setItem('userId', data.userId);
-      // Corregimos la clave a 'rol' para que coincida con SideMenu.jsx
-      localStorage.setItem('rol', data.rol);
-
-      // Redirigimos al home
+  try {
+    const result = await login(email, password);
+    
+    if (result.success) {
+      // Navegar a Home
       navigate('/home', { state: { fromLogin: true } });
-
-    } catch (err) {
-      // Hacemos el mensaje de error más descriptivo
-      const errorMessage = err.message.includes('Failed to fetch') ? 'No se pudo conectar con el servidor. ¿Está en ejecución?' : err.message;
-      setError(errorMessage);
+    } else {
+      setError(result.error);
     }
-  };
+  } catch {
+    setError('Error inesperado al iniciar sesión');
+  }
+};
 
   const handleRegisterSubmit = (formData) => {
     console.log('Datos de registro enviados:', formData);
-    // Aquí puedes implementar la lógica para registrar al usuario
+    
   };
 
   const handleBackToLogin = () => {
@@ -86,11 +66,11 @@ const LoginPage = () => {
   };
   return (
     <StyledPageContainer>
-      
-      <img 
-        src={logoUrl} 
-        alt="La gran OCASION Logo" 
-        style={{ maxWidth: '100%', height: 'auto', marginBottom: '40px', display: 'block', width: '350px' }} 
+
+      <img
+        src={logoUrl}
+        alt="La gran OCASIÓN Logo"
+        style={{ maxWidth: '100%', height: 'auto', marginBottom: '40px', display: 'block', width: '350px' }}
       />
       {view === 'presentation' ? (
         <Login

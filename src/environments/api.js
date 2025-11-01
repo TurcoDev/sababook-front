@@ -1,3 +1,1 @@
-export const API_BASE_URL = 'http://localhost:3000';
-// TODO: Cambiar a la URL de producción cuando se haga el deploy
-// export const API_BASE_URL = 'https://sababook-back.onrender.com';
+export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000';

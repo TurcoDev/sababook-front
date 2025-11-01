@@ -1,5 +1,3 @@
-
-
 import React from 'react';
 import { 
     Box, 
@@ -99,7 +97,7 @@ const BookDetails = () => {
                         </Typography>
                         <Rating value={book.rating} precision={0.1} readOnly size="small" />
                         <Typography variant="caption" color="text.secondary" display="block">
-                            ¿Qué piensan?
+                            ¿Cómo puntuamos?
                         </Typography>
                     </Box>
                     

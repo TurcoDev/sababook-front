@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import {
   Box,
   Typography,
@@ -11,75 +11,49 @@ import {
 import AppHeader from "../components/AppHeader";
 import BookCard from "../components/BookCard";
 import SideMenu from "../components/SideMenu";
-import SearchBar from "../components/SearchBar";
 import FilterChips from "../components/FilterChips";
-import LibroImage from '../assets/libro.jpg'
-import { API_BASE_URL } from "../environments/api";
 import WelcomeModal from "../components/WelcomeModal";
 import { getCatalogoLibros, buscarLibros } from "../services/apiService";
 import { normalizarTexto } from "../utils/normalize";
+import FeaturedBookSection from "../components/FeaturedBookSection"; 
+import BookListSection from "../components/BookListSection";
 
-
-const FEATURED_BOOK = {
-  id: 0,
-  title: "La Campana de Cristal",
-  rating: 4.2,
-  progress: 80,
-  isFavorite: false,
-  image: LibroImage
-};
+// Importaciones de Lógica (Custom Hooks)
+import { useAuth } from "../hooks/useAuth";
+import { useBookData } from "../hooks/useBookData"; // NUEVO: Lógica de carga de libros
+import { useFavorites } from "../hooks/useFavorites"; // Lógica de manejo de favoritos
 
 
 export default function Home() {
+  // --- Estados de UI ---
   const [menuOpen, setMenuOpen] = useState(false);
-  const [books, setBooks] = useState([]);
-  const [featuredBook, setFeaturedBook] = useState(FEATURED_BOOK);
-  const [welcomeUser, setWelcomeUser] = useState(null);
   const [isWelcomeModalOpen, setWelcomeModalOpen] = useState(false);
   const [currentFilters, setCurrentFilters] = useState({});
   const [currentQuery, setCurrentQuery] = useState('');
   const location = useLocation();
+  const navigate = useNavigate();
+  const { user } = useAuth();
+  
+  // --- LÓGICA DE DATOS: Llamada a Custom Hooks ---
+  // 1. Hook para cargar los datos y manejar sus estados
+  const { books, setBooks, featuredBook, setFeaturedBook } = useBookData();
 
+  // 2. Hook para manejar la interacción de favoritos
+  const { handleFavoriteToggle } = useFavorites(
+    books, 
+    setBooks, 
+    featuredBook, 
+    setFeaturedBook
+  );
+  // -----------------------------------------------
+  
+  // --- Lógica de Modal de Bienvenida  ---
   useEffect(() => {
-    const cargarLibros = async () => {
-      try {
-        const libros = await getCatalogoLibros();
-        setBooks(libros);
-        console.log("Libros cargados:", libros);
-      } catch (error) {
-        console.error("Error cargando libros:", error);
-      }
-    };
-
-    cargarLibros();
-  }, []);
-
-  // Efecto para mostrar el modal de bienvenida
-  useEffect(() => {
-    if (location.state?.fromLogin) {
-      const userId = localStorage.getItem('userId');
-      if (userId) {
-        // Hacemos un fetch para obtener los datos del usuario
-        const token = localStorage.getItem('token');
-        fetch(`${API_BASE_URL}/api/v1/user/${userId}`, {
-          headers: {
-            'Authorization': `Bearer ${token}`
-          }
-        })
-          .then(res => {
-            if (!res.ok) throw new Error('La respuesta de la red no fue exitosa al obtener datos del usuario.');
-            return res.json();
-          })
-          .then(userData => {
-            setWelcomeUser(userData);
-            setWelcomeModalOpen(true);
-          })
-          .catch(err => console.error("Error al obtener datos del usuario:", err));
-      }
-      // Limpiamos el estado para que el modal no aparezca si se recarga la página
-      window.history.replaceState({}, document.title)
+    if (location.state?.fromLogin && user) {
+      setWelcomeModalOpen(true);
+      window.history.replaceState({}, document.title);
     }
-  }, [location.state]);
+  }, [location.state, user]);
 
   const handleCloseWelcomeModal = () => setWelcomeModalOpen(false);
 
@@ -131,17 +105,11 @@ export default function Home() {
         isFavorite: !prevBook.isFavorite
       }));
     } else {
-      setBooks(prevBooks =>
-        prevBooks.map(book => {
-          if (book.id === bookId) {
-            return { ...book, isFavorite: !book.isFavorite };
-          }
-          return book;
-        })
-      );
+        console.error("ERROR de Navegación: ID de libro es nulo o indefinido.");
     }
   };
-
+  
+  // --- RENDERIZADO ---
   return (
     <Box
       py={2}
@@ -152,27 +120,22 @@ export default function Home() {
         margin: "0 auto"
       }}
     >
-
-  
       <AppHeader
         onMenuClick={() => setMenuOpen(true)}
-        title="Bienvenida, Lucía"
-        subtitle="Miércoles, Septiembre 17, 2025"
+        title={`Hola, ${user?.nombre || 'Usuario'}`}
+        subtitle={new Date().toLocaleDateString('es-ES', {
+          weekday: 'long',
+          year: 'numeric',
+          month: 'long',
+          day: 'numeric'
+        })}
       />
 
-      {/* Drawer lateral */}
       <SideMenu open={menuOpen} onClose={() => setMenuOpen(false)} active="Inicio" />
+      <WelcomeModal open={isWelcomeModalOpen} onClose={handleCloseWelcomeModal} user={user} />
 
-      {/* Modal de Bienvenida */}
-      <WelcomeModal
-        open={isWelcomeModalOpen}
-        onClose={handleCloseWelcomeModal}
-        user={welcomeUser}
-      />
-
-      {/* SearchBar personalizada */}
       <Box mb={2}>
-        <SearchBar onSearch={handleSearch} />
+        {/* <SearchBar onSearch={handleSearch} /> */}
       </Box>
 
 

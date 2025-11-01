@@ -4,17 +4,15 @@ import {
   CardContent,
   Typography,
   Rating,
-  Chip,
   Button,
   Box,
   IconButton,
 } from "@mui/material";
+import { useNavigate } from "react-router-dom";
 
+import FavoriteIcon from "@mui/icons-material/Favorite";
+import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
 
-import FavoriteIcon from '@mui/icons-material/Favorite';
-import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
-
-// Define un valor para el padding horizontal que será común para el contenido
 const HORIZONTAL_PADDING = 2; // (Equivale a 16px en el tema de Material-UI)
 
 export default function BookCard({
@@ -24,11 +22,17 @@ export default function BookCard({
   gender,
   description,
   rating,
-  progress,
   featured = false,
   isFavorite = false,
   onFavoriteToggle,
+  bookId,
+  libro_id,
 }) {
+  const navigate = useNavigate();
+
+  // Determinar ID del libro (usa cualquiera de los dos disponibles)
+  const bookIdentifier = bookId || libro_id;
+
   return (
     <Card
       sx={{
@@ -49,69 +53,64 @@ export default function BookCard({
         mb: 2,
       }}
     >
-
+      {/* Imagen del libro */}
       <Box
         sx={{
-          position: 'relative',
+          position: "relative",
           width: featured ? 145 : 110,
           height: featured ? 200 : 155,
           mr: 2,
         }}
       >
-
         <CardMedia
           component="img"
           image={image}
           alt={title}
           sx={{
-            width: '100%',
-            height: '100%',
+            width: "100%",
+            height: "100%",
             borderRadius: 2,
             objectFit: "cover",
           }}
         />
 
+        {/* Botón de favorito */}
         <IconButton
           aria-label="Toggle favorite"
           onClick={onFavoriteToggle}
           sx={{
-            position: 'absolute',
+            position: "absolute",
             top: 4,
             right: 4,
             p: 0.5,
-            bgcolor: 'rgba(255, 255, 255, 0.9)',
+            bgcolor: "rgba(255, 255, 255, 0.9)",
           }}
         >
-
           {isFavorite ? (
-            <FavoriteIcon
-              fontSize="small"
-              sx={{ color: 'red' }}
-            />
+            <FavoriteIcon fontSize="small" sx={{ color: "red" }} />
           ) : (
-            <FavoriteBorderIcon
-              fontSize="small"
-              sx={{ color: 'red' }}
-            />
+            <FavoriteBorderIcon fontSize="small" sx={{ color: "red" }} />
           )}
         </IconButton>
       </Box>
 
+      {/* Contenido de la tarjeta */}
       <CardContent
         sx={{
           flex: 1,
           p: 0,
-          display: 'flex',
-          flexDirection: 'column',
-          height: '100%',
+          display: "flex",
+          flexDirection: "column",
+          height: "100%",
         }}
       >
-
-        <Box sx={{
-          px: HORIZONTAL_PADDING,
-          pt: 1,
-          pb: 1,
-        }}>
+        <Box
+          sx={{
+            px: HORIZONTAL_PADDING,
+            pt: 1,
+            pb: 1,
+          }}
+        >
           <Typography
             variant={featured ? "h5" : "subtitle1"}
             fontWeight="bold"
@@ -119,7 +118,7 @@ export default function BookCard({
           >
             {title}
           </Typography>
-          {/* Agrega autor, género y descripción */}
+
           {autor && (
             <Typography variant="body2" color="text.secondary" sx={{ mb: 0.5 }}>
               <b>Autor:</b> {autor}
@@ -135,35 +134,32 @@ export default function BookCard({
               {description}
             </Typography>
           )}
+
           <Rating
             value={rating ?? 0}
             precision={0.5}
             readOnly
             size={featured ? "medium" : "small"}
           />
-          <Typography
-            variant="h6"
-            color="subtitle"
-            fontWeight="bold"
-            sx={{ mt: 0.2, mb: 1 }}
-          >
-            {rating?.toFixed(1)}
-          </Typography>
-          <Box mt={1}>
-            <Chip
-              label={`${progress ?? 0}%`}
-              color="primary"
-              size="small"
-              sx={{ fontSize: "0.75rem" }}
-            />
-          </Box>
+
+          {rating && (
+            <Typography
+              variant="h6"
+              color="subtitle"
+              fontWeight="bold"
+              sx={{ mt: 0.2, mb: 1 }}
+            >
+              {rating.toFixed(1)}
+            </Typography>
+          )}
         </Box>
 
+        {/* Botón Ver más */}
         <Box
           sx={{
             display: "flex",
             justifyContent: "flex-end",
-            mt: 'auto',
+            mt: "auto",
             px: HORIZONTAL_PADDING,
             pt: 1,
             pb: 0,
@@ -171,11 +167,19 @@ export default function BookCard({
         >
           <Button
             variant="contained"
+            onClick={() => {
+              if (bookIdentifier) {
+                navigate(`/bookdetails/${bookIdentifier}`);
+              }
+            }}
             sx={{
               bgcolor: "#f25600",
               textTransform: "none",
               fontSize: featured ? "0.9rem" : "0.8rem",
               borderRadius: 2,
+              "&:hover": {
+                bgcolor: "#d64500",
+              },
             }}
           >
             Ver más

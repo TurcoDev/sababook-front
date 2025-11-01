@@ -41,14 +41,14 @@ const Login = ({ imageUrl, onRegisterClick, onLoginClick }) => {
         }}
       >
         {/* Botón para el Registro ("Registrate acá") */}
-        <StyledButton
+        {/* <StyledButton
           variant="contained"
           onClick={onRegisterClick}
           fullWidth
           
         >
           Registrate
-        </StyledButton>
+        </StyledButton> */}
 
         {/* Botón para Iniciar Sesión ("Iniciar sesión") */}
         <StyledButton
