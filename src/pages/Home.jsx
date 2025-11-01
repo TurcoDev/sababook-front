@@ -97,17 +97,6 @@ export default function Home() {
       setBooks([]);
     }
   };
-
-  const handleFavoriteToggle = (bookId, isFeatured = false) => {
-    if (isFeatured) {
-      setFeaturedBook(prevBook => ({
-        ...prevBook,
-        isFavorite: !prevBook.isFavorite
-      }));
-    } else {
-        console.error("ERROR de Navegación: ID de libro es nulo o indefinido.");
-    }
-  };
   
   // --- RENDERIZADO ---
   return (
