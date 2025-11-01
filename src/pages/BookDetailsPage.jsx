@@ -325,27 +325,7 @@ const BookDetailsPage = () => {
               </Box>
             );
           })}
-          <NavButton
-            onClick={handleViewCommentsClick}
-            variant="outlined"
-            sx={{
-              width: '100%',
-              mt: 3, p: '12px 20px',
-              m: '0 0 0 0 !important',
-              borderColor: ORANGE_COLOR + ' !important',
-              color: ORANGE_COLOR + ' !important',
-              fontWeight: 'bold',
-              bgcolor: theme.palette.common.white + ' !important',
-              borderRadius: '8px !important',
-              boxShadow: `0 2px 5px rgba(255, 102, 51, 0.1)`,
-              '&:hover': {
-                bgcolor: theme.palette.grey[50] + ' !important',
-                borderColor: ORANGE_COLOR + ' !important',
-              },
-            }}
-          >
-            Ver todos los comentarios
-          </NavButton>
+          
 
           <NavButton
           onClick={handleCommentClick}
