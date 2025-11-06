@@ -13,7 +13,6 @@ import BookCommentBox from "../components/BookCommentBox";
 import BookOpinionList from "../components/BookOpinionList";
 import BookDescription from "../components/BookDescription";
 
-
 const ORANGE_COLOR = "#FF6633";
 
 const BookDetailsPage = () => {
@@ -111,7 +110,6 @@ const BookDetailsPage = () => {
               theme={theme}
               handleViewCommentsClick={handleViewCommentsClick}
             />
-
       </Box>
     </Box>
   );
