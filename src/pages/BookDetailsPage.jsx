@@ -1,43 +1,28 @@
-import React, { useState, useEffect } from 'react';
-import { Box, Typography, Rating, Divider, Chip, useTheme } from '@mui/material';
-import StarIcon from '@mui/icons-material/Star';
-import { useNavigate, useParams } from 'react-router-dom';
-import SideMenu from '../components/SideMenu';
-import NavButton from '../components/NavButton';
-import AppHeader from '../components/AppHeader';
-import { API_BASE_URL } from '../environments/api';
+import React, { useState } from "react";
+import { Box, Divider, useTheme } from "@mui/material";
+import { useParams, useNavigate } from "react-router-dom";
+import SideMenu from "../components/SideMenu";
+import AppHeader from "../components/AppHeader";
+import NavButton from "../components/NavButton";
 import { useAuth } from "../hooks/useAuth";
+import { useBookDetails } from "../hooks/useBookDetails";
+import { useBookOpinion } from "../hooks/useBookOpinion";
+import BookDetailsHeader from "../components/BookDetailsHeader";
+import BookRatingSection from "../components/BookRatingSection";
+import BookCommentBox from "../components/BookCommentBox";
+import BookOpinionList from "../components/BookOpinionList";
+import BookDescription from "../components/BookDescription";
 
-
-const ORANGE_COLOR = '#FF6633';
+const ORANGE_COLOR = "#FF6633";
 
 const BookDetailsPage = () => {
   const theme = useTheme();
   const { id } = useParams();
-  const [book, setBook] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
   const navigate = useNavigate();
-  const [menuOpen, setMenuOpen] = useState(false);
   const { user } = useAuth();
-  const [opinions, setOpinions] = useState([
-    {
-      id: 1,
-      usuario: { nombre: "Pablo", rol: "Docente" },
-      calificacion: 5,
-      comentario: "Un libro sensible, para pensar...",
-      destacado: true,
-    },
-    {
-      id: 2,
-      usuario: { nombre: "Federica", rol: "Alumno" },
-      calificacion: 5,
-      comentario: "Un libro emocionante y profundo.",
-      destacado: true,
-    },
-  ]);
+  const [menuOpen, setMenuOpen] = useState(false);
   const [showCommentBox, setShowCommentBox] = useState(false);
-  const [newComment, setNewComment] = useState('');
+  const [newComment, setNewComment] = useState("");
   const [newRating, setNewRating] = useState(0);
 
 
@@ -91,21 +76,16 @@ const BookDetailsPage = () => {
   }, [id]);
 
 
+  const { book, loading, error } = useBookDetails(id);
+  const { opinions, setOpinions } = useBookOpinion(id);
 
   const authorStyle = {
     fontWeight: 900,
-    fontSize: '1.5rem',
+    fontSize: "1.5rem",
     lineHeight: 1,
-    textTransform: 'uppercase',
+    textTransform: "uppercase",
     mb: 0.5,
     color: theme.palette.text.primary,
-  };
-
-  const ratingTextStyle = {
-    fontSize: '1.8rem',
-    fontWeight: 800,
-    color: theme.palette.text.primary,
-    lineHeight: 1,
   };
 
   const handleCommentClick = () => setShowCommentBox(!showCommentBox);
@@ -117,80 +97,24 @@ const BookDetailsPage = () => {
   if (error) return <div>{error}</div>;
   if (!book) return <div>No se encontró el libro.</div>;
 
-
   const coverImageSrc = book.coverImage?.trim() || book.portada_url?.trim() || null;
 
   return (
     <Box
       sx={{
-        width: '100%',
+        width: "100%",
         maxWidth: 1000,
-        minHeight: '100vh',
-        margin: '0 auto',
+        minHeight: "100vh",
+        margin: "0 auto",
         py: 2,
         px: 1,
         backgroundColor: theme.palette.common.white,
       }}
     >
-
       <AppHeader
         onMenuClick={handleMenuToggle}
-        title={`Detalles del libro`}
-        subtitle={"Descubrí su esencia y su autor"}
-      />
-      <SideMenu
-        open={menuOpen}
-        onClose={handleMenuClose}
-        active="Inicio"
-      />
-      <Box sx={{ pt: 0 }}>
-           {/* === PORTADA + DETALLES DEL LIBRO === */}
-<Box display="flex" alignItems="flex-start" gap={2} mb={3}>
-  {/* Portada */}
-  <Box sx={{ position: 'relative' }}>
-    {coverImageSrc && (
-      <Box
-        component="img"
-        src={coverImageSrc}
-        alt={`Cubierta de ${book.title || book.titulo}`}
-        sx={{
-          width: '100px',
-          height: '150px',
-          objectFit: 'cover',
-          borderRadius: '8px',
-          border: `2px solid #D32F2F`,
-          boxShadow: theme.shadows[4],
-        }}
-      />
-    )}
-  </Box>
-
-  {/* Detalles del libro (título, autor, calificación) */}
-  <Box flexGrow={1} textAlign="left" pt={1}>
-    <Typography sx={authorStyle}>
-      {book.title || book.titulo}
-    </Typography>
-    <Typography variant="h6" color="text.primary" sx={{ mb: 1 }}>
-      {book.author || book.autor}
-    </Typography>
-
-    {/* Calificación debajo del título */}
-    <Box display="flex" alignItems="center" gap={1}>
-      <Typography
-        sx={{
-          fontSize: "1.2rem",
-          fontWeight: 700,
-          color: "#FF6633",
-        }}
-      >
-        {(book.calificacion_promedio || 0).toFixed(1)}
-      </Typography>
-      <Rating
-        value={book.calificacion_promedio || 0}
-        precision={0.1}
-        readOnly
-        size="small"
-        sx={{ color: "#FF6633" }}
+        title="Detalles del libro"
+        subtitle="Descubrí su esencia y su autor"
       />
     </Box>
   </Box>
@@ -300,70 +224,51 @@ const BookDetailsPage = () => {
           </Box>
         )}
 
+      <SideMenu open={menuOpen} onClose={handleMenuClose} active="Inicio" />
 
+      <Box sx={{ pt: 0 }}>
+        <BookDetailsHeader book={book} coverImageSrc={coverImageSrc} authorStyle={authorStyle} />
         <Divider sx={{ my: 3 }} />
-        <Box textAlign="left" mt={2}>
-          <Typography variant="subtitle1" fontWeight="bold" mb={1}>Descripción</Typography>
-          <Typography variant="body2" paragraph color="text.secondary" sx={{ mb: 3 }}>
-            {book.description || book.descripcion}
-          </Typography>
-          {/* TODO: ageregar esto para que si no existen opiniones no se muestre nada */}
-          {/* opinions.length > 0 && */}
-          {opinions?.map((opinion) => {
-            // console.log(opinion);
-            return (
-              <Box key={opinion.id} sx={{
-                p: 1.5, my: 3, borderRadius: '12px', bgcolor: theme.palette.common.white,
-                border: `1px solid ${theme.palette.grey[300]}`, boxShadow: 'none',
-              }}>
-                <Box display="flex" justifyContent="space-between" alignItems="center">
-                  <Box>
-                    <Typography variant="body2" fontWeight="bold">{opinion.usuario.nombre}</Typography>
-                    <Typography variant="caption" color="text.secondary">{opinion.usuario.rol}</Typography>
-                  </Box>
-                  <Rating value={opinion.calificacion} readOnly size="small" />
-                </Box>
-                <Typography variant="body2" mt={1} sx={{ fontStyle: 'italic', color: theme.palette.text.primary }}>
-                  {opinion.comentario}
-                </Typography>
-                <Box display="flex" justifyContent="flex-end" mt={1}>
-                  {opinion.destacado && (
-                    <Typography
-                      variant="caption"
-                      fontWeight="bold"
-                      sx={{
-                        color: ORANGE_COLOR,
-                        fontSize: '0.65rem',
-                        textTransform: 'uppercase',
-                      }}
-                    >
-                      Comentario destacado
-                    </Typography>
-                  )}
-                </Box>
-              </Box>
-            );
-          })}
-          
+        <BookRatingSection book={book} theme={theme} />
 
-          <NavButton
+        <NavButton
           onClick={handleCommentClick}
           variant="contained"
           sx={{
-            width: '100%',
-            m: '0 0 3px 0 !important',
-            p: '12px 20px',
-            bgcolor: ORANGE_COLOR + ' !important',
-            color: 'white',
-            fontWeight: 'bold',
-            borderRadius: '8px !important',
+            width: "100%",
+            p: "12px 20px",
+            bgcolor: ORANGE_COLOR + " !important",
+            color: "white",
+            fontWeight: "bold",
+            borderRadius: "8px !important",
             boxShadow: `0 4px 10px rgba(255, 102, 51, 0.4)`,
-            '&:hover': { bgcolor: '#cc4800' + ' !important' },
+            "&:hover": { bgcolor: "#cc4800 !important" },
           }}
         >
           Comentar
         </NavButton>
-        </Box>
+
+        {showCommentBox && (
+          <BookCommentBox
+            theme={theme}
+            id={id}
+            user={user}
+            newRating={newRating}
+            newComment={newComment}
+            setNewRating={setNewRating}
+            setNewComment={setNewComment}
+            setShowCommentBox={setShowCommentBox}
+            setOpinions={setOpinions}
+          />
+        )}
+        <Divider sx={{ my: 3 }} />
+            <BookDescription book={book} />
+
+            <BookOpinionList
+              opinions={opinions}
+              theme={theme}
+              handleViewCommentsClick={handleViewCommentsClick}
+            />
       </Box>
     </Box>
   );
