@@ -65,20 +65,29 @@ const BookDetailsPage = () => {
   // Cargar opiniones del libro
   useEffect(() => {
     if (!id) return;
-    // TODO: este endpoint no existe aún en el backend
-    fetch(`${API_BASE_URL}/api/v1/opinion/libro/${id}`)
-      .then(res => res.json())
-      .then(data => {
-        setOpinions(data)
-      })
-      .catch(err => {
-        console.error('Error cargando opiniones:', err)
+    let ignore = false; // 🔸 evita ejecuciones duplicadas en modo desarrollo
 
-        // Si no hay opiniones, ponemos  una de ejemplo
-        // TODO: eliminar esto cuando el backend devuelva opiniones reales
-        console.log('Opiniones cargadas:', opinions);
+    const fetchOpinions = async () => {
+      try {
+        const res = await fetch(`${API_BASE_URL}/api/v1/opinion/libro/${id}`);
+        const data = await res.json();
+        if (!ignore) {
+          setOpinions(data);
+          console.log('Opiniones cargadas:', data);
+        }
+      } catch (err) {
+        console.error('Error cargando opiniones:', err);
+        if (!ignore) {
+          console.log('Opiniones cargadas (mock):', opinions);
+        }
+      }
+    };
 
-      });
+    fetchOpinions();
+
+    return () => {
+      ignore = true; // 🔸 limpia el efecto cuando se desmonta o React re-renderiza
+    };
   }, [id]);
 
 
@@ -257,7 +266,17 @@ const BookDetailsPage = () => {
                   if (!res.ok) throw new Error('Error al guardar el comentario.');
 
                   const savedOpinion = await res.json();
-                  setOpinions((prev) => [savedOpinion, ...prev]);
+
+                  // ✅ Inyectar datos del usuario actual para mostrar el nombre inmediatamente
+                  const opinionConUsuario = {
+                    ...savedOpinion,
+                    usuario: {
+                      nombre: user?.nombre || "Usuario",
+                      rol: user?.rol || "Usuario",
+                    },
+                  };
+
+                  setOpinions((prev) => [opinionConUsuario, ...prev]);
                   setNewComment('');
                   setNewRating(0);
                   setShowCommentBox(false);
