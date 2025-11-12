@@ -1,7 +1,5 @@
 import React from "react";
 import { Box, Typography } from "@mui/material";
-import BookRatingSection from "./BookRatingSection";
-
 
 const BookDetailsHeader = ({ book, coverImageSrc, authorStyle }) => {
   return (
@@ -31,7 +29,6 @@ const BookDetailsHeader = ({ book, coverImageSrc, authorStyle }) => {
         <Typography variant="h6" color="text.primary" sx={{ mb: 0.5 }}>
           {book.author || book.autor}
         </Typography>
-        <BookRatingSection book={book}/>
       </Box>
     </Box>
   );

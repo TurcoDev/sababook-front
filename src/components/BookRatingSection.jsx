@@ -1,12 +1,10 @@
 import React from "react";
-import { Box, Typography, Rating, useTheme } from "@mui/material";
+import { Box, Typography, Rating } from "@mui/material";
 import StarIcon from "@mui/icons-material/Star";
 
 const ORANGE_COLOR = "#FF6633";
 
-const BookRatingSection = ({ book }) => {
-  const theme = useTheme(); // 👈 obtenemos theme internamente
-
+const BookRatingSection = ({ book, theme }) => {
   const ratingTextStyle = {
     fontSize: "1.8rem",
     fontWeight: 800,
@@ -41,4 +39,3 @@ const BookRatingSection = ({ book }) => {
 };
 
 export default BookRatingSection;
-
