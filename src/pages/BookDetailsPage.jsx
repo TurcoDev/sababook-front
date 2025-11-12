@@ -116,6 +116,8 @@ const BookDetailsPage = () => {
       sx={{
         width: '100%',
         maxWidth: 1000,
+        // display: 'flex',
+        // alignItems: 'center',
         minHeight: '100vh',
         margin: '0 auto',
         py: 2,

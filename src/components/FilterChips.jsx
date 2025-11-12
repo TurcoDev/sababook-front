@@ -3,51 +3,51 @@ import { Stack, Chip, Menu, MenuItem } from "@mui/material";
 import { buscarLibros } from '../services/apiService';
 
 const FILTERS_DATA = [
-    { 
-        id: 'genre',
-        name: 'Género', 
-        options: ['Terror', 'Romance', 'Policial', 'Ciencia Ficción', 'Fantasía', 'Académico'] 
-    },
-    {
-        id: 'level',
-        name: 'Nivel Educativo',
-        options: ['Primario', 'Secundario']
-    },
-    { 
-        id: 'lists',
-        name: 'Listas', 
-        options: ['Favoritos', 'Pendientes'] 
-    },
-    { 
-        id: 'highlights',
-        name: 'Destacados', 
-        options: ['Populares', 'Nuevos', 'Mejor Calificados'] 
-    },
+  {
+    id: 'genre',
+    name: 'Género',
+    options: ['Novela', 'Ficción', 'Poesía', 'Ensayo', 'Biografía', 'Terror', 'Romance', 'Policial', 'Ciencia Ficción', 'Fantasía', 'Académico']
+  },
+  {
+    id: 'level',
+    name: 'Nivel Educativo',
+    options: ['Nivel Básico', 'Nivel Superior']
+  },
+  // {
+  //   id: 'lists',
+  //   name: 'Listas',
+  //   options: ['Favoritos', 'Pendientes']
+  // },
+  // {
+  //   id: 'highlights',
+  //   name: 'Destacados',
+  //   options: ['Populares', 'Nuevos', 'Mejor Calificados']
+  // },
 ];
 
 export default function FilterChips({ onFilterChange }) {
   // Estado para el elemento de anclaje (donde se abre el menú)
-  const [anchorEl, setAnchorEl] = useState(null); 
+  const [anchorEl, setAnchorEl] = useState(null);
   // Estado para saber qué filtro está activo (e.g., 'Género')
-  const [activeFilterId, setActiveFilterId] = useState(null); 
+  const [activeFilterId, setActiveFilterId] = useState(null);
   // Estado para los filtros seleccionados
   const [selectedFilters, setSelectedFilters] = useState({});
   const openMenu = Boolean(anchorEl);
 
   const handleChipClick = (event, filterId) => {
     // 1. Establece el chip clicado como el ancla
-    setAnchorEl(event.currentTarget); 
+    setAnchorEl(event.currentTarget);
     // 2. Registra el ID del filtro activo
-    setActiveFilterId(filterId); 
+    setActiveFilterId(filterId);
   };
 
   const handleMenuClose = () => {
     setAnchorEl(null);
     setActiveFilterId(null);
   };
-  
+
   const handleMenuItemClick = async (filterId, option) => {
-      console.log(`Filtro [${filterId}] seleccionado: ${option}`);
+    console.log(`Filtro [${filterId}] seleccionado: ${option}`);
 
     // Mapear los IDs de filtro a los nombres de campo de la API
     const filterMapping = {
@@ -76,7 +76,7 @@ export default function FilterChips({ onFilterChange }) {
       }
     }
 
-      handleMenuClose();
+    handleMenuClose();
   };
 
   const activeFilterData = FILTERS_DATA.find(f => f.id === activeFilterId);
@@ -84,24 +84,24 @@ export default function FilterChips({ onFilterChange }) {
   return (
     <>
       <Stack direction="row" spacing={1} mb={2} sx={{ overflowX: "auto" }}>
-        
+
         {/* Mapea y renderiza todos los chips */}
         {FILTERS_DATA.map((filter) => (
-            <Chip 
-                key={filter.id}
-                label={filter.name} 
-                // Al hacer clic, pasamos el evento y el ID del filtro
-                onClick={(e) => handleChipClick(e, filter.id)} 
-                
-                aria-controls={activeFilterId === filter.id ? 'filter-menu' : undefined}
-                aria-haspopup="true"
-                aria-expanded={activeFilterId === filter.id ? 'true' : undefined}
-                color={activeFilterId === filter.id ? "primary" : "default"}
-                variant="outlined" 
-            />
+          <Chip
+            key={filter.id}
+            label={filter.name}
+            // Al hacer clic, pasamos el evento y el ID del filtro
+            onClick={(e) => handleChipClick(e, filter.id)}
+
+            aria-controls={activeFilterId === filter.id ? 'filter-menu' : undefined}
+            aria-haspopup="true"
+            aria-expanded={activeFilterId === filter.id ? 'true' : undefined}
+            color={activeFilterId === filter.id ? "primary" : "default"}
+            variant="outlined"
+          />
         ))}
       </Stack>
-      
+
       {/* El componente Menu se renderiza para el filtro activo */}
       <Menu
         id="filter-menu"
@@ -112,12 +112,12 @@ export default function FilterChips({ onFilterChange }) {
         transformOrigin={{ vertical: 'top', horizontal: 'left' }}
       >
         {activeFilterData?.options.map(option => (
-            <MenuItem 
-                key={option} 
-                onClick={() => handleMenuItemClick(activeFilterId, option)}
-            >
-                {option}
-            </MenuItem>
+          <MenuItem
+            key={option}
+            onClick={() => handleMenuItemClick(activeFilterId, option)}
+          >
+            {option}
+          </MenuItem>
         ))}
       </Menu>
     </>

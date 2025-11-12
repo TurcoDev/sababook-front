@@ -14,6 +14,7 @@ export default function BookListSection({ books, handleFavoriteToggle, handleVer
           flexWrap: "wrap",
           justifyContent: "center",
           gap: 4,
+          width: "100%",
         }}
       >
         {books.map((book) => (

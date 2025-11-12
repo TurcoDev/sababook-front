@@ -105,7 +105,7 @@ export default function Home() {
       px={1}
       sx={{
         width: '100%',
-        maxWidth: 1000,
+        // maxWidth: 1000,
         margin: "0 auto"
       }}
     >
