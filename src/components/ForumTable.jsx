@@ -1,6 +1,7 @@
 // src/components/ForumTable.jsx
 
 import React, { useState, useEffect } from 'react';
+import { API_BASE_URL } from '../environments/api';
 import {
   Box,
   Typography,
@@ -73,7 +74,7 @@ const ForumTable = ({ forums, loading, error, onForumUpdate, onForumClick }) => 
     if (!nuevoTitulo || !nuevaDescripcion) return;
 
     try {
-      const res = await fetch(`http://localhost:3000/api/v1/foro/${id}`, {
+      const res = await fetch(`${API_BASE_URL}/api/v1/foro/${id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ titulo: nuevoTitulo, descripcion: nuevaDescripcion }),
@@ -94,7 +95,7 @@ const ForumTable = ({ forums, loading, error, onForumUpdate, onForumClick }) => 
     if (!window.confirm('¿Estás seguro de eliminar este foro?')) return;
 
     try {
-      const res = await fetch(`http://localhost:3000/api/v1/foro/${id}`, {
+      const res = await fetch(`${API_BASE_URL}/api/v1/foro/${id}`, {
         method: 'DELETE',
       });
 
