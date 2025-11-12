@@ -6,6 +6,7 @@ import Home from "./pages/Home";
 import LoginPage from "./pages/LoginRegister";
 import Favs from "./pages/Favs";
 import Profile from "./pages/Profile";
+import MyForum from './pages/MyForums';
 import DashboardPage from "./pages/DashboardPage";
 import BookDetailsPage from "./pages/BookDetailsPage";
 import MyComments from "./pages/MyComments";
@@ -18,7 +19,7 @@ function App() {
     <Routes>
       <Route path="/" element={<Navigate to="/login" replace />} />
       <Route path="/login" element={<LoginPage />} />
-      
+
       {/* Rutas protegidas */}
       <Route path="/home" element={
         <ProtectedRoute>
@@ -55,6 +56,15 @@ function App() {
           <BookDetailsPage />
         </ProtectedRoute>
       } />
+
+      <Route
+        path="/foros"
+        element={
+          <ProtectedRoute>
+            <MyForum />
+          </ProtectedRoute>
+        }
+      />
 
       {/* Ruta principal de administración */}
       <Route path="/dashboard" element={
