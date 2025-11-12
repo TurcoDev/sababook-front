@@ -3,33 +3,33 @@ import { Stack, Chip, Menu, MenuItem } from "@mui/material";
 import { buscarLibros } from '../services/apiService';
 
 const FILTERS_DATA = [
-    {
+    { 
         id: 'genre',
-        name: 'Género',
-        options: ['Realismo mágico', 'Fábula', 'Distopía', 'Novela']
+        name: 'Género', 
+        options: ['Terror', 'Romance', 'Policial', 'Ciencia Ficción', 'Fantasía', 'Académico'] 
     },
     {
         id: 'level',
         name: 'Nivel Educativo',
-        options: ['Primario', 'Secundario', 'Universitario']
+        options: ['Primario', 'Secundario']
     },
-    {
+    { 
         id: 'lists',
-        name: 'Listas',
-        options: ['Favoritos', 'Pendientes']
+        name: 'Listas', 
+        options: ['Favoritos', 'Pendientes'] 
     },
-    {
+    { 
         id: 'highlights',
-        name: 'Destacados',
-        options: ['Populares', 'Nuevos', 'Mejor Calificados']
+        name: 'Destacados', 
+        options: ['Populares', 'Nuevos', 'Mejor Calificados'] 
     },
 ];
 
 export default function FilterChips({ onFilterChange }) {
   // Estado para el elemento de anclaje (donde se abre el menú)
-  const [anchorEl, setAnchorEl] = useState(null);
+  const [anchorEl, setAnchorEl] = useState(null); 
   // Estado para saber qué filtro está activo (e.g., 'Género')
-  const [activeFilterId, setActiveFilterId] = useState(null);
+  const [activeFilterId, setActiveFilterId] = useState(null); 
   // Estado para los filtros seleccionados
   const [selectedFilters, setSelectedFilters] = useState({});
   const openMenu = Boolean(anchorEl);
@@ -47,7 +47,7 @@ export default function FilterChips({ onFilterChange }) {
   };
   
   const handleMenuItemClick = async (filterId, option) => {
-    console.log(`Filtro [${filterId}] seleccionado: ${option}`);
+      console.log(`Filtro [${filterId}] seleccionado: ${option}`);
 
     // Mapear los IDs de filtro a los nombres de campo de la API
     const filterMapping = {
@@ -76,7 +76,7 @@ export default function FilterChips({ onFilterChange }) {
       }
     }
 
-    handleMenuClose();
+      handleMenuClose();
   };
 
   const activeFilterData = FILTERS_DATA.find(f => f.id === activeFilterId);
