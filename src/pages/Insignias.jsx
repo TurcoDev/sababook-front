@@ -7,15 +7,19 @@ import { useTheme } from '@mui/material/styles';
 import AppHeader from '../components/AppHeader';
 import InsigniaUnica from '../components/InsigniaUnica';
 
+// Importa el hook de autenticación
+import { useAuth } from '../hooks/useAuth';
+
 const Insignias = () => {
   const theme = useTheme();
   const [menuOpen, setMenuOpen] = useState(false);
+  const { user } = useAuth();
 
   // ----------------------------------------------------
   // DATOS DINÁMICOS (Se simula la obtención de datos del usuario)
   // ----------------------------------------------------
 
-  const username = 'Desarrollador'; // Simulación de usuario logueado
+  const username = user ? user.nombre : 'Usuario'; // Obtener nombre real del usuario logueado
 
   // Las cuatro insignias que el usuario tiene
   const insigniasUsuario = [
@@ -25,16 +29,29 @@ const Insignias = () => {
     'Pionero de la Novedad'
   ];
 
+  // Fecha dinámica (formato en español, con mayúscula inicial)
+  const formattedDate = (() => {
+    const d = new Date();
+    const opts = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+    // Usamos locale 'es-ES' y capitalizamos la primera letra
+    return d.toLocaleDateString('es-ES', opts).replace(/^./, c => c.toUpperCase());
+  })();
+
   // ----------------------------------------------------
 
   return (
     // Box principal para simular el contenedor de la pantalla de la app
     <Box
       sx={{
-        maxWidth: 400, // Ancho típico de un móvil
+        maxWidth: {
+          xs: 400, // Móvil
+          sm: 600, // Tablet pequeña
+          md: 800, // Tablet grande / Desktop pequeño
+          lg: 1000, // Desktop
+        },
         margin: '0 auto',
         height: '100vh',
-        backgroundColor: '#f5f5f5', // Fondo general sutil
+        // Fondo general sutil
         display: 'flex',
         flexDirection: 'column',
         overflowY: 'auto',
@@ -45,7 +62,7 @@ const Insignias = () => {
      <AppHeader
              onMenuClick={() => setMenuOpen(true)}
              title={`Hola, ${username || 'Usuario'}`}
-             subtitle="Miércoles, Septiembre 17, 2025"
+             subtitle={formattedDate}
            />
 
       <Box sx={{ flex: 1, overflowY: 'auto' }}>
@@ -64,7 +81,7 @@ const Insignias = () => {
 
           {/* 2. COMPONENTES DE LAS CUATRO INSIGNIAS */}
           {insigniasUsuario.map((insignia, index) => (
-            <Box key={index} sx={{ marginBottom: 4 }}>
+            <Box key={index} sx={{ marginBottom: 2, width: { xs: 350, lg: 500 }, marginX: 'auto', paddingRight: { lg: 5 } }}>
               <InsigniaUnica nombreInsignia={insignia} />
             </Box>
           ))}
