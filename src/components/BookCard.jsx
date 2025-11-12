@@ -43,8 +43,8 @@ export default function BookCard({
         bgcolor: "#ffffff",
         px: 3,
         py: 1.5,
-        maxWidth: featured ? 500 : 320,
-        minWidth: featured ? 400 : 300,
+        width: featured ? { xs: "100%", sm: 500 } : { xs: "100%", md: "48%" },
+        minWidth: featured ? { xs: "100%", sm: 400 } : 0,
         transition: "transform 0.2s, box-shadow 0.2s",
         "&:hover": {
           transform: "translateY(-3px)",
