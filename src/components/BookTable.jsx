@@ -197,8 +197,6 @@ const BookTable = ({
         </Box>
       )}
       
-      {/* 🚨 Se eliminan el Dialog de Confirmación y el Snackbar, que ahora están en DashboardPage.jsx */}
-      
     </StyledTableContainer>
   );
 };
