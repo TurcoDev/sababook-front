@@ -9,25 +9,18 @@ import InsigniaUnica from '../components/InsigniaUnica';
 
 // Importa el hook de autenticación
 import { useAuth } from '../hooks/useAuth';
+// Importa el hook de medallas
+import useMedallas from '../hooks/useMedallas';
 
 const Insignias = () => {
   const theme = useTheme();
   const [menuOpen, setMenuOpen] = useState(false);
   const { user } = useAuth();
 
-  // ----------------------------------------------------
-  // DATOS DINÁMICOS (Se simula la obtención de datos del usuario)
-  // ----------------------------------------------------
+  // Usar el hook para obtener medallas del usuario
+  const { medallas, loading, error } = useMedallas(user?.id);
 
   const username = user ? user.nombre : 'Usuario'; // Obtener nombre real del usuario logueado
-
-  // Las cuatro insignias que el usuario tiene
-  const insigniasUsuario = [
-    'Crítico Literario',
-    'Comentarista Apasionado',
-    'Fan de Libros',
-    'Pionero de la Novedad'
-  ];
 
   // Fecha dinámica (formato en español, con mayúscula inicial)
   const formattedDate = (() => {
@@ -79,12 +72,18 @@ const Insignias = () => {
             Insignias
           </Typography>
 
-          {/* 2. COMPONENTES DE LAS CUATRO INSIGNIAS */}
-          {insigniasUsuario.map((insignia, index) => (
-            <Box key={index} sx={{ marginBottom: 2, width: { xs: 350, lg: 500 }, marginX: 'auto', paddingRight: { lg: 5 } }}>
-              <InsigniaUnica nombreInsignia={insignia} />
-            </Box>
-          ))}
+          {/* Mostrar loading, error o las medallas */}
+          {loading ? (
+            <Typography>Cargando insignias...</Typography>
+          ) : error ? (
+            <Typography color="error">Error al cargar insignias: {error}</Typography>
+          ) : (
+            medallas.map((medalla, index) => (
+              <Box key={medalla.id || index} sx={{ marginBottom: 2, width: { xs: 350, lg: 500 }, marginX: 'auto', paddingRight: { lg: 5 } }}>
+                <InsigniaUnica nombreInsignia={medalla.nombre} />
+              </Box>
+            ))
+          )}
 
         </Paper>
 

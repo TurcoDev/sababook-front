@@ -71,3 +71,14 @@ export async function buscarLibros(filtros = {}) {
 export async function getLibroById(libroId) {
   return await apiRequest(`/libros/${libroId}`);
 }
+
+// ========== FUNCIONES PARA MEDALLAS ==========
+
+/**
+ * Obtener medallas de un usuario específico
+ * @param {number} userId - ID del usuario
+ * @returns {Promise<Array>} Lista de medallas del usuario
+ */
+export async function getMedallasUsuario(userId) {
+  return await apiRequest(`/usuarios/${userId}/medallas`);
+}
