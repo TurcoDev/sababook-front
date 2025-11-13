@@ -56,8 +56,7 @@ const ActionButton = styled(IconButton)(({ theme }) => ({
     backgroundColor: '#cc4800',
   },
 }));
-
-const ForumTable = ({ forums, loading, error, onForumUpdate, onForumClick }) => {
+const ForumTable = ({ forums, loading, error, onForumUpdate, onForumClick, onDeleteForum }) => {
   const theme = useTheme();
   const [page, setPage] = useState(1);
   const pageCount = Math.ceil(forums.length / ROWS_PER_PAGE);
@@ -91,24 +90,6 @@ const ForumTable = ({ forums, loading, error, onForumUpdate, onForumClick }) => 
     }
   };
 
-  const handleDelete = async (id) => {
-    if (!window.confirm('¿Estás seguro de eliminar este foro?')) return;
-
-    try {
-      const res = await fetch(`${API_BASE_URL}/api/v1/foro/${id}`, {
-        method: 'DELETE',
-      });
-
-      if (res.ok) {
-        console.log(`✅ Foro ${id} eliminado`);
-        onForumUpdate(); // 👉 vuelve a cargar los foros actualizados
-      } else {
-        console.error('❌ Error al eliminar el foro');
-      }
-    } catch (error) {
-      console.error('❌ Error al eliminar foro:', error);
-    }
-  };
 
   if (loading) return <Typography sx={{ padding: 3 }}>Cargando foros...</Typography>;
 
@@ -152,7 +133,13 @@ const ForumTable = ({ forums, loading, error, onForumUpdate, onForumClick }) => 
                           <ActionButton onClick={() => handleEdit(row.foro_id)} title="Editar">
                             <EditIcon sx={{ fontSize: '1.1rem' }} />
                           </ActionButton>
-                          <ActionButton onClick={() => handleDelete(row.foro_id)} title="Eliminar">
+                          <ActionButton
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              onDeleteForum(row.foro_id);
+                            }}
+                            title="Eliminar"
+                          >
                             <DeleteIcon sx={{ fontSize: '1.1rem' }} />
                           </ActionButton>
                         </Box>

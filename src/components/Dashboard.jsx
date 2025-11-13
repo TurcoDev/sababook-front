@@ -30,20 +30,21 @@ const Dashboard = () => {
   const [openForumModal, setOpenForumModal] = useState(false);
   const [openCreateModal, setOpenCreateModal] = useState(false); // Modal para USUARIOS
   const [openCreateBookModal, setOpenCreateBookModal] = useState(false); // Modal para LIBROS
-  // 💡 ESTADO CLAVE: Rastrear el libro que se está editando (null si es creación)
+  //  ESTADO CLAVE: Rastrear el libro que se está editando (null si es creación)
   const [bookToEdit, setBookToEdit] = useState(null);
 
   const [snackbar, setSnackbar] = useState({ open: false, message: "", severity: "success" });
   const [isApiLoading, setIsApiLoading] = useState(false); // Para manejar carga en operaciones CRUD
 const [openDeleteConfirm, setOpenDeleteConfirm] = useState(false);
   const [bookToDeleteId, setBookToDeleteId] = useState(null);
-  // --- 🧩 ESTADOS DE FOROS
+  // ---  ESTADOS DE FOROS
   const [forums, setForums] = useState([]);
   const [forumsLoading, setForumsLoading] = useState(true);
   const [forumsError, setForumsError] = useState(null);
   const [selectedForumId, setSelectedForumId] = useState(null);
   const [openForumDetail, setOpenForumDetail] = useState(false);
-
+const [openDeleteForumConfirm, setOpenDeleteForumConfirm] = useState(false);
+  const [forumToDeleteId, setForumToDeleteId] = useState(null);
   // Mapeo de roles para la creación de usuarios
   const rolMapping = {
     alumno: 1,
@@ -322,7 +323,49 @@ const handleConfirmDeleteBook = async () => {
       setSnackbar({ open: true, message: "Error al crear el foro", severity: "error" });
     }
   };
+ // 1. Handler para abrir el modal de eliminación de foros
+  const handleOpenDeleteForumConfirm = (forumId) => {
+      setForumToDeleteId(forumId);
+      setOpenDeleteForumConfirm(true);
+  };
 
+  // 2. Handler para cerrar el modal de eliminación de foros sin acción
+  const handleCloseDeleteForumConfirm = () => {
+      setOpenDeleteForumConfirm(false);
+      setForumToDeleteId(null);
+  };
+
+  // 3. Handler de eliminación definitiva de foros
+  const handleConfirmDeleteForum = async () => {
+    setOpenDeleteForumConfirm(false);
+
+    if (!forumToDeleteId) return;
+
+    setIsApiLoading(true);
+    const token = localStorage.getItem('token');
+    const endpoint = `${API_BASE_URL}/api/v1/foro/${forumToDeleteId}`;
+
+    try {
+        const response = await fetch(endpoint, {
+            method: 'DELETE',
+            headers: { 'Authorization': `Bearer ${token}` },
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json().catch(() => ({}));
+            throw new Error(errorData.message || `Fallo la eliminación del foro (HTTP ${response.status})`);
+        }
+
+        await fetchForums();
+        setSnackbar({ open: true, message: `✅ Foro eliminado correctamente.`, severity: "success" });
+    } catch (error) {
+        console.error("Error al eliminar foro:", error);
+        setSnackbar({ open: true, message: `❌ Error al eliminar foro: ${error.message}`, severity: "error" });
+    } finally {
+        setIsApiLoading(false);
+        setForumToDeleteId(null);
+    }
+  };
 
   const handleSnackbarClose = (event, reason) => {
     if (reason === 'clickaway') return;
@@ -363,6 +406,7 @@ const handleConfirmDeleteBook = async () => {
               setSelectedForumId(id);
               setOpenForumDetail(true);
             }}
+            onDeleteForum={handleOpenDeleteForumConfirm}
           />
         );
 
@@ -432,7 +476,7 @@ const handleConfirmDeleteBook = async () => {
           }}
         >
           <BookForm
-            // 💡 bookToEdit determina si el formulario está en modo 'editar' o 'crear'
+            // bookToEdit determina si el formulario está en modo 'editar' o 'crear'
             bookToEdit={bookToEdit}
             title={bookToEdit ? "Editar Libro" : "Crear Nuevo Libro"}
             onSave={handleSaveBook} // Handler unificado (POST/PUT)
@@ -510,6 +554,32 @@ const handleConfirmDeleteBook = async () => {
             disabled={isApiLoading}
           >
             {isApiLoading ? <CircularProgress size={24} color="inherit" /> : 'Sí, Eliminar'}
+          </Button>
+        </DialogActions>
+      </Dialog>
+      <Dialog
+        open={openDeleteForumConfirm}
+        onClose={handleCloseDeleteForumConfirm}
+        aria-labelledby="confirmar-eliminacion-foro-titulo"
+      >
+        <DialogTitle id="confirmar-eliminacion-foro-titulo">{"Confirmar Eliminación del Foro"}</DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            Estás a punto de eliminar el foro con ID: **{forumToDeleteId}**. ¿Estás seguro de que quieres eliminarlo? Esta acción no se puede deshacer.
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCloseDeleteForumConfirm} color="primary" disabled={isApiLoading}>
+            Cancelar
+          </Button>
+          <Button 
+            onClick={handleConfirmDeleteForum} 
+            color="error" 
+            variant="contained" 
+            autoFocus
+            disabled={isApiLoading}
+          >
+            {isApiLoading ? <CircularProgress size={24} color="inherit" /> : 'Sí, Eliminar Foro'}
           </Button>
         </DialogActions>
       </Dialog>
