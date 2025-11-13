@@ -25,13 +25,13 @@ export default function BookCard({
   featured = false,
   isFavorite = false,
   onFavoriteToggle,
-  bookId,
+  // bookId, // Esto esta de mas
   libro_id,
 }) {
   const navigate = useNavigate();
 
   // Determinar ID del libro (usa cualquiera de los dos disponibles)
-  const bookIdentifier = bookId || libro_id;
+  const bookIdentifier = libro_id;
 
   return (
     <Card
@@ -168,6 +168,7 @@ export default function BookCard({
           <Button
             variant="contained"
             onClick={() => {
+              console.log("Navigating to book details for ID:", bookIdentifier);
               if (bookIdentifier) {
                 navigate(`/bookdetails/${bookIdentifier}`);
               }
