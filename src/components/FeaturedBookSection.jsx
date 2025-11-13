@@ -1,10 +1,10 @@
 import { Box, Typography } from "@mui/material";
 import BookCard from "./BookCard";
-import LibroImage from '../assets/libro.jpg'
+// import LibroImage from '../assets/libro.jpg'
 
 export default function FeaturedBookSection({ featuredBook, handleFavoriteToggle, handleVerMas }) {
   
-  const bookId = featuredBook.id || featuredBook.libro_id;
+  //const bookId = featuredBook.id || featuredBook.libro_id;
 
   return (
     <>
@@ -14,17 +14,17 @@ export default function FeaturedBookSection({ featuredBook, handleFavoriteToggle
 
       <Box display="flex" justifyContent="left" mt={2} mb={3}>
         <BookCard
-          featured
-          image={featuredBook.portada_url || LibroImage}
+          // featured
+          image={featuredBook.portada_url}
           title={featuredBook.titulo}
           rating={featuredBook.calificacion_promedio || featuredBook.rating}
           isFavorite={featuredBook.isFavorite}
           onFavoriteToggle={() =>
-            bookId && handleFavoriteToggle(bookId, true)
+            featuredBook.libro_id && handleFavoriteToggle(featuredBook.libro_id, true)
           }
           // bookId={bookId}
           libro_id={featuredBook.libro_id}
-          onVerMas={() => handleVerMas(bookId)}
+          onVerMas={() => handleVerMas(featuredBook.libro_id)}
         />
       </Box>
     </>

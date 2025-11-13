@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { Box, Divider, useTheme } from "@mui/material";
 import { useParams, useNavigate } from "react-router-dom";
 import SideMenu from "../components/SideMenu";
