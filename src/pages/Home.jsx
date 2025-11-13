@@ -202,6 +202,7 @@ export default function Home() {
               rating={book.rating}
               progress={book.progress}
               isFavorite={book.isFavorite}
+              libro_id={book.libro_id}
               onFavoriteToggle={() => handleFavoriteToggle(book.id, false)}
             />
           ))
