@@ -1,22 +1,19 @@
-import { useState, useEffect } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
 import {
   Box,
-  Typography,
-  Modal,
   Button,
+  Typography
 } from "@mui/material";
-
+import { useEffect, useState } from "react";
+import { useLocation } from "react-router-dom";
 
 import AppHeader from "../components/AppHeader";
 import BookCard from "../components/BookCard";
-import SideMenu from "../components/SideMenu";
 import FilterChips from "../components/FilterChips";
+import SideMenu from "../components/SideMenu";
 import WelcomeModal from "../components/WelcomeModal";
-import { getCatalogoLibros, buscarLibros } from "../services/apiService";
+import SearchBar from "../components/SearchBar";
+import { buscarLibros, getCatalogoLibros } from "../services/apiService";
 import { normalizarTexto } from "../utils/normalize";
-import FeaturedBookSection from "../components/FeaturedBookSection"; 
-import BookListSection from "../components/BookListSection";
 
 // Importaciones de Lógica (Custom Hooks)
 import { useAuth } from "../hooks/useAuth";
@@ -31,7 +28,6 @@ export default function Home() {
   const [currentFilters, setCurrentFilters] = useState({});
   const [currentQuery, setCurrentQuery] = useState('');
   const location = useLocation();
-  const navigate = useNavigate();
   const { user } = useAuth();
   
   // --- LÓGICA DE DATOS: Llamada a Custom Hooks ---
@@ -75,6 +71,7 @@ export default function Home() {
     try {
       const queryNormalizada = normalizarTexto(query);
       const filtrosCombinados = { ...currentFilters, query: queryNormalizada };
+      // FIXME: Verificar funcionamiento FALLA!!. Trae todos los libros
       const resultados = await buscarLibros(filtrosCombinados);
       setBooks(resultados);
       setCurrentQuery(query);
@@ -124,7 +121,7 @@ export default function Home() {
       <WelcomeModal open={isWelcomeModalOpen} onClose={handleCloseWelcomeModal} user={user} />
 
       <Box mb={2}>
-        {/* <SearchBar onSearch={handleSearch} /> */}
+        <SearchBar onSearch={handleSearch} />
       </Box>
 
 
@@ -198,8 +195,8 @@ export default function Home() {
               autor={book.autor}
               gender={book.genero}
               title={book.titulo}
-              description={book.descripcion}
-              rating={book.rating}
+              // description={book.descripcion} // No se muestra en el home
+              rating={book.calificacion_promedio}
               progress={book.progress}
               isFavorite={book.isFavorite}
               libro_id={book.libro_id}

@@ -25,7 +25,7 @@ export default function BookCard({
   featured = false,
   isFavorite = false,
   onFavoriteToggle,
-  // bookId,
+  // bookId, // Esto esta de mas
   libro_id,
 }) {
   const navigate = useNavigate();
