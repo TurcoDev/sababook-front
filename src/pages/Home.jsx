@@ -12,6 +12,9 @@ import FilterChips from "../components/FilterChips";
 import SideMenu from "../components/SideMenu";
 import WelcomeModal from "../components/WelcomeModal";
 import SearchBar from "../components/SearchBar";
+import FeaturedBookSection from "../components/FeaturedBookSection";
+
+// Importaciones de Servicios
 import { buscarLibros, getCatalogoLibros } from "../services/apiService";
 import { normalizarTexto } from "../utils/normalize";
 
@@ -29,20 +32,20 @@ export default function Home() {
   const [currentQuery, setCurrentQuery] = useState('');
   const location = useLocation();
   const { user } = useAuth();
-  
+
   // --- LÓGICA DE DATOS: Llamada a Custom Hooks ---
   // 1. Hook para cargar los datos y manejar sus estados
   const { books, setBooks, featuredBook, setFeaturedBook } = useBookData();
 
   // 2. Hook para manejar la interacción de favoritos
   const { handleFavoriteToggle } = useFavorites(
-    books, 
-    setBooks, 
-    featuredBook, 
+    books,
+    setBooks,
+    featuredBook,
     setFeaturedBook
   );
   // -----------------------------------------------
-  
+
   // --- Lógica de Modal de Bienvenida  ---
   useEffect(() => {
     if (location.state?.fromLogin && user) {
@@ -94,14 +97,14 @@ export default function Home() {
       setBooks([]);
     }
   };
-  
+
   // --- RENDERIZADO ---
   return (
     <Box
       py={2}
       px={1}
       sx={{
-        width: '100%',
+        width: '90%',
         // maxWidth: 1000,
         margin: "0 auto"
       }}
@@ -130,28 +133,11 @@ export default function Home() {
 
       {/* Recomendado semanal - Solo mostrar si no hay filtros aplicados */}
       {Object.keys(currentFilters).length === 0 && !currentQuery && (
-        <>
-          <Typography variant="h4" fontWeight="bold" color="secondary" mb={1}>
-            Recomendado semanal
-          </Typography>
-
-          <Box display="flex" justifyContent="left" mt={2} mb={3}>
-            <BookCard
-              featured
-              image={featuredBook.image}
-              title={featuredBook.title}
-              rating={featuredBook.rating}
-              progress={featuredBook.progress}
-              isFavorite={featuredBook.isFavorite}
-              onFavoriteToggle={() => handleFavoriteToggle(featuredBook.id, true)}
-            />
-          </Box>
-
-          {/* Destacados */}
-          <Typography variant="h4" fontWeight="bold" color="secondary" mt={3} mb={1}>
-            Destacados
-          </Typography>
-        </>
+        <FeaturedBookSection
+          // TODO: Cambiar libro recomendado dinámicamente y no MOCKEADO
+          featuredBook={books.find((book) => book.titulo === "La gran ocasión") || {}}
+          handleFavoriteToggle={handleFavoriteToggle}
+        />
       )}
 
       {/* Resultados de búsqueda/filtros - Mostrar si hay búsqueda o filtros aplicados */}
