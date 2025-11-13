@@ -28,9 +28,9 @@ export default function BookListSection({ books, handleFavoriteToggle, handleVer
             progress={book.progress}
             isFavorite={book.isFavorite}
             onFavoriteToggle={() => handleFavoriteToggle(book.id || book.libro_id, false)}
-            bookId={book.id}
+            // bookId={book.id}
             libro_id={book.libro_id}
-            onVerMas={() => handleVerMas(book.id || book.libro_id)}
+            onVerMas={() => handleVerMas(book.libro_id)}
           />
         ))}
       </Box>
