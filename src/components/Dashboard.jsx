@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Box, Modal, Snackbar, Alert, CircularProgress, Typography } from '@mui/material';
+import { Box, Modal, Snackbar, Alert, CircularProgress, Typography, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Button } from '@mui/material'; 
 
 
 import HeaderDashboard from './HeaderDashboard';
@@ -35,7 +35,8 @@ const Dashboard = () => {
 
   const [snackbar, setSnackbar] = useState({ open: false, message: "", severity: "success" });
   const [isApiLoading, setIsApiLoading] = useState(false); // Para manejar carga en operaciones CRUD
-
+const [openDeleteConfirm, setOpenDeleteConfirm] = useState(false);
+  const [bookToDeleteId, setBookToDeleteId] = useState(null);
   // --- 🧩 ESTADOS DE FOROS
   const [forums, setForums] = useState([]);
   const [forumsLoading, setForumsLoading] = useState(true);
@@ -129,7 +130,7 @@ const Dashboard = () => {
     } else if (activeView === 'books') {
       fetchBooks();
     } else if (activeView === 'forums') {
-      fetchForums(); // 👈 añadimos esta línea
+      fetchForums(); 
     }
     setUserError(null);
     setBooksError(null);
@@ -146,7 +147,7 @@ const Dashboard = () => {
     } else if (activeView === 'forums') {
       setOpenForumModal(true);
     } else if (activeView === 'books') {
-      setBookToEdit(null); // Asegura que el modo sea 'crear'
+      setBookToEdit(null); 
       setOpenCreateBookModal(true);
     }
   };
@@ -161,7 +162,7 @@ const Dashboard = () => {
     setBookToEdit(null);
   };
 
-  // 💡 HANDLER DE EDICIÓN: Abre el modal en modo edición
+  //  HANDLER DE EDICIÓN: Abre el modal en modo edición
   const handleEditBookClick = (book) => {
     setBookToEdit(book);
     setOpenCreateBookModal(true);
@@ -199,7 +200,7 @@ const Dashboard = () => {
   };
 
   // --- API HANDLERS (LIBROS) ---
-  // 💡 HANDLER UNIFICADO: Maneja Creación (POST) y Edición (PUT)
+  //  HANDLER UNIFICADO: Maneja Creación (POST) y Edición (PUT)
   const handleSaveBook = async (bookData) => {
     setIsApiLoading(true);
     const token = localStorage.getItem('token');
@@ -240,37 +241,51 @@ const Dashboard = () => {
       setIsApiLoading(false);
     }
   };
+// --- HANDLER PARA ABRIR EL MODAL DE CONFIRMACIÓN ---
+const handleOpenDeleteConfirm = (bookId) => {
+    setBookToDeleteId(bookId); // Guarda el ID del libro
+    setOpenDeleteConfirm(true); // Abre el modal
+};
 
-  // 💡 HANDLER DE ELIMINACIÓN: Lógica para la Eliminación (DELETE)
-  const handleDeleteBook = async (bookId) => {
-    // 🚨 NOTA: En un entorno de producción, se debe usar un modal de Material UI en lugar de window.confirm()
-    if (!window.confirm("¿Estás seguro de que quieres eliminar este libro? Esta acción no se puede deshacer.")) return;
+// --- HANDLER PARA CERRAR EL MODAL SIN ELIMINAR ---
+const handleCloseDeleteConfirm = () => {
+    setOpenDeleteConfirm(false);
+    setBookToDeleteId(null); // Limpia el ID
+};
+// 💡 HANDLER DE ELIMINACIÓN: Lógica para la Eliminación (DELETE)
+const handleConfirmDeleteBook = async () => {
+    // 1. Cierra el modal inmediatamente
+    setOpenDeleteConfirm(false);
+
+    if (!bookToDeleteId) return; // Asegura que haya un ID
 
     setIsApiLoading(true);
     const token = localStorage.getItem('token');
-    const endpoint = `${API_BASE_URL}/api/v1/libros/${bookId}`;
+    // Usa el ID guardado en el estado
+    const endpoint = `${API_BASE_URL}/api/v1/libros/${bookToDeleteId}`;
 
     try {
-      const response = await fetch(endpoint, {
-        method: 'DELETE',
-        headers: { 'Authorization': `Bearer ${token}` },
-      });
+        const response = await fetch(endpoint, {
+            method: 'DELETE',
+            headers: { 'Authorization': `Bearer ${token}` },
+        });
 
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.message || `Fallo la eliminación (HTTP ${response.status})`);
-      }
+        if (!response.ok) {
+            const errorData = await response.json().catch(() => ({}));
+            throw new Error(errorData.message || `Fallo la eliminación (HTTP ${response.status})`);
+        }
 
-      await fetchBooks(); // Refrescar la lista de libros
-      setSnackbar({ open: true, message: `✅ Libro eliminado correctamente.`, severity: "success" });
+        await fetchBooks(); // Refrescar la lista de libros
+        setSnackbar({ open: true, message: `✅ Libro eliminado correctamente.`, severity: "success" });
     } catch (error) {
-      console.error("Error al eliminar libro:", error);
-      setSnackbar({ open: true, message: `❌ Error al eliminar: ${error.message}`, severity: "error" });
+        console.error("Error al eliminar libro:", error);
+        setSnackbar({ open: true, message: `❌ Error al eliminar: ${error.message}`, severity: "error" });
     } finally {
-      setIsApiLoading(false);
+        setIsApiLoading(false);
+        setBookToDeleteId(null); // Limpia el ID al finalizar
     }
-  };
-
+};
+  //foros
 
   const handleSaveNewForum = async (forumData) => {
     try {
@@ -334,7 +349,7 @@ const Dashboard = () => {
             error={booksError}
             onBookUpdate={fetchBooks}
             onEditBook={handleEditBookClick}
-            onDeleteBook={handleDeleteBook}
+            onDeleteBook={handleOpenDeleteConfirm}
           />
         );
       case 'forums':
@@ -469,7 +484,35 @@ const Dashboard = () => {
           )}
         </Box>
       </Modal>
-
+<Dialog
+        open={openDeleteConfirm}
+        onClose={handleCloseDeleteConfirm}
+        aria-labelledby="confirmar-eliminacion-titulo"
+        aria-describedby="confirmar-eliminacion-descripcion"
+      >
+        <DialogTitle id="confirmar-eliminacion-titulo">{"Confirmar Eliminación"}</DialogTitle>
+        <DialogContent>
+          <DialogContentText id="confirmar-eliminacion-descripcion">
+            Estás a punto de eliminar el libro con ID: **{bookToDeleteId}**. ¿Estás seguro de que quieres eliminar este libro? Esta acción no se puede deshacer.
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          {/* Botón "Cancelar" simplemente cierra el modal */}
+          <Button onClick={handleCloseDeleteConfirm} color="primary" disabled={isApiLoading}>
+            Cancelar
+          </Button>
+          {/* Botón "Eliminar" llama a la función de la API */}
+          <Button 
+            onClick={handleConfirmDeleteBook} 
+            color="error" 
+            variant="contained" 
+            autoFocus
+            disabled={isApiLoading}
+          >
+            {isApiLoading ? <CircularProgress size={24} color="inherit" /> : 'Sí, Eliminar'}
+          </Button>
+        </DialogActions>
+      </Dialog>
       {/* Snackbar para notificaciones */}
       <Snackbar open={snackbar.open} autoHideDuration={6000} onClose={handleSnackbarClose}>
         <Alert onClose={handleSnackbarClose} severity={snackbar.severity} sx={{ width: '100%' }}>
