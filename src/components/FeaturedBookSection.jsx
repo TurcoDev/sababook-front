@@ -22,7 +22,7 @@ export default function FeaturedBookSection({ featuredBook, handleFavoriteToggle
           onFavoriteToggle={() =>
             bookId && handleFavoriteToggle(bookId, true)
           }
-          bookId={bookId}
+          // bookId={bookId}
           libro_id={featuredBook.libro_id}
           onVerMas={() => handleVerMas(bookId)}
         />
