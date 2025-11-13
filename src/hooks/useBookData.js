@@ -26,7 +26,7 @@ export function useBookData() {
       .then(res => res.json())
       .then(data => {
         setBooks(data);
-        console.log("Libros cargados:", data);
+        console.log("Books loaded:", data);
 
         const featured = data.find(book =>
             book.libro_id === FEATURED_BOOK_ID || book.id === FEATURED_BOOK_ID

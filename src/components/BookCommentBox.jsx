@@ -44,15 +44,21 @@ const BookCommentBox = ({
 
       if (!res.ok) throw new Error("Error al guardar el comentario.");
 
-     
       const savedOpinion = await res.json();
 
-      savedOpinion.usuario = {
-        nombre: user.nombre || "Usuario",
-        rol: user.rol || "Lector",
+      // Aquí usamos el nombre real que devuelve la API
+      const newOpinion = {
+        id: savedOpinion.opinion_id || Date.now(),
+        comentario: savedOpinion.comentario || newComment,
+        calificacion: savedOpinion.calificacion || newRating,
+        usuario: {
+          nombre: savedOpinion.usuario_nombre || "Usuario",
+          rol: "Lector",
+        },
+        destacado: savedOpinion.destacado || false,
       };
 
-      setOpinions((prev) => [savedOpinion, ...prev]);
+      setOpinions((prev) => [newOpinion, ...prev]);
       setNewComment("");
       setNewRating(0);
       setShowCommentBox(false);
@@ -113,3 +119,5 @@ const BookCommentBox = ({
 };
 
 export default BookCommentBox;
+
+

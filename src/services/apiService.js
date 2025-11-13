@@ -1,5 +1,4 @@
-// services/apiService.js - Frontend
-const API_BASE_URL = 'http://localhost:3000/api/v1';
+import { API_BASE_URL } from "../environments/api";
 
 /**
  * Función genérica para hacer peticiones HTTP
@@ -8,7 +7,7 @@ const API_BASE_URL = 'http://localhost:3000/api/v1';
  * @returns {Promise<object>} Respuesta JSON o error
  */
 async function apiRequest(endpoint, options = {}) {
-  const url = `${API_BASE_URL}${endpoint}`;
+  const url = `${API_BASE_URL}/api/v1${endpoint}`;
 
   const defaultOptions = {
     headers: {

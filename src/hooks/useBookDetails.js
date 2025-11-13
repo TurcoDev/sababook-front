@@ -16,7 +16,6 @@ export const useBookDetails = (id) => {
         return res.json();
       })
       .then((data) => {
-        console.log("Libro cargado:", data); // 👈 agregá esto
         setBook(data);
         setLoading(false);
       })
