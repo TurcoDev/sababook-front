@@ -292,24 +292,12 @@ const BookForm = ({ bookToEdit, onSave, onCancel, title }) => {
           </Box>
         </Grid>
       </Grid>
-      
-      {/* Botones de Acción */}
-      <Box mt={5} display="flex" justifyContent="flex-end">
-        <SecondaryButton 
-          onClick={handleCancel}
-          disabled={loading}
-        >
-          Cancelar
-        </SecondaryButton>
-        <PrimaryButton 
-          type="submit" 
-          variant="contained" 
-          disabled={loading}
-        >
-          {loading ? <CircularProgress size={24} color="inherit" /> : 'Guardar'}
-        </PrimaryButton>
+        <Box sx={{ display: "flex", justifyContent: "flex-end", mt: 3, gap: 2 }}>
+        <Button onClick={onCancel} variant="outlined">Cancelar</Button>
+        <Button type="submit" variant="contained" sx={{ backgroundColor: "button.main" }}>
+          Guardar Cambios
+        </Button>
       </Box>
-
     </FormContainer>
   );
 };

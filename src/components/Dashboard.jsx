@@ -32,10 +32,9 @@ const Dashboard = () => {
   const [openCreateBookModal, setOpenCreateBookModal] = useState(false); // Modal para LIBROS
   //  ESTADO CLAVE: Rastrear el libro que se está editando (null si es creación)
   const [bookToEdit, setBookToEdit] = useState(null);
-
   const [snackbar, setSnackbar] = useState({ open: false, message: "", severity: "success" });
   const [isApiLoading, setIsApiLoading] = useState(false); // Para manejar carga en operaciones CRUD
-const [openDeleteConfirm, setOpenDeleteConfirm] = useState(false);
+  const [openDeleteConfirm, setOpenDeleteConfirm] = useState(false);
   const [bookToDeleteId, setBookToDeleteId] = useState(null);
   // ---  ESTADOS DE FOROS
   const [forums, setForums] = useState([]);
@@ -43,7 +42,8 @@ const [openDeleteConfirm, setOpenDeleteConfirm] = useState(false);
   const [forumsError, setForumsError] = useState(null);
   const [selectedForumId, setSelectedForumId] = useState(null);
   const [openForumDetail, setOpenForumDetail] = useState(false);
-const [openDeleteForumConfirm, setOpenDeleteForumConfirm] = useState(false);
+  const [forumToEdit, setForumToEdit] = useState(null);
+  const [openDeleteForumConfirm, setOpenDeleteForumConfirm] = useState(false);
   const [forumToDeleteId, setForumToDeleteId] = useState(null);
   // Mapeo de roles para la creación de usuarios
   const rolMapping = {
@@ -142,17 +142,7 @@ const [openDeleteForumConfirm, setOpenDeleteForumConfirm] = useState(false);
     setActiveView(viewName);
   };
 
-  const handleAddClick = () => {
-    if (activeView === 'users') {
-      setOpenCreateModal(true);
-    } else if (activeView === 'forums') {
-      setOpenForumModal(true);
-    } else if (activeView === 'books') {
-      setBookToEdit(null); 
-      setOpenCreateBookModal(true);
-    }
-  };
-
+ 
   const handleCloseCreateModal = () => {
     setOpenCreateModal(false);
   };
@@ -253,7 +243,7 @@ const handleCloseDeleteConfirm = () => {
     setOpenDeleteConfirm(false);
     setBookToDeleteId(null); // Limpia el ID
 };
-// 💡 HANDLER DE ELIMINACIÓN: Lógica para la Eliminación (DELETE)
+//  HANDLER DE ELIMINACIÓN: Lógica para la Eliminación (DELETE)
 const handleConfirmDeleteBook = async () => {
     // 1. Cierra el modal inmediatamente
     setOpenDeleteConfirm(false);
@@ -288,41 +278,75 @@ const handleConfirmDeleteBook = async () => {
 };
   //foros
 
-  const handleSaveNewForum = async (forumData) => {
-    try {
-      const token = localStorage.getItem('token');
 
-      // 🔹 Obtener el ID del usuario desde el token o desde tu estado de usuario
-      // Supongamos que lo guardaste en localStorage
-      const creador_id = localStorage.getItem('userId');
+//  HANDLER DE EDICIÓN: Abre el modal en modo edición y guarda los datos
+const handleEditForumClick = (forum) => {
+    setForumToEdit(forum); // Guarda el objeto completo del foro
+    setOpenForumModal(true); // Abre el modal de creación/edición
+};
 
-      const forumToSend = {
-        ...forumData,
-        creador_id: parseInt(creador_id)  // asegúrate de que sea número
-      };
+// MODIFICAR: Cierra el modal de foros y restablece el foro a editar
+const handleCloseForumModal = () => {
+    setOpenForumModal(false);
+    setForumToEdit(null); // MUY IMPORTANTE: Restablecer el foro al cerrar
+};
 
-      console.log("Datos del foro que se enviarán:", forumToSend);
-
-      const response = await fetch(`${API_BASE_URL}/api/v1/foro`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify(forumToSend),
-      });
-
-      if (!response.ok) throw new Error('Error al crear el foro');
-
-      setSnackbar({ open: true, message: "Foro creado correctamente", severity: "success" });
-      setOpenForumModal(false);
-
-      fetchForums();
-    } catch (error) {
-      console.error("Error al crear foro:", error);
-      setSnackbar({ open: true, message: "Error al crear el foro", severity: "error" });
+const handleAddClick = () => {
+    if (activeView === 'users') {
+        setOpenCreateModal(true);
+    } else if (activeView === 'forums') {
+        setForumToEdit(null); // Asegura que el modo sea 'crear'
+        setOpenForumModal(true);
+    } else if (activeView === 'books') {
+        setBookToEdit(null); 
+        setOpenCreateBookModal(true);
     }
-  };
+};
+
+//  MODIFICAR: Unificar la lógica de GUARDADO (POST y PUT)
+const handleSaveForum = async (forumData) => {
+    setIsApiLoading(true);
+    const token = localStorage.getItem('token');
+
+    const isEditing = !!forumData.foro_id;
+    const endpoint = isEditing
+      ? `${API_BASE_URL}/api/v1/foro/${forumData.foro_id}`
+      : `${API_BASE_URL}/api/v1/foro`;
+    const method = isEditing ? 'PUT' : 'POST';
+
+    // Asegúrate de que los datos enviados incluyan creador_id si es POST, o solo los campos editados si es PUT
+    const dataToSend = isEditing ? forumData : {
+        ...forumData,
+        creador_id: parseInt(localStorage.getItem('userId')) // Obtener el ID del creador solo en creación
+    };
+
+    try {
+        const response = await fetch(endpoint, {
+            method: method,
+            headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+            body: JSON.stringify(dataToSend),
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json().catch(() => ({}));
+            throw new Error(errorData.message || `Fallo la operación (HTTP ${response.status})`);
+        }
+
+        await fetchForums();
+        handleCloseForumModal();
+        const successMsg = isEditing ? 'Foro actualizado correctamente.' : 'Foro creado correctamente.';
+        setSnackbar({ open: true, message: `✅ ${successMsg}`, severity: "success" });
+        return Promise.resolve();
+    } catch (error) {
+        console.error(`Error al ${isEditing ? 'editar' : 'crear'} foro:`, error);
+        setSnackbar({ open: true, message: `❌ Error: ${error.message}`, severity: "error" });
+        return Promise.reject(error);
+    } finally {
+        setIsApiLoading(false);
+    }
+};
+
+  
  // 1. Handler para abrir el modal de eliminación de foros
   const handleOpenDeleteForumConfirm = (forumId) => {
       setForumToDeleteId(forumId);
@@ -407,6 +431,7 @@ const handleConfirmDeleteBook = async () => {
               setOpenForumDetail(true);
             }}
             onDeleteForum={handleOpenDeleteForumConfirm}
+            onEditForum={handleEditForumClick}
           />
         );
 
@@ -496,8 +521,10 @@ const handleConfirmDeleteBook = async () => {
           }}
         >
           <ForumForm
-            onSave={handleSaveNewForum}
-            onCancel={() => setOpenForumModal(false)}
+      forumToEdit={forumToEdit} // Pasa el objeto del foro
+      title={forumToEdit ? "Editar Foro" : "Crear Nuevo Foro"} // Título dinámico
+      onSave={handleSaveForum} // Handler unificado (POST/PUT)
+      onCancel={handleCloseForumModal} // Nuevo handler de cierre
           />
         </Box>
       </Modal>
