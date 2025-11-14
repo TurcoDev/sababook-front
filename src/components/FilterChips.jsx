@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Stack, Chip, Menu, MenuItem } from "@mui/material";
+import { Stack, Chip, Menu, MenuItem, Button } from "@mui/material";
 import { buscarLibros } from '../services/apiService';
 
 const FILTERS_DATA = [
@@ -25,7 +25,7 @@ const FILTERS_DATA = [
   // },
 ];
 
-export default function FilterChips({ onFilterChange }) {
+export default function FilterChips({ onFilterChange, onClearFilters }) {
   // Estado para el elemento de anclaje (donde se abre el menú)
   const [anchorEl, setAnchorEl] = useState(null);
   // Estado para saber qué filtro está activo (e.g., 'Género')
@@ -84,15 +84,12 @@ export default function FilterChips({ onFilterChange }) {
   return (
     <>
       <Stack direction="row" spacing={1} mb={2} sx={{ overflowX: "auto" }}>
-
         {/* Mapea y renderiza todos los chips */}
         {FILTERS_DATA.map((filter) => (
           <Chip
             key={filter.id}
             label={filter.name}
-            // Al hacer clic, pasamos el evento y el ID del filtro
             onClick={(e) => handleChipClick(e, filter.id)}
-
             aria-controls={activeFilterId === filter.id ? 'filter-menu' : undefined}
             aria-haspopup="true"
             aria-expanded={activeFilterId === filter.id ? 'true' : undefined}
@@ -100,6 +97,19 @@ export default function FilterChips({ onFilterChange }) {
             variant="outlined"
           />
         ))}
+        {/* Botón para borrar filtros */}
+        <Button
+          variant="outlined"
+          color="secondary"
+          size="small"
+          sx={{ ml: 2, minWidth: 120 }}
+          onClick={() => {
+            setSelectedFilters({});
+            if (onClearFilters) onClearFilters();
+          }}
+        >
+          Borrar filtros
+        </Button>
       </Stack>
 
       {/* El componente Menu se renderiza para el filtro activo */}

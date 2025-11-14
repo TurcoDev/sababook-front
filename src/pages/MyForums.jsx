@@ -84,10 +84,6 @@ export default function MyForum() {
         setForoTitle("");
     };
 
-    const handleSearch = (query) => {
-        console.log("Buscando foros:", query);
-    };
-
     // 🔹 Componente para cada foro
     const ForoItem = ({ foro }) => (
         <Box
@@ -149,10 +145,6 @@ export default function MyForum() {
             />
 
             <SideMenu open={menuOpen} onClose={() => setMenuOpen(false)} active="Foro" />
-
-            <Box mb={2}>
-                <SearchBar onSearch={handleSearch} />
-            </Box>
 
             <Typography variant="h5" fontWeight="bold" color="text.primary" mt={3} mb={2}>
                 Foros

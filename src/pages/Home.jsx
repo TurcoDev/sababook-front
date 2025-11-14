@@ -68,32 +68,49 @@ export default function Home() {
     }
   };
 
-
-  const handleSearch = async (query) => {
-    console.log("Buscando:", query);
+  // Nueva función para borrar filtros
+  const handleClearFilters = async () => {
+    setCurrentFilters({});
     try {
-      const queryNormalizada = normalizarTexto(query);
-      const filtrosCombinados = { ...currentFilters, query: queryNormalizada };
-      // FIXME: Verificar funcionamiento FALLA!!. Trae todos los libros
-      const resultados = await buscarLibros(filtrosCombinados);
-      setBooks(resultados);
-      setCurrentQuery(query);
-      console.log("Resultados de búsqueda:", resultados);
-    } catch (error) {
-      console.error("Error en búsqueda:", error);
-      setBooks([]); // Limpiar resultados en caso de error
+      // Si hay búsqueda, solo limpia filtros y mantiene la búsqueda
+      if (currentQuery) {
+        const filtrosCombinados = { query: normalizarTexto(currentQuery) };
+        const resultados = await buscarLibros(filtrosCombinados);
+        setBooks(resultados);
+      } else {
+        // Si no hay búsqueda, vuelve al catálogo completo
+        const libros = await getCatalogoLibros();
+        setBooks(libros);
+      }
+    } catch {
+      setBooks([]);
     }
   };
 
-  const handleFilterChange = async (resultados, filtros) => {
-    console.log("Filtros aplicados:", filtros);
-    setCurrentFilters(filtros);
-    const filtrosCombinados = { ...filtros, query: currentQuery ? normalizarTexto(currentQuery) : undefined };
+
+  const handleSearch = async (query) => {
+    setCurrentQuery(query);
     try {
+      const queryNormalizada = normalizarTexto(query);
+      // Combina los filtros actuales y la búsqueda
+      const filtrosCombinados = { ...currentFilters };
+      if (queryNormalizada) filtrosCombinados.query = queryNormalizada;
+      const resultados = await buscarLibros(filtrosCombinados);
+      setBooks(resultados);
+    } catch {
+      setBooks([]);
+    }
+  };
+
+  const handleFilterChange = async (_resultados, filtros) => {
+    setCurrentFilters(filtros);
+    try {
+      // Combina los filtros nuevos y la búsqueda actual
+      const filtrosCombinados = { ...filtros };
+      if (currentQuery) filtrosCombinados.query = normalizarTexto(currentQuery);
       const resultadosActualizados = await buscarLibros(filtrosCombinados);
       setBooks(resultadosActualizados);
-    } catch (error) {
-      console.error("Error al aplicar filtros:", error);
+    } catch {
       setBooks([]);
     }
   };
@@ -105,7 +122,7 @@ export default function Home() {
       px={1}
       sx={{
         width: '90%',
-        // maxWidth: 1000,
+        maxWidth: 1000,
         margin: "0 auto"
       }}
     >
@@ -127,9 +144,8 @@ export default function Home() {
         <SearchBar onSearch={handleSearch} />
       </Box>
 
-
       {/* Chips de filtros - Siempre visibles */}
-      <FilterChips onFilterChange={handleFilterChange} />
+      <FilterChips onFilterChange={handleFilterChange} onClearFilters={handleClearFilters} />
 
       {/* Recomendado semanal - Solo mostrar si no hay filtros aplicados */}
       {Object.keys(currentFilters).length === 0 && !currentQuery && (
@@ -147,14 +163,14 @@ export default function Home() {
             <Typography variant="h4" fontWeight="bold" color="secondary">
               {currentQuery ? 'Resultados de búsqueda' : 'Libros filtrados'}
             </Typography>
-            <Button
+            {/* <Button
               variant="outlined"
               color="primary"
               onClick={manejarVolverAlInicio}
               sx={{ ml: 2 }}
             >
               Volver al inicio
-            </Button>
+            </Button> */}
           </Box>
         </>
       )}
