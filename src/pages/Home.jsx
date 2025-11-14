@@ -12,6 +12,7 @@ import FilterChips from "../components/FilterChips";
 import SideMenu from "../components/SideMenu";
 import WelcomeModal from "../components/WelcomeModal";
 import SearchBar from "../components/SearchBar";
+import { useRef } from "react";
 import FeaturedBookSection from "../components/FeaturedBookSection";
 
 // Importaciones de Servicios
@@ -30,6 +31,7 @@ export default function Home() {
   const [isWelcomeModalOpen, setWelcomeModalOpen] = useState(false);
   const [currentFilters, setCurrentFilters] = useState({});
   const [currentQuery, setCurrentQuery] = useState('');
+  const searchBarRef = useRef();
   const location = useLocation();
   const { user } = useAuth();
 
@@ -56,37 +58,20 @@ export default function Home() {
 
   const handleCloseWelcomeModal = () => setWelcomeModalOpen(false);
 
-  const manejarVolverAlInicio = async () => {
+  const handleClearFilters = async () => {
     try {
       const libros = await getCatalogoLibros();
       setBooks(libros);
       setCurrentFilters({});
       setCurrentQuery('');
+      if (searchBarRef.current && typeof searchBarRef.current.clear === 'function') {
+        searchBarRef.current.clear();
+      }
       console.log("Vuelto al inicio, libros cargados:", libros);
     } catch (error) {
       console.error("Error al volver al inicio:", error);
     }
   };
-
-  // Nueva función para borrar filtros
-  const handleClearFilters = async () => {
-    setCurrentFilters({});
-    try {
-      // Si hay búsqueda, solo limpia filtros y mantiene la búsqueda
-      if (currentQuery) {
-        const filtrosCombinados = { query: normalizarTexto(currentQuery) };
-        const resultados = await buscarLibros(filtrosCombinados);
-        setBooks(resultados);
-      } else {
-        // Si no hay búsqueda, vuelve al catálogo completo
-        const libros = await getCatalogoLibros();
-        setBooks(libros);
-      }
-    } catch {
-      setBooks([]);
-    }
-  };
-
 
   const handleSearch = async (query) => {
     setCurrentQuery(query);
@@ -141,7 +126,7 @@ export default function Home() {
       <WelcomeModal open={isWelcomeModalOpen} onClose={handleCloseWelcomeModal} user={user} />
 
       <Box mb={2}>
-        <SearchBar onSearch={handleSearch} />
+        <SearchBar ref={searchBarRef} onSearch={handleSearch} />
       </Box>
 
       {/* Chips de filtros - Siempre visibles */}
@@ -163,14 +148,6 @@ export default function Home() {
             <Typography variant="h4" fontWeight="bold" color="secondary">
               {currentQuery ? 'Resultados de búsqueda' : 'Libros filtrados'}
             </Typography>
-            {/* <Button
-              variant="outlined"
-              color="primary"
-              onClick={manejarVolverAlInicio}
-              sx={{ ml: 2 }}
-            >
-              Volver al inicio
-            </Button> */}
           </Box>
         </>
       )}

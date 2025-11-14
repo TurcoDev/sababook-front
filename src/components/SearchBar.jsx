@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, forwardRef, useImperativeHandle } from "react";
 import { InputAdornment, IconButton, styled, OutlinedInput, FormControl } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
 
@@ -30,8 +30,12 @@ const StyledFormControl = styled(FormControl)(({ theme }) => ({
   },
 }));
 
-const SearchBar = ({ onSearch }) => {
+const SearchBar = forwardRef(({ onSearch }, ref) => {
   const [query, setQuery] = useState("");
+
+  useImperativeHandle(ref, () => ({
+    clear: () => setQuery("")
+  }));
 
   const handleSearch = () => {
     if (onSearch) onSearch(query);
@@ -58,6 +62,6 @@ const SearchBar = ({ onSearch }) => {
       />
     </StyledFormControl>
   );
-};
+});
 
 export default SearchBar;
