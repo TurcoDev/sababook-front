@@ -70,3 +70,12 @@ export async function buscarLibros(filtros = {}) {
 export async function getLibroById(libroId) {
   return await apiRequest(`/libros/${libroId}`);
 }
+
+/**
+ * Obtener medallas de un usuario
+ * @param {number|string} userId - ID del usuario
+ * @returns {Promise<Array>} Lista de medallas
+ */
+export async function getUserMedals(userId) {
+  return await apiRequest(`/medal/${userId}`);
+}

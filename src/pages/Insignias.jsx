@@ -1,6 +1,5 @@
-// Insignias.jsx
-import React, { useState } from 'react';
-import { Box, Typography, Paper, Divider } from '@mui/material';
+import { useState, useEffect } from 'react';
+import { Box, Typography, Paper } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 
 // Importa los componentes de la carpeta 'components'
@@ -9,6 +8,8 @@ import InsigniaUnica from '../components/InsigniaUnica';
 
 // Importa el hook de autenticación
 import { useAuth } from '../hooks/useAuth';
+import { getUserMedals } from '../services/apiService';
+
 
 const Insignias = () => {
   const theme = useTheme();
@@ -21,13 +22,22 @@ const Insignias = () => {
 
   const username = user ? user.nombre : 'Usuario'; // Obtener nombre real del usuario logueado
 
-  // Las cuatro insignias que el usuario tiene
-  const insigniasUsuario = [
-    'Crítico Literario',
-    'Comentarista Apasionado',
-    'Fan de Libros',
-    'Pionero de la Novedad'
-  ];
+
+  // Estado para las medallas del usuario
+  const [insigniasUsuario, setInsigniasUsuario] = useState([]);
+
+  useEffect(() => {
+    if (user?.usuario_id) {
+      getUserMedals(user.usuario_id)
+        .then((medals) => {
+          
+          // Si el endpoint devuelve un array de strings o de objetos, ajusta aquí
+          setInsigniasUsuario(Array.isArray(medals) ? medals : []);
+          console.log(medals, user);
+        })
+        .catch(() => setInsigniasUsuario([]));
+    }
+  }, [user?.usuario_id]);
 
   // Fecha dinámica (formato en español, con mayúscula inicial)
   const formattedDate = (() => {
@@ -59,11 +69,11 @@ const Insignias = () => {
     >
 
       {/* 1. COMPONENTE DE ENCABEZADO */}
-     <AppHeader
-             onMenuClick={() => setMenuOpen(true)}
-             title={`Hola, ${username || 'Usuario'}`}
-             subtitle={formattedDate}
-           />
+      <AppHeader
+        onMenuClick={() => setMenuOpen(true)}
+        title={`Hola, ${username || 'Usuario'}`}
+        subtitle={formattedDate}
+      />
 
       <Box sx={{ flex: 1, overflowY: 'auto' }}>
 
@@ -81,8 +91,8 @@ const Insignias = () => {
 
           {/* 2. COMPONENTES DE LAS CUATRO INSIGNIAS */}
           {insigniasUsuario.map((insignia, index) => (
-            <Box key={index} sx={{ marginBottom: 2, width: { xs: 350, lg: 500 }, marginX: 'auto', paddingRight: { lg: 5 } }}>
-              <InsigniaUnica nombreInsignia={insignia} />
+            <Box key={insignia.medalla_id ?? index} sx={{ marginBottom: 2, width: { xs: 350, lg: 500 }, marginX: 'auto', paddingRight: { lg: 5 } }}>
+              <InsigniaUnica insignia={insignia} />
             </Box>
           ))}
 
