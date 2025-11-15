@@ -1,19 +1,19 @@
-import React from "react";
+import ForumIcon from "@mui/icons-material/Forum";
 import {
-  Box,
-  Typography,
   Avatar,
-  Paper,
-  Divider,
+  Box,
   CircularProgress,
+  Divider,
+  Paper,
+  Typography,
   useTheme,
 } from "@mui/material";
-import ForumIcon from "@mui/icons-material/Forum";
-import AppHeader from "../components/AppHeader";
-import SideMenu from "../components/SideMenu";
+import React from "react";
 import { useParams } from "react-router-dom";
-import { useForums } from "../hooks/useForum";
+import AppHeader from "../components/AppHeader";
 import ForumCommentList from "../components/ForumCommentList";
+import SideMenu from "../components/SideMenu";
+import { useForums } from "../hooks/useForum";
 
 const ForumDetailsPage = () => {
   const theme = useTheme();

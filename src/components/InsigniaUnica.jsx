@@ -11,10 +11,12 @@ const InsigniaUnica = ({ insignia }) => {
         return '💬'; // Participar en foros
       case 'comentar':
         return '⭐'; // Comentar libros
-      case 'leer':
-        return '📚'; // Leer libros
-      case 'descubrir':
-        return '🔥'; // Descubrir novedades
+        
+        // TODO: Estas de aca abajo no se usan
+      // case 'leer':
+      //   return '📚'; // Leer libros
+      // case 'descubrir':
+      //   return '🔥'; // Descubrir novedades
       default:
         return <StarIcon />;
     }

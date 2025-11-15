@@ -1,19 +1,18 @@
 import {
   Box,
-  Button,
   Typography
 } from "@mui/material";
 import { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
 
+import { useRef } from "react";
 import AppHeader from "../components/AppHeader";
 import BookCard from "../components/BookCard";
+import FeaturedBookSection from "../components/FeaturedBookSection";
 import FilterChips from "../components/FilterChips";
+import SearchBar from "../components/SearchBar";
 import SideMenu from "../components/SideMenu";
 import WelcomeModal from "../components/WelcomeModal";
-import SearchBar from "../components/SearchBar";
-import { useRef } from "react";
-import FeaturedBookSection from "../components/FeaturedBookSection";
 
 // Importaciones de Servicios
 import { buscarLibros, getCatalogoLibros } from "../services/apiService";

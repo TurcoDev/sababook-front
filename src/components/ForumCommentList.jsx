@@ -1,10 +1,48 @@
 
-import React from "react";
-import { Box, Typography, Paper, CircularProgress } from "@mui/material";
+import { Box, Typography, Paper, CircularProgress, Button, TextField } from "@mui/material";
 import { useForumComments } from "../hooks/useForumComments";
+import { useAuth } from "../hooks/useAuth";
+import { useState } from "react";
+import { API_BASE_URL } from "../environments/api";
 
-const ForumCommentList = ({ foroId, theme }) => {
-  const { comments, loading, error } = useForumComments(foroId);
+const ForumCommentList = ({ foroId, theme, usuarioId: usuarioIdProp }) => {
+  const { comments, loading, error, refetch } = useForumComments(foroId);
+  const [contenido, setContenido] = useState("");
+  const [sending, setSending] = useState(false);
+  const [sendError, setSendError] = useState(null);
+  const [successMsg, setSuccessMsg] = useState("");
+  const { user } = useAuth() || {};
+  const usuarioId = usuarioIdProp || user?.usuario_id || user?.id;
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setSending(true);
+    setSendError(null);
+    setSuccessMsg("");
+    try {
+      const payload = { foro_id: foroId, contenido, usuario_id: usuarioId };
+      const res = await fetch(`${API_BASE_URL}/api/v1/comentario`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(payload),
+      });
+      if (!res.ok) {
+        throw new Error("Error al enviar el comentario");
+      }
+      setContenido("");
+      setSuccessMsg("Comentario enviado correctamente");
+      // Opcional: recargar comentarios aquí si lo deseas
+      if (typeof refetch === "function") {
+        await refetch();
+      }
+    } catch (err) {
+      setSendError(err.message);
+    } finally {
+      setSending(false);
+    }
+  };
 
   return (
     <Box textAlign="left" mt={2}>
@@ -22,9 +60,9 @@ const ForumCommentList = ({ foroId, theme }) => {
           Aún no hay comentarios.
         </Typography>
       )}
-      {comments.map((comment) => (
+      {comments?.map((comment) => (
         <Paper
-          key={comment.id || comment.comentario_id}
+          key={comment.comentario_id}
           variant="outlined"
           sx={{
             p: 1.5,
@@ -37,22 +75,47 @@ const ForumCommentList = ({ foroId, theme }) => {
           <Box display="flex" justifyContent="space-between" alignItems="center">
             <Box>
               <Typography variant="body2" fontWeight="bold">
-                {comment.usuario?.nombre || comment.usuario_nombre || "Usuario"}
+                {comment.nombre || "Usuario"}
               </Typography>
               <Typography variant="caption" color="text.secondary">
-                {comment.usuario?.rol || comment.usuario_rol || ""}
+                {comment.email || ""}
               </Typography>
             </Box>
-            <Typography variant="caption" color="text.secondary">
-              {comment.fecha}
-            </Typography>
+            <Box display="flex" alignItems="center" gap={1}>
+              <Typography variant="caption" color="text.secondary">
+                {comment.fecha ? new Date(comment.fecha).toLocaleString() : ""}
+              </Typography>
+              {usuarioId && (Number(comment.usuario_id) === Number(usuarioId)) && (
+                <Button
+                  size="small"
+                  color="error"
+                  variant="outlined"
+                  onClick={async () => {
+                    if (window.confirm("¿Seguro que quieres eliminar este comentario?")) {
+                      try {
+                        const res = await fetch(`${API_BASE_URL}/api/v1/comentario/${comment.comentario_id}`, {
+                          method: "DELETE",
+                        });
+                        if (!res.ok) throw new Error("Error al eliminar el comentario");
+                        if (typeof refetch === "function") await refetch();
+                      } catch (err) {
+                        alert(err.message);
+                      }
+                    }
+                  }}
+                  sx={{ ml: 1 }}
+                >
+                  Eliminar
+                </Button>
+              )}
+            </Box>
           </Box>
           <Typography
             variant="body2"
             mt={1}
             sx={{ fontStyle: "italic", color: theme?.palette?.text?.primary }}
           >
-            {comment.comentario}
+            {comment.contenido || comment.comentario || ""}
           </Typography>
           {comment.destacado && (
             <Box display="flex" justifyContent="flex-end" mt={1}>
@@ -71,6 +134,25 @@ const ForumCommentList = ({ foroId, theme }) => {
           )}
         </Paper>
       ))}
+
+      <Box component="form" onSubmit={handleSubmit} mt={2}>
+        <TextField
+          label="Agregar comentario"
+          multiline
+          minRows={2}
+          fullWidth
+          value={contenido}
+          onChange={e => setContenido(e.target.value)}
+          disabled={sending}
+          required
+          sx={{ mb: 1 }}
+        />
+        <Button type="submit" variant="contained" color="primary" disabled={sending || !contenido.trim()}>
+          {sending ? "Enviando..." : "Comentar"}
+        </Button>
+        {sendError && <Typography color="error" mt={1}>{sendError}</Typography>}
+        {successMsg && <Typography color="success.main" mt={1}>{successMsg}</Typography>}
+      </Box>
     </Box>
   );
 };
