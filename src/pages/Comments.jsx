@@ -1,26 +1,20 @@
-import React, { useState } from 'react';
-import { BrowserRouter, Routes, Route, useNavigate } from 'react-router-dom';
 import {
     Box,
-    Typography,
-    Button,
-    Avatar,
-    TextField,
-    IconButton,
-    Rating, // Componente de Rating de MUI
+    Button, // Componente de Rating de MUI
     createTheme,
-    ThemeProvider,
-    CssBaseline,
     DialogActions,
+    Rating,
+    TextField,
+    Typography
 } from '@mui/material';
+import { useState } from 'react';
 
 // Iconos de MUI
 import StarIcon from '@mui/icons-material/Star';
-import ChatBubbleOutlineIcon from '@mui/icons-material/ChatBubbleOutline';
 
 import AppHeader from '../components/AppHeader';
-import SideMenu from '../components/SideMenu';
 import RatingAndCommentForm from '../components/RatingAndCommentForm';
+import SideMenu from '../components/SideMenu';
 
 
 // --- CONFIGURACIÓN DE TEMA ---
