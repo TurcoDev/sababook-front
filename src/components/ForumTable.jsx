@@ -1,5 +1,3 @@
-// src/components/ForumTable.jsx
-
 import React, { useState, useEffect } from 'react';
 import { API_BASE_URL } from '../environments/api';
 import {
@@ -57,7 +55,7 @@ const ActionButton = styled(IconButton)(({ theme }) => ({
   },
 }));
 
-const ForumTable = ({ forums, loading, error, onForumUpdate, onForumClick }) => {
+  const ForumTable = ({ forums, loading, error, onForumUpdate, onForumClick, onDeleteForum, onEditForum }) => {
   const theme = useTheme();
   const [page, setPage] = useState(1);
   const pageCount = Math.ceil(forums.length / ROWS_PER_PAGE);
@@ -68,47 +66,7 @@ const ForumTable = ({ forums, loading, error, onForumUpdate, onForumClick }) => 
     setPage(newPage);
   };
 
-  const handleEdit = async (id) => {
-    const nuevoTitulo = prompt('Nuevo título:');
-    const nuevaDescripcion = prompt('Nueva descripción:');
-    if (!nuevoTitulo || !nuevaDescripcion) return;
-
-    try {
-      const res = await fetch(`${API_BASE_URL}/api/v1/foro/${id}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ titulo: nuevoTitulo, descripcion: nuevaDescripcion }),
-      });
-
-      if (res.ok) {
-        console.log('✅ Foro actualizado correctamente');
-        onForumUpdate(); // 👉 Actualiza la lista en Dashboard
-      } else {
-        console.error('❌ Error al actualizar el foro');
-      }
-    } catch (error) {
-      console.error('❌ Error al actualizar foro:', error);
-    }
-  };
-
-  const handleDelete = async (id) => {
-    if (!window.confirm('¿Estás seguro de eliminar este foro?')) return;
-
-    try {
-      const res = await fetch(`${API_BASE_URL}/api/v1/foro/${id}`, {
-        method: 'DELETE',
-      });
-
-      if (res.ok) {
-        console.log(`✅ Foro ${id} eliminado`);
-        onForumUpdate(); // 👉 vuelve a cargar los foros actualizados
-      } else {
-        console.error('❌ Error al eliminar el foro');
-      }
-    } catch (error) {
-      console.error('❌ Error al eliminar foro:', error);
-    }
-  };
+  
 
   if (loading) return <Typography sx={{ padding: 3 }}>Cargando foros...</Typography>;
 
@@ -149,10 +107,22 @@ const ForumTable = ({ forums, loading, error, onForumUpdate, onForumClick }) => 
                     return (
                       <TableCell key={column.id} align="center">
                         <Box sx={{ display: 'flex', gap: 1, justifyContent: 'center' }}>
-                          <ActionButton onClick={() => handleEdit(row.foro_id)} title="Editar">
+                        <ActionButton 
+                              onClick={(e) => {
+                                  e.stopPropagation(); 
+                                  onEditForum(row);
+                              }} 
+                              title="Editar"
+                          >
                             <EditIcon sx={{ fontSize: '1.1rem' }} />
                           </ActionButton>
-                          <ActionButton onClick={() => handleDelete(row.foro_id)} title="Eliminar">
+                          <ActionButton
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              onDeleteForum(row.foro_id);
+                            }}
+                            title="Eliminar"
+                          >
                             <DeleteIcon sx={{ fontSize: '1.1rem' }} />
                           </ActionButton>
                         </Box>

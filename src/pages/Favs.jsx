@@ -1,4 +1,6 @@
 import { useState } from "react";
+import { useFavorites } from "../hooks/useFavorites";
+import { useFavoriteActions } from "../hooks/useFavoriteActions";
 import {
   Box,
   Typography,
@@ -7,47 +9,35 @@ import {
 import AppHeader from "../components/AppHeader"; 
 import BookCard from "../components/BookCard";
 import SideMenu from "../components/SideMenu";
-import SearchBar from "../components/SearchBar";
-
 import LibroImage from '../assets/libro.jpg'
-
-
-const INITIAL_BOOKS = [
-  { id: 1, title: "La Resistencia", rating: 4.7, progress: 90, isFavorite: true, image: LibroImage },
-  { id: 2, title: "El Principito", rating: 4.8, progress: 50, isFavorite: true, image: LibroImage },
-  { id: 3, title: "Rayuela", rating: 4.6, progress: 80, isFavorite: false, image: LibroImage },
-  { id: 4, title: "Cien años de soledad", rating: 4.9, progress: 20, isFavorite: true, image: LibroImage },
-  { id: 5, title: "Crimen y Castigo", rating: 4.5, progress: 65, isFavorite: false, image: LibroImage },
-  { id: 6, title: "El Alquimista", rating: 4.2, progress: 100, isFavorite: true, image: LibroImage },
-];
 
 
 export default function Favs() {
   const [menuOpen, setMenuOpen] = useState(false);
-  const [books, setBooks] = useState(INITIAL_BOOKS);
+  const [favoriteBooks, setFavoriteBooks] = useState([]);
 
-  const handleSearch = (query) => {
-    console.log("Buscando:", query);
-    // aca se haria la llamada a la API
+  // Usar el hook para manejar favoritos
+  const { handleFavoriteToggle } = useFavorites(favoriteBooks, setFavoriteBooks);
+
+  // Usar el nuevo hook para acciones de favoritos
+  const { addFavorite, removeFavorite } = useFavoriteActions();
+
+  // Handler para el corazón
+  const handleFavoriteClick = async (libro_id, isFavorite) => {
+    let success = false;
+    if (isFavorite) {
+      success = await removeFavorite(libro_id);
+    } else {
+      success = await addFavorite(libro_id);
+    }
+    if (success) {
+      setFavoriteBooks(prevBooks =>
+        prevBooks.map(book =>
+          book.libro_id === libro_id ? { ...book, isFavorite: !isFavorite } : book
+        )
+      );
+    }
   };
-  
-
-  const handleFavoriteToggle = (bookId) => {
-    // Actualizamos el estado de los libros
-    setBooks(prevBooks => 
-      prevBooks.map(book => {
-        // Si el ID del libro coincide, invertimos su estado 'isFavorite'
-        if (book.id === bookId) {
-          // Nota: aca iria la llamada a la API para guardar el cambio.
-          return { ...book, isFavorite: !book.isFavorite };
-        }
-        return book;
-      })
-    );
-  };
-
-  const favoriteBooks = books.filter(book => book.isFavorite);
-
 
   return (
     <Box
@@ -91,15 +81,17 @@ export default function Favs() {
       >
         {/* Mapear la lista de libros favoritos y pasar las nuevas props */}
         {favoriteBooks.map((book) => (
-            <BookCard
-                key={book.id}
-                image={book.image}
-                title={book.title}
-                rating={book.rating}
-                progress={book.progress}
-                isFavorite={book.isFavorite} 
-                onFavoriteToggle={() => handleFavoriteToggle(book.id)} 
-            />
+          <BookCard
+            key={book.libro_id}
+            image={book.portada_url || LibroImage}
+            title={book.titulo}
+            autor={book.autor}
+            gender={book.genero}
+            rating={book.calificacion_promedio}
+            isFavorite={!!book.isFavorite}
+            onFavoriteToggle={() => handleFavoriteClick(book.libro_id, !!book.isFavorite)}
+            libro_id={book.libro_id}
+          />
         ))}
         
         {/* Mensaje si no hay favoritos */}

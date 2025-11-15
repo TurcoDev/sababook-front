@@ -1,14 +1,22 @@
-import { useState, useEffect } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
-import { Box } from "@mui/material";
+import {
+  Box,
+  Typography
+} from "@mui/material";
+import { useEffect, useState } from "react";
+import { useLocation } from "react-router-dom";
 
-// Importaciones de Componentes de Presentación
+import { useRef } from "react";
 import AppHeader from "../components/AppHeader";
-import SideMenu from "../components/SideMenu";
+import BookCard from "../components/BookCard";
+import FeaturedBookSection from "../components/FeaturedBookSection";
 import FilterChips from "../components/FilterChips";
+import SearchBar from "../components/SearchBar";
+import SideMenu from "../components/SideMenu";
 import WelcomeModal from "../components/WelcomeModal";
-import FeaturedBookSection from "../components/FeaturedBookSection"; 
-import BookListSection from "../components/BookListSection";
+
+// Importaciones de Servicios
+import { buscarLibros, getCatalogoLibros } from "../services/apiService";
+import { normalizarTexto } from "../utils/normalize";
 
 // Importaciones de Lógica (Custom Hooks)
 import { useAuth } from "../hooks/useAuth";
@@ -20,23 +28,25 @@ export default function Home() {
   // --- Estados de UI ---
   const [menuOpen, setMenuOpen] = useState(false);
   const [isWelcomeModalOpen, setWelcomeModalOpen] = useState(false);
+  const [currentFilters, setCurrentFilters] = useState({});
+  const [currentQuery, setCurrentQuery] = useState('');
+  const searchBarRef = useRef();
   const location = useLocation();
-  const navigate = useNavigate();
   const { user } = useAuth();
-  
+
   // --- LÓGICA DE DATOS: Llamada a Custom Hooks ---
   // 1. Hook para cargar los datos y manejar sus estados
   const { books, setBooks, featuredBook, setFeaturedBook } = useBookData();
 
   // 2. Hook para manejar la interacción de favoritos
   const { handleFavoriteToggle } = useFavorites(
-    books, 
-    setBooks, 
-    featuredBook, 
+    books,
+    setBooks,
+    featuredBook,
     setFeaturedBook
   );
   // -----------------------------------------------
-  
+
   // --- Lógica de Modal de Bienvenida  ---
   useEffect(() => {
     if (location.state?.fromLogin && user) {
@@ -47,22 +57,55 @@ export default function Home() {
 
   const handleCloseWelcomeModal = () => setWelcomeModalOpen(false);
 
-  // --- Lógica de Navegación  ---
-  const handleVerMas = (bookId) => {
-    if (bookId) {
-        navigate(`/bookdetails/${bookId}`);
-    } else {
-        console.error("ERROR de Navegación: ID de libro es nulo o indefinido.");
+  const handleClearFilters = async () => {
+    try {
+      const libros = await getCatalogoLibros();
+      setBooks(libros);
+      setCurrentFilters({});
+      setCurrentQuery('');
+      if (searchBarRef.current && typeof searchBarRef.current.clear === 'function') {
+        searchBarRef.current.clear();
+      }
+      console.log("Vuelto al inicio, libros cargados:", libros);
+    } catch (error) {
+      console.error("Error al volver al inicio:", error);
     }
   };
-  
+
+  const handleSearch = async (query) => {
+    setCurrentQuery(query);
+    try {
+      const queryNormalizada = normalizarTexto(query);
+      // Combina los filtros actuales y la búsqueda
+      const filtrosCombinados = { ...currentFilters };
+      if (queryNormalizada) filtrosCombinados.query = queryNormalizada;
+      const resultados = await buscarLibros(filtrosCombinados);
+      setBooks(resultados);
+    } catch {
+      setBooks([]);
+    }
+  };
+
+  const handleFilterChange = async (_resultados, filtros) => {
+    setCurrentFilters(filtros);
+    try {
+      // Combina los filtros nuevos y la búsqueda actual
+      const filtrosCombinados = { ...filtros };
+      if (currentQuery) filtrosCombinados.query = normalizarTexto(currentQuery);
+      const resultadosActualizados = await buscarLibros(filtrosCombinados);
+      setBooks(resultadosActualizados);
+    } catch {
+      setBooks([]);
+    }
+  };
+
   // --- RENDERIZADO ---
   return (
     <Box
       py={2}
       px={1}
       sx={{
-        width: '100%',
+        width: '90%',
         maxWidth: 1000,
         margin: "0 auto"
       }}
@@ -82,22 +125,65 @@ export default function Home() {
       <WelcomeModal open={isWelcomeModalOpen} onClose={handleCloseWelcomeModal} user={user} />
 
       <Box mb={2}>
-        {/* <SearchBar onSearch={handleSearch} /> */}
+        <SearchBar ref={searchBarRef} onSearch={handleSearch} />
       </Box>
-      
-      <FilterChips />
 
-      <FeaturedBookSection 
-        featuredBook={featuredBook}
-        handleFavoriteToggle={handleFavoriteToggle}
-        handleVerMas={handleVerMas}
-      />
+      {/* Chips de filtros - Siempre visibles */}
+      <FilterChips onFilterChange={handleFilterChange} onClearFilters={handleClearFilters} />
 
-      <BookListSection
-        books={books}
-        handleFavoriteToggle={handleFavoriteToggle}
-        handleVerMas={handleVerMas}
-      />
+      {/* Recomendado semanal - Solo mostrar si no hay filtros aplicados */}
+      {Object.keys(currentFilters).length === 0 && !currentQuery && (
+        <FeaturedBookSection
+          // TODO: Cambiar libro recomendado dinámicamente y no MOCKEADO
+          featuredBook={books.find((book) => book.titulo === "La gran ocasión") || {}}
+          handleFavoriteToggle={handleFavoriteToggle}
+        />
+      )}
+
+      {/* Resultados de búsqueda/filtros - Mostrar si hay búsqueda o filtros aplicados */}
+      {(currentQuery || Object.keys(currentFilters).length > 0) && (
+        <>
+          <Box display="flex" justifyContent="space-between" alignItems="center" mt={3} mb={1}>
+            <Typography variant="h4" fontWeight="bold" color="secondary">
+              {currentQuery ? 'Resultados de búsqueda' : 'Libros filtrados'}
+            </Typography>
+          </Box>
+        </>
+      )}
+
+      <Box
+        sx={{
+          display: "flex",
+          flexWrap: "wrap",
+          justifyContent: "center",
+          gap: 4,
+        }}
+      >
+        {/* Mostrar mensaje si no hay libros */}
+        {books.length === 0 ? (
+          <Typography variant="h6" color="text.secondary" sx={{ textAlign: "center", py: 4 }}>
+            El libro que usted está buscando no se encuentra disponible
+          </Typography>
+        ) : (
+          /*Mapear la lista de libros destacados */
+          books.map((book) => (
+            <BookCard
+              key={book.libro_id}
+              image={book.portada_url}
+              autor={book.autor}
+              gender={book.genero}
+              title={book.titulo}
+              // description={book.descripcion} // No se muestra en el home
+              rating={book.calificacion_promedio}
+              progress={book.progress}
+              isFavorite={book.isFavorite}
+              libro_id={book.libro_id}
+              onFavoriteToggle={() => handleFavoriteToggle(book.id, false)}
+            />
+          ))
+        )}
+
+      </Box>
     </Box>
   );
 }

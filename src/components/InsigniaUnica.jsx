@@ -3,57 +3,44 @@ import React from 'react';
 import { Box, Typography, Divider, Avatar, ListItem, ListItemAvatar, ListItemText } from '@mui/material';
 import StarIcon from '@mui/icons-material/Star'; // Ícono de ejemplo
 
-const InsigniaUnica = ({ nombreInsignia }) => {
-
-   // Función para obtener propiedades específicas de cada insignia
-   const getInsigniaProps = (nombre) => {
-     switch (nombre) {
-       case 'Crítico Literario':
-         return {
-           bgColor: 'transparent',
-           icon: '📚' // Un libro como emoji
-         };
-       case 'Comentarista Apasionado':
-         return {
-           bgColor: 'transparent',
-           icon: '💬' // Globo de diálogo con puntos suspensivos
-         };
-       case 'Fan de Libros':
-         return {
-           bgColor: 'transparent',
-           icon: '⭐' // Estrella amarilla
-         };
-       case 'Pionero de la Novedad':
-         return {
-           bgColor: 'transparent',
-           icon: '🔥' // Fuego como pico o novedad
-         };
-       default:
-         return {
-           bgColor: 'primary.main',
-           icon: <StarIcon />
-         };
-     }
-   };
-
-  const { bgColor, icon } = getInsigniaProps(nombreInsignia);
+const InsigniaUnica = ({ insignia }) => {
+  // icono según tipo_accion
+  const getIcon = (tipo) => {
+    switch (tipo) {
+      case 'participar':
+        return '💬'; // Participar en foros
+      case 'comentar':
+        return '⭐'; // Comentar libros
+        
+        // TODO: Estas de aca abajo no se usan
+      // case 'leer':
+      //   return '📚'; // Leer libros
+      // case 'descubrir':
+      //   return '🔥'; // Descubrir novedades
+      default:
+        return <StarIcon />;
+    }
+  };
 
   return (
     <Box sx={{ backgroundColor: '#f7f7f7ff', padding: 1, mx: 2, boxShadow: '0 2px 4px rgba(0,0,0,0.4)' }}>
       <ListItem sx={{ padding: 0 }}>
-        
         {/* Círculo de la Insignia (Avatar) */}
         <ListItemAvatar sx={{ minWidth: 40 }}>
-          <Avatar sx={{ bgcolor: bgColor, color: 'text.primary', width: 32, height: 32, fontSize: '1.25rem' }}>
-            {icon}
+          <Avatar sx={{ bgcolor: 'transparent', color: 'text.primary', width: 32, height: 32, fontSize: '1.25rem' }}>
+            {getIcon(insignia.tipo_accion)}
           </Avatar>
         </ListItemAvatar>
-        
-        {/* Nombre de la Insignia */}
+        {/* Nombre y descripción de la Insignia */}
         <ListItemText
           primary={
             <Typography variant="body2" fontWeight="medium" textAlign="center">
-              {nombreInsignia}
+              {insignia.nombre}
+            </Typography>
+          }
+          secondary={
+            <Typography variant="caption" color="text.secondary" textAlign="center">
+              {insignia.descripcion}
             </Typography>
           }
           sx={{ marginY: 0 }}

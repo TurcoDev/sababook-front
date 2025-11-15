@@ -12,6 +12,9 @@ import BookDetailsPage from "./pages/BookDetailsPage";
 import MyComments from "./pages/MyComments";
 import Comments from "./pages/Comments";
 import Insignias from "./pages/Insignias";
+import ForumDetailsPage from "./pages/ForumDetailsPage";
+
+// Importación de Ruta Protegida
 import { ProtectedRoute } from "./components/ProtectedRoute";
 
 function App() {
@@ -54,6 +57,11 @@ function App() {
       <Route path="/bookdetails/:id" element={
         <ProtectedRoute>
           <BookDetailsPage />
+        </ProtectedRoute>
+      } />
+      <Route path="/foro/detalle/:id" element={
+        <ProtectedRoute>
+          <ForumDetailsPage />
         </ProtectedRoute>
       } />
 

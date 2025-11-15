@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { Box, Divider, useTheme } from "@mui/material";
 import { useParams, useNavigate } from "react-router-dom";
 import SideMenu from "../components/SideMenu";
@@ -8,7 +8,6 @@ import { useAuth } from "../hooks/useAuth";
 import { useBookDetails } from "../hooks/useBookDetails";
 import { useBookOpinion } from "../hooks/useBookOpinion";
 import BookDetailsHeader from "../components/BookDetailsHeader";
-import BookRatingSection from "../components/BookRatingSection";
 import BookCommentBox from "../components/BookCommentBox";
 import BookOpinionList from "../components/BookOpinionList";
 import BookDescription from "../components/BookDescription";
@@ -20,13 +19,14 @@ const BookDetailsPage = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const { user } = useAuth();
+
   const [menuOpen, setMenuOpen] = useState(false);
   const [showCommentBox, setShowCommentBox] = useState(false);
   const [newComment, setNewComment] = useState("");
   const [newRating, setNewRating] = useState(0);
 
-  const { book, loading, error } = useBookDetails(id);
-  const { opinions, setOpinions } = useBookOpinion(id);
+  const { book, loading: bookLoading, error: bookError } = useBookDetails(id);
+  const { opinions, setOpinions, loading: opinionsLoading, error: opinionsError } = useBookOpinion(id);
 
   const authorStyle = {
     fontWeight: 900,
@@ -42,8 +42,8 @@ const BookDetailsPage = () => {
   const handleMenuToggle = () => setMenuOpen(true);
   const handleMenuClose = () => setMenuOpen(false);
 
-  if (loading) return <div>Cargando...</div>;
-  if (error) return <div>{error}</div>;
+  if (bookLoading || opinionsLoading) return <div>Cargando...</div>;
+  if (bookError) return <div>{bookError}</div>;
   if (!book) return <div>No se encontró el libro.</div>;
 
   const coverImageSrc = book.coverImage?.trim() || book.portada_url?.trim() || null;
@@ -69,8 +69,24 @@ const BookDetailsPage = () => {
 
       <Box sx={{ pt: 0 }}>
         <BookDetailsHeader book={book} coverImageSrc={coverImageSrc} authorStyle={authorStyle} />
+
+        {showCommentBox && (
+          <BookCommentBox
+            theme={theme}
+            id={id}
+            user={user}
+            newRating={newRating}
+            newComment={newComment}
+            setNewRating={setNewRating}
+            setNewComment={setNewComment}
+            setShowCommentBox={setShowCommentBox}
+            setOpinions={setOpinions} // Actualiza la lista de opiniones en tiempo real
+          />
+        )}
+
         <Divider sx={{ my: 3 }} />
-        <BookRatingSection book={book} theme={theme} />
+
+        <BookDescription book={book} />
 
         <NavButton
           onClick={handleCommentClick}
@@ -89,30 +105,18 @@ const BookDetailsPage = () => {
           Comentar
         </NavButton>
 
-        {showCommentBox && (
-          <BookCommentBox
-            theme={theme}
-            id={id}
-            user={user}
-            newRating={newRating}
-            newComment={newComment}
-            setNewRating={setNewRating}
-            setNewComment={setNewComment}
-            setShowCommentBox={setShowCommentBox}
-            setOpinions={setOpinions}
-          />
-        )}
         <Divider sx={{ my: 3 }} />
-            <BookDescription book={book} />
 
-            <BookOpinionList
-              opinions={opinions}
-              theme={theme}
-              handleViewCommentsClick={handleViewCommentsClick}
-            />
+        {/* Lista de opiniones */}
+        <BookOpinionList
+          opinions={opinions}
+          theme={theme}
+          handleViewCommentsClick={handleViewCommentsClick}
+        />
       </Box>
     </Box>
   );
 };
 
 export default BookDetailsPage;
+

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState, forwardRef, useImperativeHandle } from "react";
 import { InputAdornment, IconButton, styled, OutlinedInput, FormControl } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
 
@@ -30,8 +30,12 @@ const StyledFormControl = styled(FormControl)(({ theme }) => ({
   },
 }));
 
-const SearchBar = ({ onSearch }) => {
+const SearchBar = forwardRef(({ onSearch }, ref) => {
   const [query, setQuery] = useState("");
+
+  useImperativeHandle(ref, () => ({
+    clear: () => setQuery("")
+  }));
 
   const handleSearch = () => {
     if (onSearch) onSearch(query);
@@ -44,7 +48,7 @@ const SearchBar = ({ onSearch }) => {
   return (
     <StyledFormControl variant="outlined">
       <OutlinedInput
-        placeholder="Buscar libros, autores o géneros..."
+        placeholder="Buscar por título, autor o género (separados por coma)..."
         value={query}
         onChange={(e) => setQuery(e.target.value)}
         onKeyDown={handleKeyPress}
@@ -58,6 +62,6 @@ const SearchBar = ({ onSearch }) => {
       />
     </StyledFormControl>
   );
-};
+});
 
 export default SearchBar;
