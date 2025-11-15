@@ -1,43 +1,48 @@
-import { useState } from "react";
-import { useFavorites } from "../hooks/useFavorites";
-import { useFavoriteActions } from "../hooks/useFavoriteActions";
 import {
   Box,
   Typography,
 } from "@mui/material";
+import { useState } from "react";
+import { useFavorites } from "../hooks/useFavorites";
 
-import AppHeader from "../components/AppHeader"; 
+import LibroImage from '../assets/libro.jpg';
+import AppHeader from "../components/AppHeader";
 import BookCard from "../components/BookCard";
 import SideMenu from "../components/SideMenu";
-import LibroImage from '../assets/libro.jpg'
 
 
 export default function Favs() {
   const [menuOpen, setMenuOpen] = useState(false);
-  const [favoriteBooks, setFavoriteBooks] = useState([]);
+  const { favoriteBooks, loading, error, toggleFavorite } = useFavorites();
 
-  // Usar el hook para manejar favoritos
-  const { handleFavoriteToggle } = useFavorites(favoriteBooks, setFavoriteBooks);
+  // Para determinar si un libro es favorito (basado en la lista obtenida)
+  const isBookFavorite = (libro_id) => favoriteBooks.some(book => book.libro_id === libro_id);
 
-  // Usar el nuevo hook para acciones de favoritos
-  const { addFavorite, removeFavorite } = useFavoriteActions();
-
-  // Handler para el corazón
-  const handleFavoriteClick = async (libro_id, isFavorite) => {
-    let success = false;
-    if (isFavorite) {
-      success = await removeFavorite(libro_id);
-    } else {
-      success = await addFavorite(libro_id);
-    }
-    if (success) {
-      setFavoriteBooks(prevBooks =>
-        prevBooks.map(book =>
-          book.libro_id === libro_id ? { ...book, isFavorite: !isFavorite } : book
-        )
-      );
-    }
+  // Handler para toggle
+  const handleFavoriteToggle = async (libro_id) => {
+    const currentlyFavorite = isBookFavorite(libro_id);
+    await toggleFavorite(libro_id, currentlyFavorite);
   };
+
+  if (loading) {
+    return (
+      <Box py={2} px={1} sx={{ width: '100%', maxWidth: 1000, margin: "0 auto" }}>
+        <Typography variant="h6" color="text.secondary" textAlign="center" mt={5}>
+          Cargando favoritos...
+        </Typography>
+      </Box>
+    );
+  }
+
+  if (error) {
+    return (
+      <Box py={2} px={1} sx={{ width: '100%', maxWidth: 1000, margin: "0 auto" }}>
+        <Typography variant="h6" color="error" textAlign="center" mt={5}>
+          Error al cargar favoritos: {error}
+        </Typography>
+      </Box>
+    );
+  }
 
   return (
     <Box
@@ -88,8 +93,8 @@ export default function Favs() {
             autor={book.autor}
             gender={book.genero}
             rating={book.calificacion_promedio}
-            isFavorite={!!book.isFavorite}
-            onFavoriteToggle={() => handleFavoriteClick(book.libro_id, !!book.isFavorite)}
+            isFavorite={isBookFavorite(book.libro_id)}  // Determina si está en favoritos
+            onFavoriteToggle={() => handleFavoriteToggle(book.libro_id)}  // Maneja el toggle
             libro_id={book.libro_id}
           />
         ))}

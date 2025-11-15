@@ -2,7 +2,7 @@ import { Box, Typography } from "@mui/material";
 import BookCard from "./BookCard";
 // import LibroImage from '../assets/libro.jpg'
 
-export default function FeaturedBookSection({ featuredBook, handleFavoriteToggle, handleVerMas }) {
+export default function FeaturedBookSection({ featuredBook, handleFavoriteToggle, isFavorite, handleVerMas }) {
   
   //const bookId = featuredBook.id || featuredBook.libro_id;
 
@@ -18,9 +18,9 @@ export default function FeaturedBookSection({ featuredBook, handleFavoriteToggle
           image={featuredBook.portada_url}
           title={featuredBook.titulo}
           rating={featuredBook.calificacion_promedio || featuredBook.rating}
-          isFavorite={featuredBook.isFavorite}
+          isFavorite={isFavorite}
           onFavoriteToggle={() =>
-            featuredBook.libro_id && handleFavoriteToggle(featuredBook.libro_id, true)
+            featuredBook.libro_id && handleFavoriteToggle(featuredBook.libro_id)
           }
           // bookId={bookId}
           libro_id={featuredBook.libro_id}

@@ -39,12 +39,13 @@ export default function Home() {
   const { books, setBooks, featuredBook, setFeaturedBook } = useBookData();
 
   // 2. Hook para manejar la interacción de favoritos
-  const { handleFavoriteToggle } = useFavorites(
-    books,
-    setBooks,
-    featuredBook,
-    setFeaturedBook
-  );
+  const { favoriteBooks, toggleFavorite, isBookFavorite } = useFavorites();
+
+  // Handler para toggle de favoritos
+  const handleFavoriteToggle = async (libro_id) => {
+    const isFavorite = isBookFavorite(libro_id);
+    await toggleFavorite(libro_id, isFavorite);
+  };
   // -----------------------------------------------
 
   // --- Lógica de Modal de Bienvenida  ---
@@ -137,6 +138,7 @@ export default function Home() {
           // TODO: Cambiar libro recomendado dinámicamente y no MOCKEADO
           featuredBook={books.find((book) => book.titulo === "La gran ocasión") || {}}
           handleFavoriteToggle={handleFavoriteToggle}
+          isFavorite={isBookFavorite(books.find((book) => book.titulo === "La gran ocasión")?.libro_id)}
         />
       )}
 
@@ -176,9 +178,9 @@ export default function Home() {
               // description={book.descripcion} // No se muestra en el home
               rating={book.calificacion_promedio}
               progress={book.progress}
-              isFavorite={book.isFavorite}
+              isFavorite={isBookFavorite(book.libro_id)}
               libro_id={book.libro_id}
-              onFavoriteToggle={() => handleFavoriteToggle(book.id, false)}
+              onFavoriteToggle={() => handleFavoriteToggle(book.libro_id)}
             />
           ))
         )}

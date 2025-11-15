@@ -1,49 +1,104 @@
-import { useEffect } from "react";
-import { API_BASE_URL } from "../environments/api";
-import { useAuth } from "./useAuth";
+import { useState, useEffect, useCallback } from 'react';
+import { useAuth } from './useAuth';
+import { API_BASE_URL } from '../environments/api';
 
-export function useFavorites(featuredBook, setFeaturedBook) {
-
+export function useFavorites() {
+  const [favoriteBooks, setFavoriteBooks] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const { token } = useAuth() || {};
 
-  useEffect(() => {
-    const fetchFavorites = async () => {
-      try {
-        if (!token) return;
-        const res = await fetch(`${API_BASE_URL}/api/v1/favorites`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-        if (!res.ok) throw new Error("Error al obtener favoritos");
-        const data = await res.json();
-        setFeaturedBook(data);
-      } catch (err) {
-        console.log(err);
-        setFeaturedBook([]);
-      }
-    };
-    fetchFavorites();
-  }, [setFeaturedBook, token]);
+  // Fetch favoritos del usuario
+  const fetchFavorites = useCallback(async () => {
+    if (!token) {
+      setLoading(false);
+      return;
+    }
+    
+    try {
+      const res = await fetch(`${API_BASE_URL}/api/v1/favorites`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (!res.ok) throw new Error('Error al obtener favoritos');
+      const data = await res.json();
+      setFavoriteBooks(data);
+      console.log("FAVORITOS", data);
+      
+    } catch (err) {
+      setError(err.message);
+      console.error("Error al cargar favoritos:", err);
+    } finally {
+      setLoading(false);
+    }
+  }, [token]);
 
-  const handleFavoriteToggle = (bookId, isFeatured = false) => {
-    // Lógica para alternar el estado de favorito...
-    if (isFeatured && setFeaturedBook) {
-      setFeaturedBook(prevBook => ({
-        ...prevBook,
-        isFavorite: !prevBook.isFavorite
-      }));
-    } else {
-      setFeaturedBook(prevBooks =>
-        prevBooks.map(book => {
-          if ((book.id === bookId) || (book.libro_id === bookId)) {
-            return { ...book, isFavorite: !book.isFavorite };
-          }
-          return book;
-        })
-      );
+  useEffect(() => {
+    fetchFavorites();
+  }, [fetchFavorites]);
+
+  // Agregar favorito
+  const addFavorite = async (libro_id) => {
+    if (!token) return false;
+    try {
+      const res = await fetch(`${API_BASE_URL}/api/v1/favorites`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ libro_id }),
+      });
+      if (!res.ok) throw new Error('Error al agregar favorito');
+      
+      // Refrescar la lista completa de favoritos
+      await fetchFavorites();
+      return true;
+    } catch (err) {
+      console.error("Error al agregar favorito:", err);
+      return false;
     }
   };
-  return { handleFavoriteToggle };
 
+  // Quitar favorito
+  const removeFavorite = async (libro_id) => {
+    if (!token) return false;
+    try {
+      const res = await fetch(`${API_BASE_URL}/api/v1/favorites`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ libro_id }),
+      });
+      if (!res.ok) throw new Error('Error al quitar favorito');
+      
+      // Refrescar la lista completa de favoritos
+      await fetchFavorites();
+      return true;
+    } catch (err) {
+      console.error("Error al quitar favorito:", err);
+      return false;
+    }
+  };
+
+  // Toggle favorito (combina add/remove)
+  const toggleFavorite = async (libro_id, isFavorite) => {
+    return isFavorite ? await removeFavorite(libro_id) : await addFavorite(libro_id);
+  };
+
+  // Función para verificar si un libro es favorito
+  const isBookFavorite = (libro_id) => {
+    return favoriteBooks.some(book => book.libro_id === libro_id);
+  };
+
+  return { 
+    favoriteBooks, 
+    loading, 
+    error, 
+    addFavorite, 
+    removeFavorite, 
+    toggleFavorite, 
+    isBookFavorite 
+  };
 }
