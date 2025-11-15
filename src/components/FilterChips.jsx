@@ -11,7 +11,7 @@ const FILTERS_DATA = [
   {
     id: 'level',
     name: 'Nivel Educativo',
-    options: ['Nivel Básico', 'Nivel Superior']
+    options: ['Básico', 'Superior']
   },
   // {
   //   id: 'lists',
