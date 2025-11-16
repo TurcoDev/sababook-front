@@ -7,11 +7,11 @@ import {
 } from "@mui/material";
 import { useState } from "react";
 import { useForums } from "../hooks/useForum";
-
+import theme from "../theme/theme";
 import { useNavigate } from "react-router-dom";
 
 import ForumIcon from "@mui/icons-material/Forum";
-import VisibilityIcon from "@mui/icons-material/Visibility";
+import ChatBubbleOutlineIcon from "@mui/icons-material/ChatBubbleOutline";
 
 import AppHeader from "../components/AppHeader";
 import SideMenu from "../components/SideMenu";
@@ -47,7 +47,7 @@ export default function MyForum() {
                         height: 45,
                         mr: 2,
                         border: "1px solid #ddd",
-                        bgcolor: "#f0f0f0",
+                        bgcolor: theme.palette.button.main,
                     }}
                 >
                     <ForumIcon />
@@ -65,9 +65,9 @@ export default function MyForum() {
             <Box display="flex" gap={1}>
                 <IconButton
                     onClick={() => handleViewForo(foro.foro_id)}
-                    sx={{ bgcolor: "#007BFF", color: "#fff", "&:hover": { bgcolor: "#0056b3" } }}
+                    sx={{ bgcolor: theme.palette.button.main, color: "#fff", "&:hover": { bgcolor: '#cc4800' } }}
                 >
-                    <VisibilityIcon fontSize="small" />
+                    <ChatBubbleOutlineIcon fontSize="small" />
                 </IconButton>
             </Box>
         </Box>
