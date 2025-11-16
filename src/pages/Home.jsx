@@ -142,6 +142,15 @@ export default function Home() {
         />
       )}
 
+      {/* Título para la lista de libros cuando no hay filtros */}
+      {Object.keys(currentFilters).length === 0 && !currentQuery && (
+        <Box mt={3} mb={3}>
+          <Typography variant="h4" fontWeight="bold" color="secondary">
+            Listado de libros
+          </Typography>
+        </Box>
+      )}
+
       {/* Resultados de búsqueda/filtros - Mostrar si hay búsqueda o filtros aplicados */}
       {(currentQuery || Object.keys(currentFilters).length > 0) && (
         <>

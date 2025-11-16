@@ -9,7 +9,7 @@ export default function FeaturedBookSection({ featuredBook, handleFavoriteToggle
   return (
     <>
       <Typography variant="h4" fontWeight="bold" color="secondary" mb={1}>
-        Recomendado semanal
+        Nuestro recomendado
       </Typography>
 
       <Box display="flex" justifyContent="left" mt={2} mb={3}>

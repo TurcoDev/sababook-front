@@ -102,7 +102,7 @@ export default function FilterChips({ onFilterChange, onClearFilters }) {
           variant="outlined"
           color="secondary"
           size="small"
-          sx={{ ml: 2, minWidth: 120 }}
+          sx={{ ml: 2, minWidth: 120, borderRadius:'20px' }}
           onClick={() => {
             setSelectedFilters({});
             if (onClearFilters) onClearFilters();
