@@ -4,6 +4,8 @@ import { useForumComments } from "../hooks/useForumComments";
 import { useAuth } from "../hooks/useAuth";
 import { useState } from "react";
 import { API_BASE_URL } from "../environments/api";
+import DeleteIcon from "@mui/icons-material/Delete";
+import { IconButton } from "@mui/material";
 
 const ForumCommentList = ({ foroId, theme, usuarioId: usuarioIdProp }) => {
   const { comments, loading, error, refetch } = useForumComments(foroId);
@@ -86,10 +88,7 @@ const ForumCommentList = ({ foroId, theme, usuarioId: usuarioIdProp }) => {
                 {comment.fecha ? new Date(comment.fecha).toLocaleString() : ""}
               </Typography>
               {usuarioId && (Number(comment.usuario_id) === Number(usuarioId)) && (
-                <Button
-                  size="small"
-                  color="error"
-                  variant="outlined"
+                <IconButton
                   onClick={async () => {
                     if (window.confirm("¿Seguro que quieres eliminar este comentario?")) {
                       try {
@@ -103,10 +102,20 @@ const ForumCommentList = ({ foroId, theme, usuarioId: usuarioIdProp }) => {
                       }
                     }
                   }}
-                  sx={{ ml: 1 }}
+                  sx={{
+                    bgcolor: theme.palette.button.main,
+                    color: "#fff",
+                    "&:hover": {
+                      bgcolor: theme.palette.button.main,
+                      opacity: 0.85
+                    },
+                    width: 32,
+                    height: 32
+                  }}
                 >
-                  Eliminar
-                </Button>
+                  <DeleteIcon fontSize="small" />
+                </IconButton>
+
               )}
             </Box>
           </Box>
@@ -145,9 +154,51 @@ const ForumCommentList = ({ foroId, theme, usuarioId: usuarioIdProp }) => {
           onChange={e => setContenido(e.target.value)}
           disabled={sending}
           required
-          sx={{ mb: 1 }}
+          sx={{
+            mb: 1,
+            "& .MuiOutlinedInput-root": {
+              "& fieldset": {
+                borderColor: "#ccc" // color normal
+              },
+              "&:hover fieldset": {
+                borderColor: theme.palette.button.main // color al pasar el mouse
+              },
+              "&.Mui-focused fieldset": {
+                borderColor: theme.palette.button.main, // borde naranja al escribir
+                borderWidth: "2px"
+              }
+            },
+            "& .MuiInputLabel-root.Mui-focused": {
+              color: theme.palette.button.main // label naranja al enfocarse
+            }
+          }}
         />
-        <Button type="submit" variant="contained" color="primary" disabled={sending || !contenido.trim()}>
+        <Button
+          type="submit"
+          variant="contained"
+          fullWidth
+          disabled={sending || !contenido.trim()}
+          sx={{
+            // estilos copiados del StyledButton
+            backgroundColor:
+              !sending && contenido.trim()
+                ? theme.palette.button?.main || "#f25600"
+                : "#bbb", // gris cuando está deshabilitado
+            color: "#FFFFFF",
+            padding: "12px 0",
+            fontSize: "1rem",
+            fontWeight: "bold",
+            borderRadius: "30px",
+
+            // hover
+            "&:hover": {
+              backgroundColor:
+                !sending && contenido.trim()
+                  ? "#cc4800"
+                  : "#aaa", // gris más fuerte si está deshabilitado
+            }
+          }}
+        >
           {sending ? "Enviando..." : "Comentar"}
         </Button>
         {sendError && <Typography color="error" mt={1}>{sendError}</Typography>}
