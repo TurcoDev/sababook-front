@@ -89,12 +89,22 @@ const Insignias = () => {
             Insignias
           </Typography>
 
-          {/* 2. COMPONENTES DE LAS CUATRO INSIGNIAS */}
-          {insigniasUsuario.map((insignia, index) => (
-            <Box key={insignia.medalla_id ?? index} sx={{ marginBottom: 2, width: { xs: 350, lg: 500 }, marginX: 'auto', paddingRight: { lg: 5 } }}>
-              <InsigniaUnica insignia={insignia} />
-            </Box>
-          ))}
+          {/* 2. COMPONENTES DE LAS INSIGNIAS */}
+          {(() => {
+            const rows = [];
+            for (let i = 0; i < insigniasUsuario.length; i += 2) {
+              rows.push(insigniasUsuario.slice(i, i + 2));
+            }
+            return rows.map((row, rowIndex) => (
+              <Box key={rowIndex} sx={{ display: 'flex', justifyContent: 'center', mb: 2 }}>
+                {row.map((insignia, index) => (
+                  <Box key={insignia.medalla_id ?? index} sx={{ mx: 1 }}>
+                    <InsigniaUnica insignia={insignia} />
+                  </Box>
+                ))}
+              </Box>
+            ));
+          })()}
 
         </Paper>
 
