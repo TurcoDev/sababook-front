@@ -4,6 +4,8 @@ import { useForumComments } from "../hooks/useForumComments";
 import { useAuth } from "../hooks/useAuth";
 import { useState } from "react";
 import { API_BASE_URL } from "../environments/api";
+import DeleteIcon from "@mui/icons-material/Delete";
+import { IconButton } from "@mui/material";
 
 const ForumCommentList = ({ foroId, theme, usuarioId: usuarioIdProp }) => {
   const { comments, loading, error, refetch } = useForumComments(foroId);
@@ -86,10 +88,7 @@ const ForumCommentList = ({ foroId, theme, usuarioId: usuarioIdProp }) => {
                 {comment.fecha ? new Date(comment.fecha).toLocaleString() : ""}
               </Typography>
               {usuarioId && (Number(comment.usuario_id) === Number(usuarioId)) && (
-                <Button
-                  size="small"
-                  color="error"
-                  variant="outlined"
+                <IconButton
                   onClick={async () => {
                     if (window.confirm("¿Seguro que quieres eliminar este comentario?")) {
                       try {
@@ -103,10 +102,20 @@ const ForumCommentList = ({ foroId, theme, usuarioId: usuarioIdProp }) => {
                       }
                     }
                   }}
-                  sx={{ ml: 1 }}
+                  sx={{
+                    bgcolor: theme.palette.button.main,
+                    color: "#fff",
+                    "&:hover": {
+                      bgcolor: theme.palette.button.main,
+                      opacity: 0.85
+                    },
+                    width: 32,
+                    height: 32
+                  }}
                 >
-                  Eliminar
-                </Button>
+                  <DeleteIcon fontSize="small" />
+                </IconButton>
+
               )}
             </Box>
           </Box>

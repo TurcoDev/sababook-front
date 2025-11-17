@@ -11,6 +11,7 @@ import {
 import React from "react";
 import { useParams } from "react-router-dom";
 import AppHeader from "../components/AppHeader";
+import theme from "../theme/theme";
 import ForumCommentList from "../components/ForumCommentList";
 import SideMenu from "../components/SideMenu";
 import { useForums } from "../hooks/useForum";
@@ -34,7 +35,7 @@ const ForumDetailsPage = () => {
     >
       <AppHeader
         onMenuClick={() => setMenuOpen(true)}
-        title="DETALLE DEL FORO"
+        title="Foro"
         subtitle="Detalles y comentarios"
       />
       <SideMenu open={menuOpen} onClose={() => setMenuOpen(false)} active="Foro" />
@@ -61,7 +62,7 @@ const ForumDetailsPage = () => {
                 height: 60,
                 mr: 2,
                 border: "1px solid #ddd",
-                bgcolor: "#f0f0f0",
+                bgcolor: theme.palette.button.main,
               }}
             >
               <ForumIcon fontSize="large" />
