@@ -3,15 +3,19 @@ import React from 'react';
 import { Box, Typography, Divider, Avatar, ListItem, ListItemAvatar, ListItemText } from '@mui/material';
 import StarIcon from '@mui/icons-material/Star'; // Ícono de ejemplo
 
+// Importar los GIFs
+import lapizGif from '../assets/lapiz.gif';
+import chatGif from '../assets/chat.gif';
+
 const InsigniaUnica = ({ insignia }) => {
   // icono según tipo_accion
   const getIcon = (tipo) => {
     switch (tipo) {
       case 'participar':
-        return '💬'; // Participar en foros
+        return <img src={lapizGif} alt="Participar" style={{ width: 40, height: 40 }} />; // GIF de lápiz
       case 'comentar':
-        return '⭐'; // Comentar libros
-        
+        return <img src={chatGif} alt="Comentar" style={{ width: 40, height: 40 }} />; // GIF de chat
+
         // TODO: Estas de aca abajo no se usan
       // case 'leer':
       //   return '📚'; // Leer libros
@@ -23,29 +27,32 @@ const InsigniaUnica = ({ insignia }) => {
   };
 
   return (
-    <Box sx={{ backgroundColor: '#f7f7f7ff', padding: 1, mx: 2, boxShadow: '0 2px 4px rgba(0,0,0,0.4)' }}>
-      <ListItem sx={{ padding: 0 }}>
-        {/* Círculo de la Insignia (Avatar) */}
-        <ListItemAvatar sx={{ minWidth: 40 }}>
-          <Avatar sx={{ bgcolor: 'transparent', color: 'text.primary', width: 32, height: 32, fontSize: '1.25rem' }}>
-            {getIcon(insignia.tipo_accion)}
-          </Avatar>
-        </ListItemAvatar>
-        {/* Nombre y descripción de la Insignia */}
-        <ListItemText
-          primary={
-            <Typography variant="body2" fontWeight="medium" textAlign="center">
-              {insignia.nombre}
-            </Typography>
-          }
-          secondary={
-            <Typography variant="caption" color="text.secondary" textAlign="center">
-              {insignia.descripcion}
-            </Typography>
-          }
-          sx={{ marginY: 0 }}
-        />
-      </ListItem>
+    <Box
+      sx={{
+        backgroundColor: '#f7f7f7ff',
+        padding: 1,
+        boxShadow: '0 2px 4px rgba(0,0,0,0.4)',
+        width: { xs: 120, sm: 150 },
+        height: { xs: 120, sm: 150 },
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
+        borderRadius: 2,
+      }}
+    >
+      {/* Ícono de la Insignia */}
+      <Avatar sx={{ bgcolor: 'transparent', color: 'text.primary', width: 40, height: 40, fontSize: '1.5rem', mb: 1 }}>
+        {getIcon(insignia.tipo_accion)}
+      </Avatar>
+      {/* Nombre de la Insignia */}
+      <Typography variant="body2" fontWeight="medium" textAlign="center" sx={{ mb: 0.5 }}>
+        {insignia.nombre}
+      </Typography>
+      {/* Descripción de la Insignia */}
+      <Typography variant="caption" color="text.secondary" textAlign="center">
+        {insignia.descripcion}
+      </Typography>
     </Box>
   );
 };
