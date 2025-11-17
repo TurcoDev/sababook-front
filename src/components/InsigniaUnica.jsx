@@ -3,15 +3,19 @@ import React from 'react';
 import { Box, Typography, Divider, Avatar, ListItem, ListItemAvatar, ListItemText } from '@mui/material';
 import StarIcon from '@mui/icons-material/Star'; // Ícono de ejemplo
 
+// Importar los GIFs
+import lapizGif from '../assets/lapiz.gif';
+import chatGif from '../assets/chat.gif';
+
 const InsigniaUnica = ({ insignia }) => {
   // icono según tipo_accion
   const getIcon = (tipo) => {
     switch (tipo) {
       case 'participar':
-        return '💬'; // Participar en foros
+        return <img src={lapizGif} alt="Participar" style={{ width: 40, height: 40 }} />; // GIF de lápiz
       case 'comentar':
-        return '⭐'; // Comentar libros
-        
+        return <img src={chatGif} alt="Comentar" style={{ width: 40, height: 40 }} />; // GIF de chat
+
         // TODO: Estas de aca abajo no se usan
       // case 'leer':
       //   return '📚'; // Leer libros
