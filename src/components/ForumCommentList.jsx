@@ -154,9 +154,41 @@ const ForumCommentList = ({ foroId, theme, usuarioId: usuarioIdProp }) => {
           onChange={e => setContenido(e.target.value)}
           disabled={sending}
           required
-          sx={{ mb: 1 }}
+          sx={{
+            mb: 1,
+            "& .MuiOutlinedInput-root": {
+              "& fieldset": {
+                borderColor: "#ccc" // color normal
+              },
+              "&:hover fieldset": {
+                borderColor: theme.palette.button.main // color al pasar el mouse
+              },
+              "&.Mui-focused fieldset": {
+                borderColor: theme.palette.button.main, // borde naranja al escribir
+                borderWidth: "2px"
+              }
+            },
+            "& .MuiInputLabel-root.Mui-focused": {
+              color: theme.palette.button.main // label naranja al enfocarse
+            }
+          }}
         />
-        <Button type="submit" variant="contained" color="primary" disabled={sending || !contenido.trim()}>
+        <Button
+          type="submit"
+          variant="contained"
+          disabled={sending || !contenido.trim()}
+          sx={{
+            bgcolor: !sending && contenido.trim()
+              ? theme.palette.button.main
+              : "#bbb",                     // gris cuando no se puede usar
+            color: "#fff",
+            "&:hover": {
+              bgcolor: !sending && contenido.trim()
+                ? theme.palette.button.main
+                : "#aaa"
+            }
+          }}
+        >
           {sending ? "Enviando..." : "Comentar"}
         </Button>
         {sendError && <Typography color="error" mt={1}>{sendError}</Typography>}

@@ -27,7 +27,7 @@ const ForumDetailsPage = () => {
     <Box
       sx={{
         minHeight: "100vh",
-        backgroundColor: theme.palette.grey[50],
+        backgroundColor: "white",
         p: { xs: 2, md: 4 },
         maxWidth: "600px",
         margin: "0 auto",
