@@ -48,7 +48,7 @@ const SearchBar = forwardRef(({ onSearch }, ref) => {
   return (
     <StyledFormControl variant="outlined">
       <OutlinedInput
-        placeholder="Buscar por título o autor(separados por coma)..."
+        placeholder="Buscar por título o autor..."
         value={query}
         onChange={(e) => setQuery(e.target.value)}
         onKeyDown={handleKeyPress}
