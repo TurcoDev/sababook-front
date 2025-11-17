@@ -176,16 +176,26 @@ const ForumCommentList = ({ foroId, theme, usuarioId: usuarioIdProp }) => {
         <Button
           type="submit"
           variant="contained"
+          fullWidth
           disabled={sending || !contenido.trim()}
           sx={{
-            bgcolor: !sending && contenido.trim()
-              ? theme.palette.button.main
-              : "#bbb",                     // gris cuando no se puede usar
-            color: "#fff",
+            // estilos copiados del StyledButton
+            backgroundColor:
+              !sending && contenido.trim()
+                ? theme.palette.button?.main || "#f25600"
+                : "#bbb", // gris cuando está deshabilitado
+            color: "#FFFFFF",
+            padding: "12px 0",
+            fontSize: "1rem",
+            fontWeight: "bold",
+            borderRadius: "30px",
+
+            // hover
             "&:hover": {
-              bgcolor: !sending && contenido.trim()
-                ? theme.palette.button.main
-                : "#aaa"
+              backgroundColor:
+                !sending && contenido.trim()
+                  ? "#cc4800"
+                  : "#aaa", // gris más fuerte si está deshabilitado
             }
           }}
         >
