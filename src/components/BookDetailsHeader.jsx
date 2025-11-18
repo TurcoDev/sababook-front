@@ -17,7 +17,6 @@ const BookDetailsHeader = ({ book, coverImageSrc, authorStyle }) => {
               height: "150px",
               objectFit: "cover",
               borderRadius: "8px",
-              border: `2px solid #D32F2F`,
               boxShadow: 4,
             }}
           />
