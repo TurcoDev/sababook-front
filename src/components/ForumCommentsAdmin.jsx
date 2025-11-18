@@ -3,8 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import {
     Box, Typography, Paper, Table, TableBody, TableCell, TableContainer,
     TableHead, TableRow, IconButton, CircularProgress, Dialog, DialogTitle,
-    DialogContent, DialogContentText, DialogActions, Button, Snackbar, Alert,
-    Rating, TextField, styled, Chip,
+    DialogContent, DialogContentText, DialogActions, Button, Snackbar, Alert, TextField, styled, Chip,
 } from "@mui/material";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import EditIcon from "@mui/icons-material/Edit";
@@ -49,7 +48,7 @@ const ForumCommentsAdmin = () => {
 
     // Estados de edición
     const [editingCommentId, setEditingCommentId] = useState(null);
-    const [editedComment, setEditedComment] = useState({ comentario: "", calificacion: 0 });
+    const [editedComment, setEditedComment] = useState({ comentario: "" });
 
     // Estados de eliminación
     const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
@@ -63,9 +62,17 @@ const ForumCommentsAdmin = () => {
     const [isUpdating, setIsUpdating] = useState(false);
 
     // Hook de comentarios
-    const { comments, loading: loadingComments, error: errorComments, refetch } = useForumComments(foroId);
+    const { comments: rawComments, loading: loadingComments, error: errorComments, refetch } = useForumComments(foroId);
 
-    // Fetch info del foro
+    const comments = rawComments.map(c => ({
+        comentario_id: c.id || c.comentario_id,
+        comentario: c.contenido || c.comentario || "",
+        usuario_nombre: c.nombre || c.usuario_nombre || "Usuario",
+        email: c.email || "",
+        fecha: c.fecha || c.createdAt || new Date().toISOString(),
+        destacado: c.destacado || false,
+        usuario_id: c.usuario_id || c.usuario?.id || null,
+    }));
     // Fetch info del foro
     useEffect(() => {
         console.log("➡️ Entrando al useEffect del FORO con forumId:", foroId);
@@ -118,11 +125,11 @@ const ForumCommentsAdmin = () => {
     // Editar comentario
     const handleEditClick = (comment) => {
         setEditingCommentId(comment.comentario_id);
-        setEditedComment({ comentario: comment.comentario, calificacion: comment.calificacion });
+        setEditedComment({ comentario: comment.comentario });
     };
     const handleCancelEdit = () => {
         setEditingCommentId(null);
-        setEditedComment({ comentario: "", calificacion: 0 });
+        setEditedComment({ comentario: "" });
     };
     const handleSaveEdit = async (comentarioId) => {
         setIsUpdating(true);
@@ -251,7 +258,6 @@ const ForumCommentsAdmin = () => {
                         <TableHead>
                             <TableRow>
                                 <StyledTableCellHeader>Usuario</StyledTableCellHeader>
-                                <StyledTableCellHeader>Calificación</StyledTableCellHeader>
                                 <StyledTableCellHeader>Comentario</StyledTableCellHeader>
                                 <StyledTableCellHeader>Fecha</StyledTableCellHeader>
                                 <StyledTableCellHeader align="center">Acciones</StyledTableCellHeader>
@@ -270,19 +276,6 @@ const ForumCommentsAdmin = () => {
                                 comments.map((comment) => (
                                     <TableRow key={comment.comentario_id} hover>
                                         <TableCell>{comment.usuario_nombre || "Usuario"}</TableCell>
-                                        <TableCell>
-                                            {editingCommentId === comment.comentario_id ? (
-                                                <Rating
-                                                    value={editedComment.calificacion}
-                                                    onChange={(e, newValue) =>
-                                                        setEditedComment({ ...editedComment, calificacion: newValue })
-                                                    }
-                                                    size="small"
-                                                />
-                                            ) : (
-                                                <Rating value={comment.calificacion} readOnly size="small" />
-                                            )}
-                                        </TableCell>
                                         <TableCell>
                                             {editingCommentId === comment.comentario_id ? (
                                                 <TextField
@@ -323,9 +316,6 @@ const ForumCommentsAdmin = () => {
                                                     </>
                                                 ) : (
                                                     <>
-                                                        <ActionButton onClick={() => handleEditClick(comment)} title="Editar">
-                                                            <EditIcon sx={{ fontSize: "1.1rem" }} />
-                                                        </ActionButton>
                                                         <ActionButton onClick={() => handleDeleteClick(comment)} title="Eliminar">
                                                             <DeleteIcon sx={{ fontSize: "1.1rem" }} />
                                                         </ActionButton>
