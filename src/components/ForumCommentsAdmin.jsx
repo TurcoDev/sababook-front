@@ -75,37 +75,30 @@ const ForumCommentsAdmin = () => {
     }));
     // Fetch info del foro
     useEffect(() => {
-        console.log("➡️ Entrando al useEffect del FORO con forumId:", foroId);
 
         const fetchForum = async () => {
-            if (!foroId) {
-                console.log("⛔ forumId es NULL, abortando fetch del foro");
-                return;
-            }
 
             setLoadingForum(true);
             setErrorForum(null);
 
             const token = localStorage.getItem("token");
-            console.log("🔑 Token obtenido:", token);
 
             try {
-                console.log(`🔄 Fetching foro: ${API_BASE_URL}/api/v1/foro/${foroId}`);
 
                 const res = await fetch(`${API_BASE_URL}/api/v1/foro/${foroId}`, {
                     headers: { Authorization: `Bearer ${token}` },
                 });
 
-                console.log("📥 Respuesta del foro:", res);
+
 
                 if (!res.ok) {
                     const text = await res.text();
-                    console.log("❌ Error HTTP foro:", res.status, text);
+
                     throw new Error("Error al cargar el foro");
                 }
 
                 const data = await res.json();
-                console.log("🟢 Datos del foro obtenidos:", data);
+
 
                 setForumInfo(data);
 
@@ -114,7 +107,7 @@ const ForumCommentsAdmin = () => {
                 setErrorForum(err.message);
             } finally {
                 setLoadingForum(false);
-                console.log("✔️ Finalizó carga foro");
+
             }
         };
 
