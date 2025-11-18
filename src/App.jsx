@@ -13,6 +13,7 @@ import MyComments from "./pages/MyComments";
 import Comments from "./pages/Comments";
 import Insignias from "./pages/Insignias";
 import ForumDetailsPage from "./pages/ForumDetailsPage";
+import BookCommentsAdmin from "./components/BookCommentsAdmin";
 
 // Importación de Ruta Protegida
 import { ProtectedRoute } from "./components/ProtectedRoute";
@@ -78,6 +79,13 @@ function App() {
       <Route path="/dashboard" element={
         <ProtectedRoute>
           <DashboardPage />
+        </ProtectedRoute>
+      } />
+
+      {/* Ruta para administrar comentarios de libros */}
+      <Route path="/dashboard/book-comments/:bookId" element={
+        <ProtectedRoute>
+          <BookCommentsAdmin />
         </ProtectedRoute>
       } />
 

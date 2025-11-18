@@ -15,10 +15,12 @@ import {
   useTheme,
   CircularProgress,
 } from '@mui/material';
+import { useNavigate } from 'react-router-dom';
 
 // Se eliminan imports relacionados con la API, Dialogs, Snackbar, y useNavigate
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
+import CommentIcon from '@mui/icons-material/Comment';
 
 
 // 1. Definición de las constantes
@@ -68,6 +70,7 @@ const BookTable = ({
     onDeleteBook, // 💡 Nuevo prop: función que ejecuta el DELETE en el padre
 }) => {
   const theme = useTheme();
+  const navigate = useNavigate();
   
   // Estados de UI (Paginación)
   const [page, setPage] = useState(1);
@@ -90,6 +93,11 @@ const BookTable = ({
   const handleDelete = (libro_id) => {
     // Llama a la función del padre pasando solo el ID
     onDeleteBook(libro_id);
+  }
+
+  // Handler para navegar a la administración de comentarios
+  const handleRowClick = (bookId) => {
+    navigate(`/dashboard/book-comments/${bookId}`);
   }
   
   // 🚨 Nota: Toda la lógica de DELETE, confirmación (Dialog), Snackbar y estados de loading/error internos
@@ -134,19 +142,38 @@ const BookTable = ({
             ) : (
               currentBooks.map((row) => (
                
-                <TableRow hover role="checkbox" tabIndex={-1} key={row.libro_id || row.id}> 
+                <TableRow 
+                  hover 
+                  role="checkbox" 
+                  tabIndex={-1} 
+                  key={row.libro_id || row.id}
+                  onClick={() => handleRowClick(row.libro_id || row.id)}
+                  sx={{ cursor: 'pointer' }}
+                > 
                   {columns.map((column) => {
                     if (column.id === 'acciones') {
                       return (
                         <TableCell key={column.id} align="center"> 
                           <Box sx={{ display: 'flex', gap: 1, justifyContent: 'center' }}>
                             {/* 💡 Llama a onEditBook del padre, pasando toda la fila (row) */}
-                            <ActionButton onClick={() => handleEdit(row)} title="Editar">
+                            <ActionButton 
+                              onClick={(e) => {
+                                e.stopPropagation(); // Evita que se active el onClick de la fila
+                                handleEdit(row);
+                              }} 
+                              title="Editar"
+                            >
                               <EditIcon sx={{ fontSize: '1.1rem' }} />
                             </ActionButton>
                             
                             {/* 💡 Llama a onDeleteBook del padre, pasando solo el ID */}
-                            <ActionButton onClick={() => handleDelete(row.libro_id || row.id)} title="Eliminar">
+                            <ActionButton 
+                              onClick={(e) => {
+                                e.stopPropagation(); // Evita que se active el onClick de la fila
+                                handleDelete(row.libro_id || row.id);
+                              }} 
+                              title="Eliminar"
+                            >
                               <DeleteIcon sx={{ fontSize: '1.1rem' }} />
                             </ActionButton>
                           </Box>
