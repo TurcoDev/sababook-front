@@ -58,20 +58,6 @@ export default function Home() {
 
   const handleCloseWelcomeModal = () => setWelcomeModalOpen(false);
 
-  const handleClearFilters = async () => {
-    try {
-      const libros = await getCatalogoLibros();
-      setBooks(libros);
-      setCurrentFilters({});
-      setCurrentQuery('');
-      if (searchBarRef.current && typeof searchBarRef.current.clear === 'function') {
-        searchBarRef.current.clear();
-      }
-      console.log("Vuelto al inicio, libros cargados:", libros);
-    } catch (error) {
-      console.error("Error al volver al inicio:", error);
-    }
-  };
 
   const handleSearch = async (query) => {
     setCurrentQuery(query);
@@ -130,7 +116,15 @@ export default function Home() {
       </Box>
 
       {/* Chips de filtros - Siempre visibles */}
-      <FilterChips onFilterChange={handleFilterChange} onClearFilters={handleClearFilters} />
+      <FilterChips
+        onFilterChange={handleFilterChange}
+        onClearSearch={() => {
+          setCurrentQuery('');
+          if (searchBarRef.current && typeof searchBarRef.current.clear === 'function') {
+            searchBarRef.current.clear();
+          }
+        }}
+      />
 
       {/* Recomendado semanal - Solo mostrar si no hay filtros aplicados */}
       {Object.keys(currentFilters).length === 0 && !currentQuery && (

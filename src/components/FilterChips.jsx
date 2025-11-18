@@ -25,7 +25,13 @@ const FILTERS_DATA = [
   // },
 ];
 
-export default function FilterChips({ onFilterChange, onClearFilters }) {
+// Mapa inverso para mostrar nombres legibles
+const reverseMapping = {
+  'genero': 'Género',
+  'nivel_educativo': 'Nivel Educativo',
+};
+
+export default function FilterChips({ onFilterChange, onClearSearch }) {
   // Estado para el elemento de anclaje (donde se abre el menú)
   const [anchorEl, setAnchorEl] = useState(null);
   // Estado para saber qué filtro está activo (e.g., 'Género')
@@ -79,6 +85,24 @@ export default function FilterChips({ onFilterChange, onClearFilters }) {
     handleMenuClose();
   };
 
+  const handleDeleteFilter = async (apiField) => {
+    const newFilters = { ...selectedFilters };
+    delete newFilters[apiField];
+    setSelectedFilters(newFilters);
+
+    // Limpiar la barra de búsqueda
+    if (onClearSearch) onClearSearch();
+
+    try {
+      const resultados = await buscarLibros(newFilters);
+      if (onFilterChange) {
+        onFilterChange(resultados, newFilters);
+      }
+    } catch (error) {
+      console.error('Error al eliminar filtro:', error);
+    }
+  };
+
   const activeFilterData = FILTERS_DATA.find(f => f.id === activeFilterId);
 
   return (
@@ -97,20 +121,23 @@ export default function FilterChips({ onFilterChange, onClearFilters }) {
             variant="outlined"
           />
         ))}
-        {/* Botón para borrar filtros */}
-        <Button
-          variant="outlined"
-          color="secondary"
-          size="small"
-          sx={{ ml: 2, minWidth: 120, borderRadius:'20px' }}
-          onClick={() => {
-            setSelectedFilters({});
-            if (onClearFilters) onClearFilters();
-          }}
-        >
-          Borrar filtros
-        </Button>
       </Stack>
+
+      {/* Chips de filtros seleccionados */}
+      {Object.keys(selectedFilters).length > 0 && (
+        <Stack direction="row" spacing={1} mt={1} sx={{ overflowX: "auto" }}>
+          {Object.entries(selectedFilters).map(([apiField, value]) => (
+            <Chip
+              key={apiField}
+              label={`${reverseMapping[apiField] || apiField}: ${value}`}
+              onDelete={() => handleDeleteFilter(apiField)}
+              color="primary"
+              variant="filled"
+              size="small"
+            />
+          ))}
+        </Stack>
+      )}
 
       {/* El componente Menu se renderiza para el filtro activo */}
       <Menu
