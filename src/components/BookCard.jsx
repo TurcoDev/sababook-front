@@ -102,13 +102,14 @@ export default function BookCard({
           display: "flex",
           flexDirection: "column",
           height: "100%",
+        
         }}
       >
         <Box
           sx={{
             px: HORIZONTAL_PADDING,
-            pt: 1,
             pb: 1,
+            pt: featured ? 4 : 6,
           }}
         >
           <Typography
@@ -120,12 +121,14 @@ export default function BookCard({
           </Typography>
 
           {autor && (
-            <Typography variant="body2" color="text.secondary" sx={{ mb: 0.5 }}>
+            <Typography
+              variant={featured ? "body1" : "body2"}
+              color="text.secondary" sx={{ mb: 0.5 }}>
               <b>Autor:</b> {autor}
             </Typography>
           )}
           {gender && (
-            <Typography variant="body2" color="text.secondary" sx={{ mb: 0.5 }}>
+            <Typography variant={featured ? "body1" : "body2"} color="text.secondary" sx={{ mb: 0.5 }}>
               <b>Género:</b> {gender}
             </Typography>
           )}

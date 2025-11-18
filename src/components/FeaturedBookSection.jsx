@@ -14,9 +14,11 @@ export default function FeaturedBookSection({ featuredBook, handleFavoriteToggle
 
       <Box display="flex" justifyContent="left" mt={2} mb={3}>
         <BookCard
-          // featured
+          featured={true}
           image={featuredBook.portada_url}
           title={featuredBook.titulo}
+          autor={featuredBook.autor}
+          gender={featuredBook.genero}
           rating={featuredBook.calificacion_promedio || featuredBook.rating}
           isFavorite={isFavorite}
           onFavoriteToggle={() =>
