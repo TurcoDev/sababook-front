@@ -59,24 +59,24 @@ const ActionButton = styled(IconButton)(({ theme }) => ({
 const BookCommentsAdmin = () => {
   const { bookId } = useParams();
   const navigate = useNavigate();
-  
+
   // Estados principales
   const [bookInfo, setBookInfo] = useState(null);
   const [comments, setComments] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  
+
   // Estados para edición
   const [editingCommentId, setEditingCommentId] = useState(null);
   const [editedComment, setEditedComment] = useState({ comentario: '', calificacion: 0 });
-  
+
   // Estados para eliminación
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [commentToDelete, setCommentToDelete] = useState(null);
-  
+
   // Estados para notificaciones
   const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' });
-  
+
   // Estados de loading para operaciones
   const [isDeleting, setIsDeleting] = useState(false);
   const [isUpdating, setIsUpdating] = useState(false);
@@ -96,7 +96,7 @@ const BookCommentsAdmin = () => {
       const bookRes = await fetch(`${API_BASE_URL}/api/v1/libros/${bookId}`, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
-      
+
       if (!bookRes.ok) throw new Error('Error al cargar el libro');
       const bookData = await bookRes.json();
       setBookInfo(bookData);
@@ -105,7 +105,7 @@ const BookCommentsAdmin = () => {
       const commentsRes = await fetch(`${API_BASE_URL}/api/v1/opinion/libro/${bookId}`, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
-      
+
       if (!commentsRes.ok) throw new Error('Error al cargar los comentarios');
       const commentsData = await commentsRes.json();
       setComments(commentsData);
@@ -172,7 +172,7 @@ const BookCommentsAdmin = () => {
   // Confirmar eliminación
   const handleConfirmDelete = async () => {
     if (!commentToDelete) return;
-    
+
     setIsDeleting(true);
     const token = localStorage.getItem('token');
 
