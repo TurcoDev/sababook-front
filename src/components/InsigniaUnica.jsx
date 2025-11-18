@@ -6,21 +6,24 @@ import StarIcon from '@mui/icons-material/Star'; // Ícono de ejemplo
 // Importar los GIFs
 import lapizGif from '../assets/lapiz.gif';
 import chatGif from '../assets/chat.gif';
+import githubGif from '../assets/github.gif';
+import globosGif from '../assets/globos.gif';
 
 const InsigniaUnica = ({ insignia }) => {
   // icono según tipo_accion
   const getIcon = (tipo) => {
     switch (tipo) {
-      case 'participar':
-        return <img src={lapizGif} alt="Participar" style={{ width: 40, height: 40 }} />; // GIF de lápiz
-      case 'comentar':
-        return <img src={chatGif} alt="Comentar" style={{ width: 40, height: 40 }} />; // GIF de chat
-
-        // TODO: Estas de aca abajo no se usan
-      // case 'leer':
-      //   return '📚'; // Leer libros
-      // case 'descubrir':
-      //   return '🔥'; // Descubrir novedades
+      // Comentador --> al menos  libro
+      case 'Comentador':
+        return <img src={lapizGif} alt="Opinar" style={{ width: 40, height: 40 }} />; // GIF de lápiz para opiniones
+      // Opinador --> comento en un foro
+        case 'Opinador':
+        return <img src={chatGif} alt="Foro" style={{ width: 40, height: 40 }} />; // GIF de chat para foros
+      // mas de 10 foros
+        case 'Debatiente':
+        return <img src={githubGif} alt="Lectura" style={{ width: 40, height: 40 }} />; // GIF de github para lectura
+      case 'Comentador Activo':
+        return <img src={globosGif} alt="Club" style={{ width: 40, height: 40 }} />; // GIF de globos para clubes
       default:
         return <StarIcon />;
     }
@@ -43,7 +46,7 @@ const InsigniaUnica = ({ insignia }) => {
     >
       {/* Ícono de la Insignia */}
       <Avatar sx={{ bgcolor: 'transparent', color: 'text.primary', width: 40, height: 40, fontSize: '1.5rem', mb: 1 }}>
-        {getIcon(insignia.tipo_accion)}
+        {getIcon(insignia.nombre)}
       </Avatar>
       {/* Nombre de la Insignia */}
       <Typography variant="body2" fontWeight="medium" textAlign="center" sx={{ mb: 0.5 }}>
