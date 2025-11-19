@@ -139,13 +139,13 @@ const Profile = () => {
           </StyledButton>
 
           
-          <StyledButton
+        {/*  <StyledButton
             variant="contained"
             onClick={handleMyCommentsClick} 
             fullWidth
           >
             Mis Comentarios
-          </StyledButton>
+          </StyledButton>*/}
         </Box>
       </>
     );
