@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
     Box, 
     Typography, 
@@ -91,13 +91,30 @@ export default function MyComments() {
     const navigate = useNavigate(); 
     const [menuOpen, setMenuOpen] = useState(false);
     const [comments, setComments] = useState(INITIAL_COMMENT_DATA);
+    const [filteredComments, setFilteredComments] = useState(INITIAL_COMMENT_DATA);
     
     // Estado para el diálogo de eliminación
     const [dialogOpen, setDialogOpen] = useState(false);
-    const [commentToDelete, setCommentToDelete] = useState(null); 
-    const [commentTitle, setCommentTitle] = useState(''); 
+    const [commentToDelete, setCommentToDelete] = useState(null);
+    const [commentTitle, setCommentTitle] = useState('');
 
-    const handleSearch = (query) => console.log("Buscando comentarios:", query);
+    // Sincronizar filteredComments con comments
+    useEffect(() => {
+        setFilteredComments(comments);
+    }, [comments]);
+
+    const handleSearch = (query) => {
+        if (!query.trim()) {
+            setFilteredComments(comments);
+            return;
+        }
+        const normalizedQuery = query.toLowerCase();
+        const filtered = comments.filter(comment =>
+            comment.title.toLowerCase().includes(normalizedQuery) ||
+            comment.author.toLowerCase().includes(normalizedQuery)
+        );
+        setFilteredComments(filtered);
+    };
 
     // --- MANEJO DE ACCIONES ---
 
@@ -174,19 +191,25 @@ export default function MyComments() {
 
             {/* Lista de Comentarios */}
             <Box sx={{ bgcolor: '#ffffff', borderRadius: 2, boxShadow: '0 3px 10px rgba(0,0,0,0.08)' }}>
-                {comments.map(item => (
-                    <CommentItem 
-                        key={item.id} 
-                        id={item.id} // Pasar el ID
-                        title={item.title} 
-                        author={item.author} 
-                        image={item.image} 
-                        // 👈 PASAR LAS FUNCIONES DE MANEJO
-                        onView={handleViewComment} 
-                        onEdit={handleEditComment} 
-                        onDelete={handleDeleteClick} 
-                    />
-                ))}
+                {filteredComments.length === 0 ? (
+                    <Typography variant="body1" color="text.secondary" sx={{ p: 2, textAlign: 'center' }}>
+                        No se encontraron comentarios que coincidan con la búsqueda.
+                    </Typography>
+                ) : (
+                    filteredComments.map(item => (
+                        <CommentItem
+                            key={item.id}
+                            id={item.id} // Pasar el ID
+                            title={item.title}
+                            author={item.author}
+                            image={item.image}
+                            // 👈 PASAR LAS FUNCIONES DE MANEJO
+                            onView={handleViewComment}
+                            onEdit={handleEditComment}
+                            onDelete={handleDeleteClick}
+                        />
+                    ))
+                )}
             </Box>
 
             {/* ------------------------------------------- */}
