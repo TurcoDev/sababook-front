@@ -14,6 +14,7 @@ import Comments from "./pages/Comments";
 import Insignias from "./pages/Insignias";
 import ForumDetailsPage from "./pages/ForumDetailsPage";
 import BookCommentsAdmin from "./components/BookCommentsAdmin";
+import ForumCommentsAdmin from "./components/ForumCommentsAdmin";
 
 // Importación de Ruta Protegida
 import { ProtectedRoute } from "./components/ProtectedRoute";
@@ -74,6 +75,7 @@ function App() {
           </ProtectedRoute>
         }
       />
+      <Route path="/dashboard/forum-comments/:foroId" element={<ForumCommentsAdmin />} />
 
       {/* Ruta principal de administración */}
       <Route path="/dashboard" element={

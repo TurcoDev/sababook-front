@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { API_BASE_URL } from '../environments/api';
+import { useNavigate } from 'react-router-dom';
 import {
   Box,
   Typography,
@@ -55,7 +56,8 @@ const ActionButton = styled(IconButton)(({ theme }) => ({
   },
 }));
 
-  const ForumTable = ({ forums, loading, error, onForumUpdate, onForumClick, onDeleteForum, onEditForum }) => {
+
+const ForumTable = ({ forums, loading, error, onForumUpdate, onForumClick, onDeleteForum, onEditForum }) => {
   const theme = useTheme();
   const [page, setPage] = useState(1);
   const pageCount = Math.ceil(forums.length / ROWS_PER_PAGE);
@@ -66,7 +68,11 @@ const ActionButton = styled(IconButton)(({ theme }) => ({
     setPage(newPage);
   };
 
-  
+  const navigate = useNavigate();
+
+  const handleRowClick = (foroId) => {
+    navigate(`/dashboard/forum-comments/${foroId}`);
+  };
 
   if (loading) return <Typography sx={{ padding: 3 }}>Cargando foros...</Typography>;
 
@@ -98,21 +104,22 @@ const ActionButton = styled(IconButton)(({ theme }) => ({
               <TableRow
                 hover
                 key={row.foro_id}
-                onClick={() => onForumClick && onForumClick(row.foro_id)}
+                onClick={() => handleRowClick(row.foro_id)}
                 sx={{ cursor: "pointer" }}
               >
+
 
                 {columns.map((column) => {
                   if (column.id === 'editar') {
                     return (
                       <TableCell key={column.id} align="center">
                         <Box sx={{ display: 'flex', gap: 1, justifyContent: 'center' }}>
-                        <ActionButton 
-                              onClick={(e) => {
-                                  e.stopPropagation(); 
-                                  onEditForum(row);
-                              }} 
-                              title="Editar"
+                          <ActionButton
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              onEditForum(row);
+                            }}
+                            title="Editar"
                           >
                             <EditIcon sx={{ fontSize: '1.1rem' }} />
                           </ActionButton>
